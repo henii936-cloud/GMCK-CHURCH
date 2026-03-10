@@ -7,13 +7,14 @@ import {
   CalendarCheck, 
   CalendarDays, 
   LogOut,
-  Church
+  Church,
+  RefreshCw
 } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import { cn } from '../lib/utils';
 
 export function Sidebar() {
-  const { profile, signOut } = useAuth();
+  const { profile, signOut, setSelectedGroupId } = useAuth();
   const isAdmin = profile?.role === 'admin';
 
   const navItems = [
@@ -67,6 +68,15 @@ export function Sidebar() {
             <p className="text-xs text-slate-500 capitalize">{profile?.role}</p>
           </div>
         </div>
+        {!isAdmin && (
+          <button 
+            onClick={() => setSelectedGroupId(null)}
+            className="w-full flex items-center gap-3 px-3 py-2 mb-2 text-sm font-medium text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors"
+          >
+            <RefreshCw size={20} />
+            Switch Group
+          </button>
+        )}
         <button 
           onClick={() => signOut()}
           className="w-full flex items-center gap-3 px-3 py-2 text-sm font-medium text-slate-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"

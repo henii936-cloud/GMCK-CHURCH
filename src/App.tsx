@@ -16,11 +16,18 @@ import { useAuth } from './hooks/useAuth';
 // Placeholder components for other pages
 const Programs = () => <div className="p-4 bg-white rounded-2xl border border-slate-200 shadow-sm"><h1 className="text-2xl font-bold mb-4">Church Programs</h1><p className="text-slate-500 italic">Feature coming soon: Event scheduling and calendar view.</p></div>;
 
+import { GroupSelection } from './components/GroupSelection';
+
 function AppRoutes() {
-  const { configRequired } = useAuth();
+  const { configRequired, profile, selectedGroupId } = useAuth();
 
   if (configRequired) {
     return <ConfigRequired />;
+  }
+
+  // If leader is logged in but hasn't selected a group, show group selection
+  if (profile?.role === 'leader' && !selectedGroupId) {
+    return <GroupSelection />;
   }
 
   return (

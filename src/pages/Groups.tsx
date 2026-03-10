@@ -17,10 +17,11 @@ import {
 import { cn } from '../lib/utils';
 
 export function Groups() {
-  const { profile } = useAuth();
+  const { profile, selectedGroupId } = useAuth();
   const [groups, setGroups] = useState<any[]>([]);
   const [leaders, setLeaders] = useState<any[]>([]);
   const [allMembers, setAllMembers] = useState<any[]>([]);
+  const [groupMemberships, setGroupMemberships] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showManageMembersModal, setShowManageMembersModal] = useState<string | null>(null);
@@ -36,7 +37,7 @@ export function Groups() {
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [selectedGroupId]);
 
   async function fetchData() {
     setLoading(true);
@@ -44,46 +45,67 @@ export function Groups() {
     
     if (!supabase) {
       // Mock data
-      setGroups([
-        { id: 'g1', name: 'Youth Bible Study', leader_id: 'l1', leader_name: 'Pastor Samuel', location: 'Church Hall B', member_count: 12 },
-        { id: 'g2', name: 'Men\'s Fellowship', leader_id: 'l2', leader_name: 'Elder John', location: 'Main Sanctuary', member_count: 8 },
-        { id: 'g3', name: 'Women\'s Prayer Group', leader_id: 'l3', leader_name: 'Sister Mary', location: 'Room 104', member_count: 15 },
+      const mockGroups = [
+        { id: 'g1', name: 'Youth Bible Study', leader_id: 'm1', leader_name: 'John Doe', location: 'Church Hall B', member_count: 2 },
+        { id: 'g2', name: 'Men\'s Fellowship', leader_id: 'm3', leader_name: 'Robert Brown', location: 'Main Sanctuary', member_count: 1 },
+        { id: 'g3', name: 'Women\'s Prayer Group', leader_id: 'm2', leader_name: 'Jane Smith', location: 'Room 104', member_count: 1 },
+      ];
+
+      if (!isAdmin && selectedGroupId) {
+        setGroups(mockGroups.filter(g => g.id === selectedGroupId));
+      } else {
+        setGroups(mockGroups);
+      }
+      setAllMembers([
+        { id: 'm1', full_name: 'John Doe' },
+        { id: 'm2', full_name: 'Jane Smith' },
+        { id: 'm3', full_name: 'Robert Brown' },
+        { id: 'm4', full_name: 'Sarah Wilson' },
+        { id: 'm5', full_name: 'Michael Gebre' },
+      ]);
+      setGroupMemberships([
+        { group_id: 'g1', member_id: 'm1' },
+        { group_id: 'g1', member_id: 'm2' },
+        { group_id: 'g2', member_id: 'm3' },
+        { group_id: 'g3', member_id: 'm2' }, // Note: In many-to-many, a member can be in multiple groups
       ]);
       setLeaders([
-        { id: 'l1', full_name: 'Pastor Samuel' },
-        { id: 'l2', full_name: 'Elder John' },
-        { id: 'l3', full_name: 'Sister Mary' },
-      ]);
-      setAllMembers([
-        { id: 'm1', full_name: 'John Doe', group_id: 'g1' },
-        { id: 'm2', full_name: 'Jane Smith', group_id: 'g1' },
-        { id: 'm3', full_name: 'Robert Brown', group_id: 'g2' },
-        { id: 'm4', full_name: 'Sarah Wilson', group_id: null },
-        { id: 'm5', full_name: 'Michael Gebre', group_id: null },
+        { id: 'm1', full_name: 'John Doe' },
+        { id: 'm2', full_name: 'Jane Smith' },
+        { id: 'm3', full_name: 'Robert Brown' },
       ]);
       setLoading(false);
       return;
     }
 
     try {
-      const [groupsRes, leadersRes, membersRes] = await Promise.all([
-        supabase.from('bible_study_groups').select('*, leader:profiles(full_name)'),
-        supabase.from('profiles').select('id, full_name').eq('role', 'leader'),
-        supabase.from('members').select('id, full_name, group_id')
+      let groupsQuery = supabase.from('bible_study_groups').select('*, leader:members(full_name)');
+      
+      if (!isAdmin && selectedGroupId) {
+        groupsQuery = groupsQuery.eq('id', selectedGroupId);
+      }
+
+      const [groupsRes, membersRes, groupMembersRes] = await Promise.all([
+        groupsQuery,
+        supabase.from('members').select('id, full_name'),
+        supabase.from('bible_study_members').select('*')
       ]);
 
       if (groupsRes.error) throw groupsRes.error;
       
+      const memberships = groupMembersRes.data || [];
+      setGroupMemberships(memberships);
+
       // Transform groups to include leader name and member count
       const transformedGroups = groupsRes.data.map(g => ({
         ...g,
         leader_name: g.leader?.full_name || 'Unassigned',
-        member_count: membersRes.data?.filter(m => m.group_id === g.id).length || 0
+        member_count: memberships.filter(m => m.group_id === g.id).length || 0
       }));
 
       setGroups(transformedGroups);
-      setLeaders(leadersRes.data || []);
       setAllMembers(membersRes.data || []);
+      setLeaders(membersRes.data || []); // Use all members as potential leaders
     } catch (err) {
       console.error('Error fetching groups data:', err);
     } finally {
@@ -96,12 +118,18 @@ export function Groups() {
     setSubmitting(true);
     const supabase = getSupabase();
 
+    console.log('Attempting to create group:', {
+      name: newGroupName,
+      leader_id: newGroupLeader || null,
+      location: newGroupLocation
+    });
+
     if (!supabase) {
       const newGroup = {
         id: Math.random().toString(36).substr(2, 9),
         name: newGroupName,
         leader_id: newGroupLeader,
-        leader_name: leaders.find(l => l.id === newGroupLeader)?.full_name || 'Unassigned',
+        leader_name: allMembers.find(m => m.id === newGroupLeader)?.full_name || 'Unassigned',
         location: newGroupLocation,
         member_count: 0
       };
@@ -124,13 +152,28 @@ export function Groups() {
         .single();
 
       if (error) throw error;
+
+      // If a leader was assigned, add them to the group members table as well
+      if (newGroupLeader && data) {
+        const { error: memberError } = await supabase
+          .from('bible_study_members')
+          .insert([{ group_id: data.id, member_id: newGroupLeader }]);
+        
+        if (memberError) {
+          console.error('Error adding leader as member:', memberError);
+          // We don't necessarily want to fail the whole group creation if just the member link fails,
+          // but for consistency we'll throw here to let the user know something went wrong.
+          throw memberError;
+        }
+      }
       
       fetchData(); // Refresh list
       setShowCreateModal(false);
       resetForm();
-    } catch (err) {
+      alert('Group created successfully!');
+    } catch (err: any) {
       console.error('Error creating group:', err);
-      alert('Failed to create group.');
+      alert(`Failed to create group: ${err.message || 'Unknown error'}`);
     } finally {
       setSubmitting(false);
     }
@@ -139,16 +182,15 @@ export function Groups() {
   async function handleAddMemberToGroup(memberId: string, groupId: string) {
     const supabase = getSupabase();
     if (!supabase) {
-      setAllMembers(allMembers.map(m => m.id === memberId ? { ...m, group_id: groupId } : m));
+      setGroupMemberships([...groupMemberships, { member_id: memberId, group_id: groupId }]);
       setGroups(groups.map(g => g.id === groupId ? { ...g, member_count: g.member_count + 1 } : g));
       return;
     }
 
     try {
       const { error } = await supabase
-        .from('members')
-        .update({ group_id: groupId })
-        .eq('id', memberId);
+        .from('bible_study_members')
+        .insert([{ member_id: memberId, group_id: groupId }]);
 
       if (error) throw error;
       fetchData();
@@ -157,22 +199,19 @@ export function Groups() {
     }
   }
 
-  async function handleRemoveMemberFromGroup(memberId: string) {
+  async function handleRemoveMemberFromGroup(memberId: string, groupId: string) {
     const supabase = getSupabase();
     if (!supabase) {
-      const member = allMembers.find(m => m.id === memberId);
-      if (member?.group_id) {
-        setGroups(groups.map(g => g.id === member.group_id ? { ...g, member_count: g.member_count - 1 } : g));
-      }
-      setAllMembers(allMembers.map(m => m.id === memberId ? { ...m, group_id: null } : m));
+      setGroupMemberships(groupMemberships.filter(m => !(m.member_id === memberId && m.group_id === groupId)));
+      setGroups(groups.map(g => g.id === groupId ? { ...g, member_count: g.member_count - 1 } : g));
       return;
     }
 
     try {
       const { error } = await supabase
-        .from('members')
-        .update({ group_id: null })
-        .eq('id', memberId);
+        .from('bible_study_members')
+        .delete()
+        .match({ member_id: memberId, group_id: groupId });
 
       if (error) throw error;
       fetchData();
@@ -192,8 +231,12 @@ export function Groups() {
     g.leader_name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const currentGroupMembers = allMembers.filter(m => m.group_id === showManageMembersModal);
-  const unassignedMembers = allMembers.filter(m => !m.group_id);
+  const currentGroupMembers = allMembers.filter(m => 
+    groupMemberships.some(gm => gm.group_id === showManageMembersModal && gm.member_id === m.id)
+  );
+  const unassignedMembers = allMembers.filter(m => 
+    !groupMemberships.some(gm => gm.member_id === m.id)
+  );
 
   return (
     <div className="space-y-6">
@@ -304,17 +347,20 @@ export function Groups() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-bold text-slate-700 mb-1">Assign Leader</label>
+                <label className="block text-sm font-bold text-slate-700 mb-1">Assign Leader (Select from Members)</label>
                 <select 
                   value={newGroupLeader}
                   onChange={(e) => setNewGroupLeader(e.target.value)}
                   className="w-full px-4 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none transition-all"
                 >
-                  <option value="">Select a leader...</option>
-                  {leaders.map(leader => (
-                    <option key={leader.id} value={leader.id}>{leader.full_name}</option>
+                  <option value="">Select a member as leader...</option>
+                  {allMembers.map(member => (
+                    <option key={member.id} value={member.id}>{member.full_name}</option>
                   ))}
                 </select>
+                {allMembers.length === 0 && (
+                  <p className="text-xs text-amber-600 mt-1 font-medium">No members found. Add members in the Members section first.</p>
+                )}
               </div>
               <div>
                 <label className="block text-sm font-bold text-slate-700 mb-1">Location</label>
@@ -337,7 +383,7 @@ export function Groups() {
                 <button 
                   type="submit"
                   disabled={submitting}
-                  className="flex-1 py-2.5 text-sm font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl transition-colors flex items-center justify-center gap-2"
+                  className="flex-1 py-2.5 text-sm font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl transition-all flex items-center justify-center gap-2 shadow-lg shadow-emerald-100 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {submitting ? <Loader2 className="animate-spin" size={18} /> : <Check size={18} />}
                   Create Group
@@ -375,7 +421,7 @@ export function Groups() {
                       <span className="text-sm font-medium text-slate-700">{member.full_name}</span>
                       {isAdmin && (
                         <button 
-                          onClick={() => handleRemoveMemberFromGroup(member.id)}
+                          onClick={() => handleRemoveMemberFromGroup(member.id, showManageMembersModal!)}
                           className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"
                         >
                           <Trash2 size={16} />

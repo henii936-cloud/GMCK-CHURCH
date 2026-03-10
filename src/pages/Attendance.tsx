@@ -16,7 +16,7 @@ import {
 import { cn, formatDate } from '../lib/utils';
 
 export function Attendance() {
-  const { profile } = useAuth();
+  const { profile, selectedGroupId: authSelectedGroupId } = useAuth();
   const [groups, setGroups] = useState<any[]>([]);
   const [selectedGroupId, setSelectedGroupId] = useState<string>('');
   const [members, setMembers] = useState<any[]>([]);
@@ -31,7 +31,7 @@ export function Attendance() {
 
   useEffect(() => {
     fetchGroups();
-  }, []);
+  }, [authSelectedGroupId]);
 
   useEffect(() => {
     if (selectedGroupId) {
@@ -95,11 +95,14 @@ export function Attendance() {
         { id: 'g2', name: 'Men\'s Fellowship', leader_id: 'l2' },
         { id: 'g3', name: 'Women\'s Prayer Group', leader_id: 'l3' },
       ];
-      setGroups(mockGroups);
-      if (profile?.group_id) {
-        setSelectedGroupId(profile.group_id);
-      } else if (mockGroups.length > 0) {
-        setSelectedGroupId(mockGroups[0].id);
+      
+      if (!isAdmin && authSelectedGroupId) {
+        const filtered = mockGroups.filter(g => g.id === authSelectedGroupId);
+        setGroups(filtered);
+        setSelectedGroupId(authSelectedGroupId);
+      } else {
+        setGroups(mockGroups);
+        if (mockGroups.length > 0) setSelectedGroupId(mockGroups[0].id);
       }
       setLoading(false);
       return;
@@ -107,16 +110,16 @@ export function Attendance() {
 
     try {
       let query = supabase.from('bible_study_groups').select('*');
-      if (!isAdmin && profile?.group_id) {
-        query = query.eq('id', profile.group_id);
+      if (!isAdmin && authSelectedGroupId) {
+        query = query.eq('id', authSelectedGroupId);
       }
       
       const { data, error } = await query;
       if (error) throw error;
       
       setGroups(data || []);
-      if (profile?.group_id) {
-        setSelectedGroupId(profile.group_id);
+      if (!isAdmin && authSelectedGroupId) {
+        setSelectedGroupId(authSelectedGroupId);
       } else if (data && data.length > 0) {
         setSelectedGroupId(data[0].id);
       }
@@ -145,12 +148,25 @@ export function Attendance() {
     }
 
     try {
-      // Assuming members have a group_id or there's a junction table
-      // For this implementation, we'll try to fetch from 'members' where group_id matches
+      // Fetch members via the junction table
+      const { data: groupMembers, error: gmError } = await supabase
+        .from('bible_study_members')
+        .select('member_id')
+        .eq('group_id', groupId);
+      
+      if (gmError) throw gmError;
+      
+      const memberIds = groupMembers.map(gm => gm.member_id);
+      
+      if (memberIds.length === 0) {
+        setMembers([]);
+        return;
+      }
+
       const { data, error } = await supabase
         .from('members')
         .select('*')
-        .eq('group_id', groupId);
+        .in('id', memberIds);
 
       if (error) throw error;
       setMembers(data || []);

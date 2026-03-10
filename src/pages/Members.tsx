@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { getSupabase } from '../lib/supabase';
+import { useAuth } from '../hooks/useAuth';
 import { 
   Search, 
   Plus, 
@@ -20,12 +21,15 @@ import { formatDate } from '../lib/utils';
 import { motion, AnimatePresence } from 'motion/react';
 
 export function Members() {
+  const { profile, selectedGroupId } = useAuth();
   const [members, setMembers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [showAddModal, setShowAddModal] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [toast, setToast] = useState<{ message: string, type: 'success' | 'error' } | null>(null);
+
+  const isAdmin = profile?.role === 'admin';
 
   // Form states
   const [formData, setFormData] = useState({
@@ -35,12 +39,13 @@ export function Members() {
     email: '',
     phone_number: '',
     ministry: '',
+    team: '',
     membership_status: 'Active'
   });
 
   useEffect(() => {
     fetchMembers();
-  }, []);
+  }, [selectedGroupId]);
 
   useEffect(() => {
     if (toast) {
@@ -55,31 +60,46 @@ export function Members() {
     
     if (!supabase) {
       // Mock data for demo
-      setMembers([
-        { id: '1', full_name: 'John Doe', gender: 'Male', marital_status: 'Married', email: 'john@example.com', phone_number: '+251 911 223344', ministry: 'Choir', membership_status: 'Active' },
-        { id: '2', full_name: 'Jane Smith', gender: 'Female', marital_status: 'Single', email: 'jane@example.com', phone_number: '+251 922 334455', ministry: 'Youth', membership_status: 'Active' },
-        { id: '3', full_name: 'Robert Brown', gender: 'Male', marital_status: 'Widowed', email: 'robert@example.com', phone_number: '+251 933 445566', ministry: 'Prayer Team', membership_status: 'Inactive' },
-        { id: '4', full_name: 'Sarah Wilson', gender: 'Female', marital_status: 'Married', email: 'sarah@example.com', phone_number: '+251 944 556677', ministry: 'Evangelism', membership_status: 'Active' },
-        { id: '5', full_name: 'Michael Gebre', gender: 'Male', marital_status: 'Single', email: 'michael@example.com', phone_number: '+251 955 667788', ministry: 'Youth', membership_status: 'Active' },
-      ]);
+      const mockMembers = [
+        { id: '1', full_name: 'John Doe', gender: 'Male', marital_status: 'Married', email: 'john@example.com', phone_number: '+251 911 223344', ministry: 'Choir', team: 'Vocals', membership_status: 'Active' },
+        { id: '2', full_name: 'Jane Smith', gender: 'Female', marital_status: 'Single', email: 'jane@example.com', phone_number: '+251 922 334455', ministry: 'Youth', team: 'Media', membership_status: 'Active' },
+        { id: '3', full_name: 'Robert Brown', gender: 'Male', marital_status: 'Widowed', email: 'robert@example.com', phone_number: '+251 933 445566', ministry: 'Prayer Team', team: 'Intercession', membership_status: 'Inactive' },
+        { id: '4', full_name: 'Sarah Wilson', gender: 'Female', marital_status: 'Married', email: 'sarah@example.com', phone_number: '+251 944 556677', ministry: 'Evangelism', team: 'Outreach', membership_status: 'Active' },
+        { id: '5', full_name: 'Michael Gebre', gender: 'Male', marital_status: 'Single', email: 'michael@example.com', phone_number: '+251 955 667788', ministry: 'Youth', team: 'Ushering', membership_status: 'Active' },
+      ];
+      
+      if (!isAdmin && selectedGroupId) {
+        // Mock filtering: just return a subset for leaders
+        setMembers(mockMembers.slice(0, 3));
+      } else {
+        setMembers(mockMembers);
+      }
       setLoading(false);
       return;
     }
 
     try {
-      const { data, error } = await supabase
-        .from('members')
-        .select('*')
-        .order('full_name');
+      let query = supabase.from('members').select('*');
+
+      if (!isAdmin && selectedGroupId) {
+        // For leaders, only show members of their selected group
+        const { data: groupMemberIds, error: gmError } = await supabase
+          .from('bible_study_members')
+          .select('member_id')
+          .eq('group_id', selectedGroupId);
+        
+        if (gmError) throw gmError;
+        
+        const ids = groupMemberIds.map(gm => gm.member_id);
+        query = query.in('id', ids);
+      }
+
+      const { data, error } = await query.order('full_name');
 
       if (error) throw error;
       setMembers(data || []);
     } catch (err) {
-      // Fallback for demo if query fails
-      setMembers([
-        { id: '1', full_name: 'John Doe', gender: 'Male', marital_status: 'Married', email: 'john@example.com', phone_number: '+251 911 223344', ministry: 'Choir', membership_status: 'Active' },
-        { id: '2', full_name: 'Jane Smith', gender: 'Female', marital_status: 'Single', email: 'jane@example.com', phone_number: '+251 922 334455', ministry: 'Youth', membership_status: 'Active' },
-      ]);
+      console.error('Error fetching members:', err);
     } finally {
       setLoading(false);
     }
@@ -137,6 +157,7 @@ export function Members() {
       email: '',
       phone_number: '',
       ministry: '',
+      team: '',
       membership_status: 'Active'
     });
   }
@@ -191,7 +212,7 @@ export function Members() {
               <tr className="bg-slate-50/50 border-b border-slate-100">
                 <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Member</th>
                 <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Contact</th>
-                <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Ministry</th>
+                <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Ministry & Team</th>
                 <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Status</th>
                 <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider text-right">Actions</th>
               </tr>
@@ -239,9 +260,16 @@ export function Members() {
                       </div>
                     </td>
                     <td className="px-6 py-4">
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-800">
-                        {member.ministry || 'Unassigned'}
-                      </span>
+                      <div className="flex flex-col gap-1">
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-800 w-fit">
+                          {member.ministry || 'No Ministry'}
+                        </span>
+                        {member.team && (
+                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 w-fit">
+                            {member.team}
+                          </span>
+                        )}
+                      </div>
                     </td>
                     <td className="px-6 py-4">
                       <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
@@ -376,6 +404,19 @@ export function Members() {
                     value={formData.ministry}
                     onChange={(e) => setFormData({...formData, ministry: e.target.value})}
                     placeholder="e.g., Youth, Choir"
+                    className="w-full px-4 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none transition-all bg-slate-50/30"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-bold text-slate-700 mb-1">
+                    Team <span className="text-xs font-normal text-slate-400">(Optional)</span>
+                  </label>
+                  <input 
+                    type="text" 
+                    value={formData.team}
+                    onChange={(e) => setFormData({...formData, team: e.target.value})}
+                    placeholder="e.g., Media, Ushering"
                     className="w-full px-4 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none transition-all bg-slate-50/30"
                   />
                 </div>

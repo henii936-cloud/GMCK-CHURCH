@@ -33,7 +33,7 @@ const data = [
 ];
 
 export function Dashboard() {
-  const { profile } = useAuth();
+  const { profile, selectedGroupId } = useAuth();
   const [stats, setStats] = useState({
     totalMembers: 0,
     totalGroups: 0,
@@ -48,19 +48,32 @@ export function Dashboard() {
 
       if (!supabase) {
         setStats({
-          totalMembers: 1250,
-          totalGroups: 42,
+          totalMembers: isAdmin ? 1250 : 25,
+          totalGroups: isAdmin ? 42 : 1,
           totalPrograms: isAdmin ? 8 : 0,
-          weeklyAttendance: 840
+          weeklyAttendance: isAdmin ? 840 : 22
         });
         return;
       }
 
       try {
-        const queries: any[] = [
-          supabase.from('members').select('id', { count: 'exact' }),
-          supabase.from('bible_study_groups').select('id', { count: 'exact' }),
-        ];
+        let membersQuery: any = supabase.from('members').select('id', { count: 'exact' });
+        let groupsQuery: any = supabase.from('bible_study_groups').select('id', { count: 'exact' });
+
+        if (!isAdmin && selectedGroupId) {
+          // For leaders, only count members in their selected group
+          membersQuery = supabase
+            .from('bible_study_members')
+            .select('member_id', { count: 'exact' })
+            .eq('group_id', selectedGroupId);
+          
+          groupsQuery = supabase
+            .from('bible_study_groups')
+            .select('id', { count: 'exact' })
+            .eq('id', selectedGroupId);
+        }
+
+        const queries: any[] = [membersQuery, groupsQuery];
 
         if (isAdmin) {
           queries.push(supabase.from('programs').select('id', { count: 'exact' }));
@@ -75,20 +88,14 @@ export function Dashboard() {
           totalMembers: members.count || 0,
           totalGroups: groups.count || 0,
           totalPrograms: programs.count || 0,
-          weeklyAttendance: 450 // Mock for now
+          weeklyAttendance: isAdmin ? 450 : 18 // Mock for now
         });
       } catch (err) {
-        // Fallback for demo
-        setStats({
-          totalMembers: 1250,
-          totalGroups: 42,
-          totalPrograms: isAdmin ? 8 : 0,
-          weeklyAttendance: 840
-        });
+        console.error('Error fetching stats:', err);
       }
     }
     fetchStats();
-  }, [profile?.role]);
+  }, [profile?.role, selectedGroupId]);
 
   const isAdmin = profile?.role === 'admin';
 

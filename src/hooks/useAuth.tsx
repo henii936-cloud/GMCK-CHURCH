@@ -7,6 +7,8 @@ interface AuthContextType {
   profile: Profile | null;
   loading: boolean;
   configRequired: boolean;
+  selectedGroupId: string | null;
+  setSelectedGroupId: (id: string | null) => void;
   loginAsDemo: (role: 'admin' | 'leader') => void;
   signOut: () => Promise<void>;
 }
@@ -18,6 +20,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
   const [configRequired, setConfigRequired] = useState(false);
+  const [selectedGroupId, setSelectedGroupIdState] = useState<string | null>(localStorage.getItem('selected_group_id'));
+
+  const setSelectedGroupId = (id: string | null) => {
+    if (id) localStorage.setItem('selected_group_id', id);
+    else localStorage.removeItem('selected_group_id');
+    setSelectedGroupIdState(id);
+  };
 
   const supabase = getSupabase();
 
@@ -91,7 +100,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, profile, loading, configRequired, loginAsDemo, signOut }}>
+    <AuthContext.Provider value={{ user, profile, loading, configRequired, selectedGroupId, setSelectedGroupId, loginAsDemo, signOut }}>
       {children}
     </AuthContext.Provider>
   );

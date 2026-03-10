@@ -31,21 +31,21 @@ export function ConfigRequired() {
         </div>
 
         <div className="mb-8">
-          <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Or Explore the UI</p>
-          <div className="grid grid-cols-2 gap-4">
+          <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Quick Start</p>
+          <div className="space-y-3">
             <button 
               onClick={() => loginAsDemo('admin')}
-              className="flex flex-col items-center gap-2 p-3 rounded-xl border border-slate-200 hover:border-emerald-500 hover:bg-emerald-50 transition-all group"
+              className="w-full flex items-center justify-center gap-3 p-4 rounded-2xl border border-slate-200 bg-white hover:border-emerald-500 hover:bg-emerald-50 transition-all group shadow-sm"
             >
-              <ShieldCheck className="text-slate-400 group-hover:text-emerald-600" size={24} />
-              <span className="text-xs font-bold text-slate-600 group-hover:text-emerald-700">Admin Demo</span>
+              <ShieldCheck className="text-emerald-600" size={24} />
+              <span className="font-bold text-slate-700 group-hover:text-emerald-700">Login as Admin</span>
             </button>
             <button 
               onClick={() => loginAsDemo('leader')}
-              className="flex flex-col items-center gap-2 p-3 rounded-xl border border-slate-200 hover:border-emerald-500 hover:bg-emerald-50 transition-all group"
+              className="w-full flex items-center justify-center gap-3 p-3 rounded-xl border border-slate-200 bg-white hover:border-emerald-500 hover:bg-emerald-50 transition-all group"
             >
-              <UserCheck className="text-slate-400 group-hover:text-emerald-600" size={24} />
-              <span className="text-xs font-bold text-slate-600 group-hover:text-emerald-700">Leader Demo</span>
+              <UserCheck className="text-slate-400 group-hover:text-emerald-600" size={20} />
+              <span className="text-sm font-bold text-slate-600 group-hover:text-emerald-700">Login as Leader</span>
             </button>
           </div>
         </div>

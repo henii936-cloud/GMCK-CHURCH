@@ -17,8 +17,19 @@ export function Login() {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Local Admin Login Fallback for demo/testing
+    if (email === 'admin@graceflow.com' && password === 'admin123') {
+      setLoading(true);
+      setTimeout(() => {
+        loginAsDemo('admin');
+        setLoading(false);
+      }, 800);
+      return;
+    }
+
     if (!supabase) {
-      setError('Supabase is not configured. Please use Demo Login or check settings.');
+      setError('Supabase is not configured. Try admin@graceflow.com / admin123 or use Demo Login.');
       return;
     }
     setLoading(true);
@@ -82,6 +93,9 @@ export function Login() {
                   placeholder="••••••••"
                 />
               </div>
+              <p className="mt-2 text-[10px] text-slate-400 italic">
+                Hint: Use <span className="font-bold">admin@graceflow.com</span> / <span className="font-bold">admin123</span> for quick admin access.
+              </p>
             </div>
 
             <button
@@ -91,24 +105,32 @@ export function Login() {
             >
               {loading ? <Loader2 className="animate-spin" size={20} /> : 'Sign In'}
             </button>
+
+            <div className="flex items-center gap-4 my-4">
+              <div className="flex-1 h-px bg-slate-100"></div>
+              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">or</span>
+              <div className="flex-1 h-px bg-slate-100"></div>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => loginAsDemo('admin')}
+              className="w-full bg-white border border-slate-200 text-slate-700 font-bold py-3 rounded-xl hover:bg-slate-50 transition-all flex items-center justify-center gap-2 shadow-sm"
+            >
+              <ShieldCheck className="text-emerald-600" size={20} />
+              Quick Admin Login
+            </button>
           </form>
 
           <div className="mt-8 pt-8 border-t border-slate-100">
-            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest text-center mb-4">Demo Access</p>
-            <div className="grid grid-cols-2 gap-4">
-              <button 
-                onClick={() => loginAsDemo('admin')}
-                className="flex flex-col items-center gap-2 p-3 rounded-xl border border-slate-200 hover:border-emerald-500 hover:bg-emerald-50 transition-all group"
-              >
-                <ShieldCheck className="text-slate-400 group-hover:text-emerald-600" size={24} />
-                <span className="text-xs font-bold text-slate-600 group-hover:text-emerald-700">Admin Demo</span>
-              </button>
+            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest text-center mb-4">Other Roles</p>
+            <div className="grid grid-cols-1 gap-4">
               <button 
                 onClick={() => loginAsDemo('leader')}
-                className="flex flex-col items-center gap-2 p-3 rounded-xl border border-slate-200 hover:border-emerald-500 hover:bg-emerald-50 transition-all group"
+                className="flex items-center justify-center gap-3 p-3 rounded-xl border border-slate-200 hover:border-emerald-500 hover:bg-emerald-50 transition-all group"
               >
-                <UserCheck className="text-slate-400 group-hover:text-emerald-600" size={24} />
-                <span className="text-xs font-bold text-slate-600 group-hover:text-emerald-700">Leader Demo</span>
+                <UserCheck className="text-slate-400 group-hover:text-emerald-600" size={20} />
+                <span className="text-xs font-bold text-slate-600 group-hover:text-emerald-700">Login as Group Leader</span>
               </button>
             </div>
           </div>

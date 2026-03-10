@@ -1,29 +1,25 @@
 import React, { useState } from 'react';
 import { supabase } from '../supabaseClient';
-import { Church, Mail, Lock, Loader2, UserCheck, ShieldCheck, UserPlus } from 'lucide-react';
+import { Church, Mail, Lock, Loader2, UserPlus } from 'lucide-react';
 import { Navigate, Link } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 
-export function Login() {
+export function SignUp() {
   const { user } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
 
   if (user) return <Navigate to="/" replace />;
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (!supabase) {
-      setError('Supabase is not configured. Please check your environment variables.');
-      return;
-    }
     setLoading(true);
     setError(null);
 
-    const { error } = await supabase.auth.signInWithPassword({
+    const { error } = await supabase.auth.signUp({
       email,
       password,
     });
@@ -31,8 +27,33 @@ export function Login() {
     if (error) {
       setError(error.message);
       setLoading(false);
+    } else {
+      setSuccess(true);
+      setLoading(false);
     }
   };
+
+  if (success) {
+    return (
+      <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-6">
+        <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-8 border border-slate-100 text-center">
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-emerald-100 rounded-2xl text-emerald-600 mb-4">
+            <Mail size={32} />
+          </div>
+          <h1 className="text-2xl font-bold text-slate-900 mb-2">Check your email</h1>
+          <p className="text-slate-600 mb-6">
+            We've sent a confirmation link to <strong>{email}</strong>. Please check your inbox to complete your registration.
+          </p>
+          <Link
+            to="/login"
+            className="inline-block bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-8 rounded-xl transition-all"
+          >
+            Back to Sign In
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-6">
@@ -41,12 +62,12 @@ export function Login() {
           <div className="inline-flex items-center justify-center w-16 h-16 bg-emerald-600 rounded-2xl text-white mb-4 shadow-lg shadow-emerald-200">
             <Church size={32} />
           </div>
-          <h1 className="text-3xl font-bold text-slate-900">GraceFlow CMS</h1>
-          <p className="text-slate-500 mt-2">Sign in to manage your church</p>
+          <h1 className="text-3xl font-bold text-slate-900">Join GraceFlow</h1>
+          <p className="text-slate-500 mt-2">Create an account for your church</p>
         </div>
 
         <div className="bg-white rounded-2xl shadow-xl shadow-slate-200/50 p-8 border border-slate-100">
-          <form onSubmit={handleLogin} className="space-y-6">
+          <form onSubmit={handleSignUp} className="space-y-6">
             {error && (
               <div className="p-4 bg-red-50 border border-red-100 text-red-600 text-sm rounded-xl">
                 {error}
@@ -88,38 +109,23 @@ export function Login() {
               disabled={loading}
               className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl shadow-lg shadow-emerald-200 transition-all flex items-center justify-center gap-2 disabled:opacity-70"
             >
-              {loading ? <Loader2 className="animate-spin" size={20} /> : 'Sign In'}
+              {loading ? <Loader2 className="animate-spin" size={20} /> : (
+                <>
+                  <UserPlus size={20} />
+                  Sign Up
+                </>
+              )}
             </button>
 
             <div className="text-center mt-4">
               <p className="text-sm text-slate-600">
-                Don't have an account?{' '}
-                <Link to="/signup" className="text-emerald-600 font-bold hover:underline">
-                  Sign Up
+                Already have an account?{' '}
+                <Link to="/login" className="text-emerald-600 font-bold hover:underline">
+                  Sign In
                 </Link>
               </p>
             </div>
-
-            <div className="flex items-center gap-4 my-4">
-              <div className="flex-1 h-px bg-slate-100"></div>
-              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">or</span>
-              <div className="flex-1 h-px bg-slate-100"></div>
-            </div>
-
-            <Link
-              to="/admin-login"
-              className="w-full bg-slate-900 text-white font-bold py-3 rounded-xl hover:bg-slate-800 transition-all flex items-center justify-center gap-2 shadow-sm"
-            >
-              <ShieldCheck className="text-emerald-400" size={20} />
-              Admin Portal Access
-            </Link>
           </form>
-
-          <div className="mt-8 pt-8 border-t border-slate-100 text-center">
-            <p className="text-sm text-slate-500 italic">
-              "Let all things be done decently and in order."
-            </p>
-          </div>
         </div>
       </div>
     </div>

@@ -3,6 +3,9 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './hooks/useAuth';
 import { Layout } from './components/Layout';
 import { Login } from './pages/Login';
+import { SignUp } from './pages/SignUp';
+import AdminSignIn from './pages/AdminSignIn';
+import AdminSignUp from './pages/AdminSignUp';
 import { Dashboard } from './pages/Dashboard';
 import { Members } from './pages/Members';
 import { Attendance } from './pages/Attendance';
@@ -23,8 +26,12 @@ function AppRoutes() {
   return (
     <Routes>
       <Route path="/login" element={<Login />} />
+      <Route path="/signup" element={<SignUp />} />
+      <Route path="/admin-login" element={<AdminSignIn />} />
+      <Route path="/admin-signup" element={<AdminSignUp />} />
       <Route path="/" element={<Layout />}>
         <Route index element={<Dashboard />} />
+        <Route path="admin" element={<Dashboard />} />
         <Route path="members" element={<Members />} />
         <Route path="groups" element={<Groups />} />
         <Route path="attendance" element={<Attendance />} />

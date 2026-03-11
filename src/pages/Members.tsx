@@ -129,21 +129,37 @@ export function Members() {
     }
 
     try {
-      const { data, error } = await supabase
+      // 1. Insert member
+      const { data: memberData, error: memberError } = await supabase
         .from('members')
         .insert([formData])
         .select()
         .single();
 
-      if (error) throw error;
+      if (memberError) throw memberError;
+
+      // 2. If leader is adding, link to group
+      if (!isAdmin && selectedGroupId) {
+        const { error: linkError } = await supabase
+          .from('bible_study_members')
+          .insert([{
+            group_id: selectedGroupId,
+            member_id: memberData.id
+          }]);
+        
+        if (linkError) {
+          console.error('Error linking member to group:', linkError);
+          // We still added the member, but linking failed
+        }
+      }
       
-      setMembers([data, ...members]);
+      setMembers([memberData, ...members]);
       setShowAddModal(false);
       resetForm();
       setToast({ message: 'Member added successfully!', type: 'success' });
-    } catch (err) {
+    } catch (err: any) {
       console.error('Error adding member:', err);
-      setToast({ message: 'Failed to add member. Please try again.', type: 'error' });
+      setToast({ message: `Failed to add member: ${err.message || 'Please try again.'}`, type: 'error' });
     } finally {
       setSubmitting(false);
     }
@@ -174,13 +190,15 @@ export function Members() {
           <h1 className="text-2xl font-bold text-slate-900">Members Management</h1>
           <p className="text-slate-500">Manage and track all church members in one place.</p>
         </div>
-        <button 
-          onClick={() => setShowAddModal(true)}
-          className="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white px-4 py-2.5 rounded-xl font-bold transition-all shadow-lg shadow-emerald-100"
-        >
-          <Plus size={20} />
-          Add Member
-        </button>
+        {!isAdmin && (
+          <button 
+            onClick={() => setShowAddModal(true)}
+            className="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white px-4 py-2.5 rounded-xl font-bold transition-all shadow-lg shadow-emerald-100"
+          >
+            <Plus size={20} />
+            Add Member
+          </button>
+        )}
       </div>
 
       <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">

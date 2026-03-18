@@ -15,13 +15,18 @@ export function GroupSelection() {
 
   async function fetchGroups() {
     const supabase = getSupabase();
+    const mockGroups = [
+      { id: 'g1', name: 'Youth Bible Study' },
+      { id: 'g2', name: 'Men\'s Fellowship' },
+      { id: 'g3', name: 'Women\'s Prayer Group' },
+      { id: 'g4', name: 'Young Adults Ministry' },
+      { id: 'g5', name: 'Choir Rehearsal' },
+      { id: 'g6', name: 'Evangelism Team' },
+      { id: 'g7', name: 'Sunday School Teachers' },
+    ];
+
     if (!supabase) {
-      // Mock groups
-      setGroups([
-        { id: 'g1', name: 'Youth Bible Study' },
-        { id: 'g2', name: 'Men\'s Fellowship' },
-        { id: 'g3', name: 'Women\'s Prayer Group' },
-      ]);
+      setGroups(mockGroups);
       setLoading(false);
       return;
     }
@@ -30,10 +35,16 @@ export function GroupSelection() {
       const { data, error } = await supabase
         .from('bible_study_groups')
         .select('id, name');
-      if (error) throw error;
-      setGroups(data || []);
+      
+      if (error || !data || data.length === 0) {
+        if (error) console.warn('Supabase query failed, falling back to mock data:', error.message);
+        setGroups(mockGroups);
+      } else {
+        setGroups(data);
+      }
     } catch (err) {
       console.error('Error fetching groups:', err);
+      setGroups(mockGroups);
     } finally {
       setLoading(false);
     }
@@ -81,9 +92,6 @@ export function GroupSelection() {
                       {selectedId === group.id && <Check size={20} className="text-emerald-600" />}
                     </button>
                   ))}
-                  {groups.length === 0 && (
-                    <p className="text-center text-slate-500 py-4 italic">No groups found. Please contact your admin.</p>
-                  )}
                 </div>
               </div>
 

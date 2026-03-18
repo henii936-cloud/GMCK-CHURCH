@@ -1,6 +1,6 @@
 /*
- GRACEFLOW CMS
- Production Safe Schema
+GRACEFLOW CMS
+Optimized Production Schema for Supabase
 */
 
 CREATE EXTENSION IF NOT EXISTS "pgcrypto";
@@ -23,9 +23,39 @@ DROP TABLE IF EXISTS profiles CASCADE;
 CREATE TABLE profiles (
   id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
   full_name TEXT NOT NULL,
-  role TEXT CHECK (role IN ('admin','leader')) DEFAULT 'leader',
+  role TEXT CHECK (role IN ('admin','leader','finance')) DEFAULT 'leader',
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-------------------------------------------------
+-- BUDGETS
+-------------------------------------------------
+
+CREATE TABLE budgets (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  title TEXT NOT NULL,
+  ministry TEXT,
+  amount NUMERIC NOT NULL,
+  status TEXT CHECK (status IN ('pending','approved','rejected')) DEFAULT 'pending',
+  year INT,
+  created_by UUID REFERENCES profiles(id),
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-------------------------------------------------
+-- TRANSACTIONS
+-------------------------------------------------
+
+CREATE TABLE transactions (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  member_id UUID REFERENCES members(id),
+  type TEXT CHECK (type IN ('tithe','offering','donation','expense')),
+  amount NUMERIC NOT NULL,
+  recorded_by UUID REFERENCES profiles(id),
+  budget_id UUID REFERENCES budgets(id),
+  date DATE DEFAULT CURRENT_DATE,
+  created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
 -------------------------------------------------
@@ -48,7 +78,7 @@ CREATE TABLE members (
   membership_status TEXT CHECK (membership_status IN ('Active','Inactive')) DEFAULT 'Active',
   join_date DATE DEFAULT CURRENT_DATE,
   notes TEXT,
-  profile_id UUID REFERENCES profiles(id),
+  created_by UUID REFERENCES profiles(id),
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
@@ -59,7 +89,7 @@ CREATE TABLE members (
 CREATE TABLE bible_study_groups (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   name TEXT NOT NULL,
-  leader_id UUID REFERENCES members(id),
+  leader_profile_id UUID REFERENCES profiles(id),
   meeting_day TEXT,
   location TEXT,
   description TEXT,
@@ -115,10 +145,11 @@ LANGUAGE plpgsql
 SECURITY DEFINER
 AS $$
 BEGIN
-  INSERT INTO public.profiles (id, full_name)
+  INSERT INTO public.profiles (id, full_name, role)
   VALUES (
     NEW.id,
-    COALESCE(NEW.raw_user_meta_data->>'full_name', NEW.email)
+    COALESCE(NEW.raw_user_meta_data->>'full_name', NEW.email),
+    COALESCE(NEW.raw_user_meta_data->>'role', 'leader')
   );
   RETURN NEW;
 END;
@@ -141,15 +172,18 @@ ALTER TABLE bible_study_groups ENABLE ROW LEVEL SECURITY;
 ALTER TABLE bible_study_members ENABLE ROW LEVEL SECURITY;
 ALTER TABLE attendance ENABLE ROW LEVEL SECURITY;
 ALTER TABLE programs ENABLE ROW LEVEL SECURITY;
+ALTER TABLE budgets ENABLE ROW LEVEL SECURITY;
+ALTER TABLE transactions ENABLE ROW LEVEL SECURITY;
 
 -------------------------------------------------
--- HELPER FUNCTION (ADMIN CHECK)
+-- HELPER FUNCTIONS
 -------------------------------------------------
 
 CREATE OR REPLACE FUNCTION is_admin()
 RETURNS BOOLEAN
 LANGUAGE SQL
 STABLE
+SECURITY DEFINER
 AS $$
   SELECT EXISTS (
     SELECT 1
@@ -158,6 +192,52 @@ AS $$
     AND role = 'admin'
   );
 $$;
+
+CREATE OR REPLACE FUNCTION is_finance()
+RETURNS BOOLEAN
+LANGUAGE SQL
+STABLE
+SECURITY DEFINER
+AS $$
+  SELECT EXISTS (
+    SELECT 1
+    FROM profiles
+    WHERE id = auth.uid()
+    AND role = 'finance'
+  );
+$$;
+
+-------------------------------------------------
+-- BUDGETS POLICIES
+-------------------------------------------------
+
+CREATE POLICY "Admin manage all budgets"
+ON budgets
+FOR ALL
+USING (is_admin());
+
+CREATE POLICY "Finance view approved budgets"
+ON budgets
+FOR SELECT
+USING (
+  status = 'approved' AND is_finance()
+);
+
+-------------------------------------------------
+-- TRANSACTIONS POLICIES
+-------------------------------------------------
+
+CREATE POLICY "Admin view all transactions"
+ON transactions
+FOR SELECT
+USING (is_admin());
+
+CREATE POLICY "Finance manage own transactions"
+ON transactions
+FOR ALL
+USING (
+  recorded_by = auth.uid() AND is_finance()
+);
 
 -------------------------------------------------
 -- PROFILES POLICIES
@@ -173,11 +253,6 @@ ON profiles
 FOR UPDATE
 USING (auth.uid() = id);
 
-CREATE POLICY "Users insert own profile"
-ON profiles
-FOR INSERT
-WITH CHECK (auth.uid() = id);
-
 -------------------------------------------------
 -- MEMBERS POLICIES
 -------------------------------------------------
@@ -187,19 +262,11 @@ ON members
 FOR ALL
 USING (is_admin());
 
-CREATE POLICY "Leaders view group members"
+CREATE POLICY "Leaders view members"
 ON members
 FOR SELECT
-USING (
-  EXISTS (
-    SELECT 1
-    FROM bible_study_members gm
-    JOIN bible_study_groups g
-    ON gm.group_id = g.id
-    WHERE gm.member_id = members.id
-    AND g.leader_id = auth.uid()
-  )
-);
+TO authenticated
+USING (true);
 
 -------------------------------------------------
 -- GROUP POLICIES
@@ -210,16 +277,18 @@ ON bible_study_groups
 FOR ALL
 USING (is_admin());
 
-CREATE POLICY "Leaders view their groups"
+CREATE POLICY "Leaders manage their groups"
+ON bible_study_groups
+FOR ALL
+USING (
+  leader_profile_id = auth.uid()
+);
+
+CREATE POLICY "Users view groups"
 ON bible_study_groups
 FOR SELECT
-USING (
-  EXISTS (
-    SELECT 1 FROM members 
-    WHERE members.id = bible_study_groups.leader_id 
-    AND members.profile_id = auth.uid()
-  )
-);
+TO authenticated
+USING (true);
 
 -------------------------------------------------
 -- GROUP MEMBERS POLICIES
@@ -238,7 +307,7 @@ USING (
     SELECT 1
     FROM bible_study_groups g
     WHERE g.id = bible_study_members.group_id
-    AND g.leader_id = auth.uid()
+    AND g.leader_profile_id = auth.uid()
   )
 );
 
@@ -259,7 +328,7 @@ USING (
     SELECT 1
     FROM bible_study_groups g
     WHERE g.id = attendance.group_id
-    AND g.leader_id = auth.uid()
+    AND g.leader_profile_id = auth.uid()
   )
 );
 

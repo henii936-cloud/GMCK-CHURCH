@@ -38,20 +38,26 @@ export function Dashboard() {
     totalMembers: 0,
     totalGroups: 0,
     totalPrograms: 0,
-    weeklyAttendance: 0
+    weeklyAttendance: 0,
+    totalIncome: 0,
+    totalExpenses: 0
   });
 
   useEffect(() => {
     async function fetchStats() {
       const supabase = getSupabase();
       const isAdmin = profile?.role === 'admin';
+      const isFinance = profile?.role === 'finance';
 
       if (!supabase) {
+        const seed = selectedGroupId ? selectedGroupId.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) : 0;
         setStats({
-          totalMembers: isAdmin ? 1250 : 25,
+          totalMembers: isAdmin ? 1250 : (15 + (seed % 20)),
           totalGroups: isAdmin ? 42 : 1,
-          totalPrograms: isAdmin ? 8 : 0,
-          weeklyAttendance: isAdmin ? 840 : 22
+          totalPrograms: isAdmin ? 8 : (seed % 3),
+          weeklyAttendance: isAdmin ? 840 : (12 + (seed % 10)),
+          totalIncome: 55000,
+          totalExpenses: 43000
         });
         return;
       }
@@ -60,7 +66,7 @@ export function Dashboard() {
         let membersQuery: any = supabase.from('members').select('id', { count: 'exact' });
         let groupsQuery: any = supabase.from('bible_study_groups').select('id', { count: 'exact' });
 
-        if (!isAdmin && selectedGroupId) {
+        if (!isAdmin && !isFinance && selectedGroupId) {
           // For leaders, only count members in their selected group
           membersQuery = supabase
             .from('bible_study_members')
@@ -79,16 +85,26 @@ export function Dashboard() {
           queries.push(supabase.from('programs').select('id', { count: 'exact' }));
         }
 
+        if (isAdmin || isFinance) {
+          queries.push(supabase.from('transactions').select('amount, type'));
+        }
+
         const results = await Promise.all(queries);
         const members = results[0];
         const groups = results[1];
         const programs = isAdmin ? results[2] : { count: 0 };
+        const transactions = (isAdmin || isFinance) ? (isAdmin ? results[3] : results[2]) : { data: [] };
+
+        const income = transactions.data?.filter((t: any) => t.type === 'tithe' || t.type === 'offering' || t.type === 'donation').reduce((acc: number, t: any) => acc + t.amount, 0) || 0;
+        const expenses = transactions.data?.filter((t: any) => t.type === 'expense').reduce((acc: number, t: any) => acc + t.amount, 0) || 0;
 
         setStats({
           totalMembers: members.count || 0,
           totalGroups: groups.count || 0,
           totalPrograms: programs.count || 0,
-          weeklyAttendance: isAdmin ? 450 : 18 // Mock for now
+          weeklyAttendance: isAdmin ? 450 : 18, // Mock for now
+          totalIncome: income,
+          totalExpenses: expenses
         });
       } catch (err) {
         console.error('Error fetching stats:', err);
@@ -98,6 +114,7 @@ export function Dashboard() {
   }, [profile?.role, selectedGroupId]);
 
   const isAdmin = profile?.role === 'admin';
+  const isFinance = profile?.role === 'finance';
 
   return (
     <div className="space-y-8">
@@ -106,7 +123,20 @@ export function Dashboard() {
         <p className="text-slate-500">Here's what's happening in your church today.</p>
       </div>
 
-      {!isAdmin ? (
+      {isFinance ? (
+        <div className="bg-amber-600 p-6 rounded-2xl text-white shadow-lg shadow-amber-100 flex flex-col md:flex-row items-center justify-between gap-4">
+          <div>
+            <h2 className="text-xl font-bold">Financial Records Portal</h2>
+            <p className="text-amber-100">Record new tithes and offerings for approved budgets.</p>
+          </div>
+          <Link 
+            to="/transactions" 
+            className="bg-white text-amber-600 px-6 py-3 rounded-xl font-bold hover:bg-amber-50 transition-colors shrink-0"
+          >
+            Record Transaction
+          </Link>
+        </div>
+      ) : !isAdmin ? (
         <div className="bg-emerald-600 p-6 rounded-2xl text-white shadow-lg shadow-emerald-100 flex flex-col md:flex-row items-center justify-between gap-4">
           <div>
             <h2 className="text-xl font-bold">Ready to record today's attendance?</h2>
@@ -135,97 +165,133 @@ export function Dashboard() {
       )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <StatCard 
-          title="Total Members" 
-          value={stats.totalMembers} 
-          icon={Users} 
-          trend="+12%" 
-          trendUp={true}
-          color="bg-blue-500"
-        />
-        <StatCard 
-          title="Study Groups" 
-          value={stats.totalGroups} 
-          icon={BookOpen} 
-          trend="+2" 
-          trendUp={true}
-          color="bg-emerald-500"
-        />
-        <StatCard 
-          title="Weekly Attendance" 
-          value={stats.weeklyAttendance} 
-          icon={CalendarCheck} 
-          trend="-5%" 
-          trendUp={false}
-          color="bg-amber-500"
-        />
-        {isAdmin && (
-          <StatCard 
-            title="Upcoming Programs" 
-            value={stats.totalPrograms} 
-            icon={CalendarDays} 
-            trend="Next: Sunday" 
-            trendUp={true}
-            color="bg-purple-500"
-          />
+        {isFinance ? (
+          <>
+            <StatCard 
+              title="Total Income" 
+              value={`$${stats.totalIncome.toLocaleString()}`} 
+              icon={TrendingUp} 
+              trend="+12%" 
+              trendUp={true}
+              color="bg-emerald-500"
+            />
+            <StatCard 
+              title="Total Expenses" 
+              value={`$${stats.totalExpenses.toLocaleString()}`} 
+              icon={TrendingUp} 
+              trend="-5%" 
+              trendUp={false}
+              color="bg-rose-500"
+            />
+            <StatCard 
+              title="Net Balance" 
+              value={`$${(stats.totalIncome - stats.totalExpenses).toLocaleString()}`} 
+              icon={TrendingUp} 
+              trend="Healthy" 
+              trendUp={true}
+              color="bg-blue-500"
+            />
+            <StatCard 
+              title="Total Members" 
+              value={stats.totalMembers} 
+              icon={Users} 
+              trend="+12%" 
+              trendUp={true}
+              color="bg-indigo-500"
+            />
+          </>
+        ) : (
+          <>
+            <StatCard 
+              title="Total Members" 
+              value={stats.totalMembers} 
+              icon={Users} 
+              trend="+12%" 
+              trendUp={true}
+              color="bg-blue-500"
+            />
+            <StatCard 
+              title="Study Groups" 
+              value={stats.totalGroups} 
+              icon={BookOpen} 
+              trend="+2" 
+              trendUp={true}
+              color="bg-emerald-500"
+            />
+            <StatCard 
+              title="Weekly Attendance" 
+              value={stats.weeklyAttendance} 
+              icon={CalendarCheck} 
+              trend="-5%" 
+              trendUp={false}
+              color="bg-amber-500"
+            />
+            {isAdmin && (
+              <StatCard 
+                title="Upcoming Programs" 
+                value={stats.totalPrograms} 
+                icon={CalendarDays} 
+                trend="Next: Sunday" 
+                trendUp={true}
+                color="bg-purple-500"
+              />
+            )}
+          </>
         )}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-2 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="font-bold text-slate-900">Attendance Overview</h2>
-            <select className="text-sm border-slate-200 rounded-lg bg-slate-50 px-2 py-1 outline-none">
-              <option>Last 6 Weeks</option>
-              <option>Last 3 Months</option>
-            </select>
-          </div>
-          <div className="h-80 w-full">
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={data}>
-                <defs>
-                  <linearGradient id="colorAttendance" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#10b981" stopOpacity={0.1}/>
-                    <stop offset="95%" stopColor="#10b981" stopOpacity={0}/>
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#64748b', fontSize: 12}} dy={10} />
-                <YAxis axisLine={false} tickLine={false} tick={{fill: '#64748b', fontSize: 12}} />
-                <Tooltip 
-                  contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }}
-                />
-                <Area type="monotone" dataKey="attendance" stroke="#10b981" strokeWidth={3} fillOpacity={1} fill="url(#colorAttendance)" />
-              </AreaChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-
-        <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+        <div className="lg:col-span-3 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
           <h2 className="font-bold text-slate-900 mb-6">Recent Activity</h2>
           <div className="space-y-6">
-            <ActivityItem 
-              title="New Member Joined" 
-              desc="John Doe added to Youth Ministry" 
-              time="2 hours ago"
-              icon={Users}
-              iconColor="text-blue-600 bg-blue-50"
-            />
-            <ActivityItem 
-              title="Attendance Recorded" 
-              desc="Youth Bible Study - 45 present" 
-              time="5 hours ago"
-              icon={CalendarCheck}
-              iconColor="text-emerald-600 bg-emerald-50"
-            />
-            {isAdmin && (
-              <ActivityItem 
-                title="Program Scheduled" 
-                desc="Annual Conference set for Oct 12" 
-                time="Yesterday"
-                icon={CalendarDays}
-                iconColor="text-purple-600 bg-purple-50"
-              />
+            {!isAdmin ? (
+              <>
+                <ActivityItem 
+                  title="Attendance Recorded" 
+                  desc="Youth Bible Study - 18 present" 
+                  time="2 hours ago"
+                  icon={CalendarCheck}
+                  iconColor="text-emerald-600 bg-emerald-50"
+                />
+                <ActivityItem 
+                  title="New Member Added" 
+                  desc="Stefan Salvatore joined your group" 
+                  time="5 hours ago"
+                  icon={Users}
+                  iconColor="text-blue-600 bg-blue-50"
+                />
+                <ActivityItem 
+                  title="Group Message Sent" 
+                  desc="Reminder for next Tuesday's session" 
+                  time="Yesterday"
+                  icon={BookOpen}
+                  iconColor="text-amber-600 bg-amber-50"
+                />
+              </>
+            ) : (
+              <>
+                <ActivityItem 
+                  title="New Member Joined" 
+                  desc="John Doe added to Youth Ministry" 
+                  time="2 hours ago"
+                  icon={Users}
+                  iconColor="text-blue-600 bg-blue-50"
+                />
+                <ActivityItem 
+                  title="Attendance Recorded" 
+                  desc="Youth Bible Study - 45 present" 
+                  time="5 hours ago"
+                  icon={CalendarCheck}
+                  iconColor="text-emerald-600 bg-emerald-50"
+                />
+                <ActivityItem 
+                  title="Program Scheduled" 
+                  desc="Annual Conference set for Oct 12" 
+                  time="Yesterday"
+                  icon={CalendarDays}
+                  iconColor="text-purple-600 bg-purple-50"
+                />
+              </>
             )}
           </div>
           <button className="w-full mt-8 py-2 text-sm font-medium text-emerald-600 hover:bg-emerald-50 rounded-xl transition-colors">

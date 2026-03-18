@@ -59,20 +59,37 @@ export function Members() {
     const supabase = getSupabase();
     
     if (!supabase) {
-      // Mock data for demo
-      const mockMembers = [
+      // Mock data
+      const allMockMembers = [
         { id: '1', full_name: 'John Doe', gender: 'Male', marital_status: 'Married', email: 'john@example.com', phone_number: '+251 911 223344', ministry: 'Choir', team: 'Vocals', membership_status: 'Active' },
         { id: '2', full_name: 'Jane Smith', gender: 'Female', marital_status: 'Single', email: 'jane@example.com', phone_number: '+251 922 334455', ministry: 'Youth', team: 'Media', membership_status: 'Active' },
         { id: '3', full_name: 'Robert Brown', gender: 'Male', marital_status: 'Widowed', email: 'robert@example.com', phone_number: '+251 933 445566', ministry: 'Prayer Team', team: 'Intercession', membership_status: 'Inactive' },
         { id: '4', full_name: 'Sarah Wilson', gender: 'Female', marital_status: 'Married', email: 'sarah@example.com', phone_number: '+251 944 556677', ministry: 'Evangelism', team: 'Outreach', membership_status: 'Active' },
         { id: '5', full_name: 'Michael Gebre', gender: 'Male', marital_status: 'Single', email: 'michael@example.com', phone_number: '+251 955 667788', ministry: 'Youth', team: 'Ushering', membership_status: 'Active' },
+        { id: '6', full_name: 'Abebe Bikila', gender: 'Male', marital_status: 'Married', email: 'abebe@example.com', phone_number: '+251 966 778899', ministry: 'Missions', team: 'Field', membership_status: 'Active' },
+        { id: '7', full_name: 'Martha Tadesse', gender: 'Female', marital_status: 'Single', email: 'martha@example.com', phone_number: '+251 977 889900', ministry: 'Children', team: 'Teaching', membership_status: 'Active' },
+        { id: '8', full_name: 'Samuel L. Jackson', gender: 'Male', marital_status: 'Married', email: 'samuel@example.com', phone_number: '+251 988 990011', ministry: 'Security', team: 'Patrol', membership_status: 'Active' },
+        { id: '9', full_name: 'Elena Gilbert', gender: 'Female', marital_status: 'Single', email: 'elena@example.com', phone_number: '+251 999 001122', ministry: 'Hospitality', team: 'Greeting', membership_status: 'Active' },
+        { id: '10', full_name: 'Damon Salvatore', gender: 'Male', marital_status: 'Single', email: 'damon@example.com', phone_number: '+251 900 112233', ministry: 'Media', team: 'Audio', membership_status: 'Active' },
+        { id: '11', full_name: 'Stefan Salvatore', gender: 'Male', marital_status: 'Single', email: 'stefan@example.com', phone_number: '+251 911 223344', ministry: 'Youth', team: 'Mentoring', membership_status: 'Active' },
+        { id: '12', full_name: 'Bonnie Bennett', gender: 'Female', marital_status: 'Single', email: 'bonnie@example.com', phone_number: '+251 922 334455', ministry: 'Prayer Team', team: 'Worship', membership_status: 'Active' },
+        { id: '13', full_name: 'Caroline Forbes', gender: 'Female', marital_status: 'Married', email: 'caroline@example.com', phone_number: '+251 933 445566', ministry: 'Events', team: 'Planning', membership_status: 'Active' },
+        { id: '14', full_name: 'Alaric Saltzman', gender: 'Male', marital_status: 'Widowed', email: 'alaric@example.com', phone_number: '+251 944 556677', ministry: 'Education', team: 'Bible Study', membership_status: 'Active' },
+        { id: '15', full_name: 'Jeremy Gilbert', gender: 'Male', marital_status: 'Single', email: 'jeremy@example.com', phone_number: '+251 955 667788', ministry: 'Youth', team: 'Art', membership_status: 'Active' },
+        { id: '16', full_name: 'Tyler Lockwood', gender: 'Male', marital_status: 'Single', email: 'tyler@example.com', phone_number: '+251 966 778899', ministry: 'Sports', team: 'Football', membership_status: 'Active' },
+        { id: '17', full_name: 'Matt Donovan', gender: 'Male', marital_status: 'Single', email: 'matt@example.com', phone_number: '+251 977 889900', ministry: 'Ushering', team: 'Lead', membership_status: 'Active' },
+        { id: '18', full_name: 'Enzo St. John', gender: 'Male', marital_status: 'Married', email: 'enzo@example.com', phone_number: '+251 988 990011', ministry: 'Music', team: 'Guitar', membership_status: 'Active' },
+        { id: '19', full_name: 'Klaus Mikaelson', gender: 'Male', marital_status: 'Single', email: 'klaus@example.com', phone_number: '+251 999 001122', ministry: 'Art', team: 'Painting', membership_status: 'Active' },
+        { id: '20', full_name: 'Elijah Mikaelson', gender: 'Male', marital_status: 'Single', email: 'elijah@example.com', phone_number: '+251 900 112233', ministry: 'Admin', team: 'Support', membership_status: 'Active' },
       ];
       
       if (!isAdmin && selectedGroupId) {
-        // Mock filtering: just return a subset for leaders
-        setMembers(mockMembers.slice(0, 3));
+        // Deterministic mock filtering based on group ID
+        const groupIndex = parseInt(selectedGroupId.replace('g', '')) || 0;
+        const groupMembers = allMockMembers.filter((_, idx) => (idx + groupIndex) % 3 === 0);
+        setMembers(groupMembers.length > 0 ? groupMembers : allMockMembers.slice(0, 3));
       } else {
-        setMembers(mockMembers);
+        setMembers(allMockMembers);
       }
       setLoading(false);
       return;
@@ -111,7 +128,7 @@ export function Members() {
     const supabase = getSupabase();
 
     if (!supabase) {
-      // Mock add for demo with a small delay
+      // Mock add with a small delay
       await new Promise(resolve => setTimeout(resolve, 800));
       
       const newMember = {
@@ -124,7 +141,7 @@ export function Members() {
       setShowAddModal(false);
       setSubmitting(false);
       resetForm();
-      setToast({ message: 'Member added successfully to demo!', type: 'success' });
+      setToast({ message: 'Member added successfully!', type: 'success' });
       return;
     }
 
@@ -133,10 +150,12 @@ export function Members() {
       const { data: memberData, error: memberError } = await supabase
         .from('members')
         .insert([formData])
-        .select()
-        .single();
+        .select();
 
       if (memberError) throw memberError;
+      if (!memberData || memberData.length === 0) throw new Error('No data returned from server');
+
+      const newMember = memberData[0];
 
       // 2. If leader is adding, link to group
       if (!isAdmin && selectedGroupId) {
@@ -144,7 +163,7 @@ export function Members() {
           .from('bible_study_members')
           .insert([{
             group_id: selectedGroupId,
-            member_id: memberData.id
+            member_id: newMember.id
           }]);
         
         if (linkError) {
@@ -153,7 +172,7 @@ export function Members() {
         }
       }
       
-      setMembers([memberData, ...members]);
+      setMembers([newMember, ...members]);
       setShowAddModal(false);
       resetForm();
       setToast({ message: 'Member added successfully!', type: 'success' });
@@ -190,7 +209,7 @@ export function Members() {
           <h1 className="text-2xl font-bold text-slate-900">Members Management</h1>
           <p className="text-slate-500">Manage and track all church members in one place.</p>
         </div>
-        {!isAdmin && (
+        {isAdmin && (
           <button 
             onClick={() => setShowAddModal(true)}
             className="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white px-4 py-2.5 rounded-xl font-bold transition-all shadow-lg shadow-emerald-100"

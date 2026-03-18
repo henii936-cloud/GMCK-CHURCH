@@ -6,24 +6,27 @@ import {
   BookOpen, 
   CalendarCheck, 
   CalendarDays, 
-  LogOut,
   Church,
-  RefreshCw
+  LogOut,
+  Wallet,
+  History
 } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import { cn } from '../lib/utils';
 
 export function Sidebar() {
-  const { profile, signOut, setSelectedGroupId } = useAuth();
+  const { profile, signOut } = useAuth();
   const isAdmin = profile?.role === 'admin';
 
   const navItems = [
-    { name: 'Dashboard', icon: LayoutDashboard, path: '/' },
-    { name: 'Members', icon: Users, path: '/members', adminOnly: true },
-    { name: 'Bible Study', icon: BookOpen, path: '/groups' },
-    { name: 'Attendance', icon: CalendarCheck, path: '/attendance' },
-    { name: 'Programs', icon: CalendarDays, path: '/programs', adminOnly: true },
-  ];
+    { name: 'Dashboard', icon: LayoutDashboard, path: '/dashboard' },
+    { name: 'Members', icon: Users, path: '/members', roles: ['admin', 'leader'] },
+    { name: 'Bible Study', icon: BookOpen, path: '/groups', roles: ['admin', 'leader'] },
+    { name: 'Attendance', icon: CalendarCheck, path: '/attendance', roles: ['admin', 'leader'] },
+    { name: 'Programs', icon: CalendarDays, path: '/programs', roles: ['admin'] },
+    { name: 'Budgets', icon: Wallet, path: '/budgets', roles: ['admin', 'finance'] },
+    { name: 'Transactions', icon: History, path: '/transactions', roles: ['admin', 'finance'] },
+  ].filter(item => !item.roles || item.roles.includes(profile?.role || ''));
 
   return (
     <aside className="w-64 bg-white border-r border-slate-200 flex flex-col h-screen sticky top-0">
@@ -33,29 +36,25 @@ export function Sidebar() {
         </div>
         <div>
           <h1 className="font-bold text-slate-900 leading-tight">GraceFlow</h1>
-          <p className="text-xs text-slate-500 font-medium uppercase tracking-wider">CMS</p>
         </div>
       </div>
 
       <nav className="flex-1 px-4 space-y-1 mt-4">
-        {navItems.map((item) => {
-          if (item.adminOnly && !isAdmin) return null;
-          return (
-            <NavLink
-              key={item.path}
-              to={item.path}
-              className={({ isActive }) => cn(
-                "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors",
-                isActive 
-                  ? "bg-emerald-50 text-emerald-700" 
-                  : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
-              )}
-            >
-              <item.icon size={20} />
-              {item.name}
-            </NavLink>
-          );
-        })}
+        {navItems.map((item) => (
+          <NavLink
+            key={item.path}
+            to={item.path}
+            className={({ isActive }) => cn(
+              "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors",
+              isActive 
+                ? "bg-emerald-50 text-emerald-700" 
+                : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+            )}
+          >
+            <item.icon size={20} />
+            {item.name}
+          </NavLink>
+        ))}
       </nav>
 
       <div className="p-4 mt-auto border-t border-slate-100">
@@ -68,15 +67,6 @@ export function Sidebar() {
             <p className="text-xs text-slate-500 capitalize">{profile?.role}</p>
           </div>
         </div>
-        {!isAdmin && (
-          <button 
-            onClick={() => setSelectedGroupId(null)}
-            className="w-full flex items-center gap-3 px-3 py-2 mb-2 text-sm font-medium text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors"
-          >
-            <RefreshCw size={20} />
-            Switch Group
-          </button>
-        )}
         <button 
           onClick={() => signOut()}
           className="w-full flex items-center gap-3 px-3 py-2 text-sm font-medium text-slate-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"

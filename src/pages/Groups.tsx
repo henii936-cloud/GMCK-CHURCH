@@ -26,6 +26,7 @@ export function Groups() {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showManageMembersModal, setShowManageMembersModal] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const [memberSearchTerm, setMemberSearchTerm] = useState('');
   
   // Form states
   const [newGroupName, setNewGroupName] = useState('');
@@ -46,9 +47,13 @@ export function Groups() {
     if (!supabase) {
       // Mock data
       const mockGroups = [
-        { id: 'g1', name: 'Youth Bible Study', leader_id: 'm1', leader_name: 'John Doe', location: 'Church Hall B', member_count: 2 },
-        { id: 'g2', name: 'Men\'s Fellowship', leader_id: 'm3', leader_name: 'Robert Brown', location: 'Main Sanctuary', member_count: 1 },
-        { id: 'g3', name: 'Women\'s Prayer Group', leader_id: 'm2', leader_name: 'Jane Smith', location: 'Room 104', member_count: 1 },
+        { id: 'g1', name: 'Youth Bible Study', leader_id: 'm1', leader_name: 'John Doe', location: 'Church Hall B', member_count: 12 },
+        { id: 'g2', name: 'Men\'s Fellowship', leader_id: 'm3', leader_name: 'Robert Brown', location: 'Main Sanctuary', member_count: 8 },
+        { id: 'g3', name: 'Women\'s Prayer Group', leader_id: 'm2', leader_name: 'Jane Smith', location: 'Room 104', member_count: 15 },
+        { id: 'g4', name: 'Young Adults Ministry', leader_id: 'm4', leader_name: 'Sarah Wilson', location: 'Youth Center', member_count: 22 },
+        { id: 'g5', name: 'Choir Rehearsal', leader_id: 'm5', leader_name: 'Michael Gebre', location: 'Choir Room', member_count: 30 },
+        { id: 'g6', name: 'Evangelism Team', leader_id: 'm6', leader_name: 'Abebe Bikila', location: 'Outreach Office', member_count: 10 },
+        { id: 'g7', name: 'Sunday School Teachers', leader_id: 'm7', leader_name: 'Martha Tadesse', location: 'Education Wing', member_count: 18 },
       ];
 
       if (!isAdmin && selectedGroupId) {
@@ -62,17 +67,28 @@ export function Groups() {
         { id: 'm3', full_name: 'Robert Brown' },
         { id: 'm4', full_name: 'Sarah Wilson' },
         { id: 'm5', full_name: 'Michael Gebre' },
+        { id: 'm6', full_name: 'Abebe Bikila' },
+        { id: 'm7', full_name: 'Martha Tadesse' },
+        { id: 'm8', full_name: 'Samuel L. Jackson' },
+        { id: 'm9', full_name: 'Elena Gilbert' },
+        { id: 'm10', full_name: 'Damon Salvatore' },
       ]);
       setGroupMemberships([
         { group_id: 'g1', member_id: 'm1' },
         { group_id: 'g1', member_id: 'm2' },
+        { group_id: 'g1', member_id: 'm5' },
+        { group_id: 'g1', member_id: 'm9' },
         { group_id: 'g2', member_id: 'm3' },
-        { group_id: 'g3', member_id: 'm2' }, // Note: In many-to-many, a member can be in multiple groups
+        { group_id: 'g2', member_id: 'm6' },
+        { group_id: 'g3', member_id: 'm2' },
+        { group_id: 'g3', member_id: 'm7' },
       ]);
       setLeaders([
         { id: 'm1', full_name: 'John Doe' },
         { id: 'm2', full_name: 'Jane Smith' },
         { id: 'm3', full_name: 'Robert Brown' },
+        { id: 'm4', full_name: 'Sarah Wilson' },
+        { id: 'm5', full_name: 'Michael Gebre' },
       ]);
       setLoading(false);
       return;
@@ -234,8 +250,9 @@ export function Groups() {
   const currentGroupMembers = allMembers.filter(m => 
     groupMemberships.some(gm => gm.group_id === showManageMembersModal && gm.member_id === m.id)
   );
-  const unassignedMembers = allMembers.filter(m => 
-    !groupMemberships.some(gm => gm.member_id === m.id)
+  const availableMembers = allMembers.filter(m => 
+    !groupMemberships.some(gm => gm.group_id === showManageMembersModal && gm.member_id === m.id) &&
+    m.full_name.toLowerCase().includes(memberSearchTerm.toLowerCase())
   );
 
   return (
@@ -313,7 +330,7 @@ export function Groups() {
 
                 <button 
                   onClick={() => setShowManageMembersModal(group.id)}
-                  className="w-full py-2.5 text-sm font-bold text-emerald-600 bg-emerald-50 hover:bg-emerald-100 rounded-xl transition-colors flex items-center justify-center gap-2"
+                  className="w-full py-2.5 text-sm font-bold text-emerald-600 bg-emerald-50 hover:bg-emerald-600 hover:text-white rounded-xl transition-all flex items-center justify-center gap-2 active:scale-95 shadow-sm hover:shadow-emerald-100"
                 >
                   Manage Members
                   <ChevronRight size={16} />
@@ -408,7 +425,10 @@ export function Groups() {
               </button>
             </div>
             
-            <div className="flex-1 overflow-y-auto p-6 grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className={cn(
+              "flex-1 overflow-y-auto p-6 grid grid-cols-1 gap-8",
+              isAdmin && "md:grid-cols-2"
+            )}>
               {/* Current Members */}
               <div>
                 <h3 className="text-sm font-bold text-slate-900 mb-4 flex items-center gap-2">
@@ -436,28 +456,49 @@ export function Groups() {
               </div>
 
               {/* Add Members */}
-              <div>
-                <h3 className="text-sm font-bold text-slate-900 mb-4 flex items-center gap-2">
-                  <Plus size={16} className="text-emerald-600" />
-                  Add Unassigned Members
-                </h3>
-                <div className="space-y-2">
-                  {unassignedMembers.map(member => (
-                    <div key={member.id} className="flex items-center justify-between p-3 bg-white border border-slate-200 rounded-xl hover:border-emerald-200 transition-all">
-                      <span className="text-sm font-medium text-slate-700">{member.full_name}</span>
-                      <button 
-                        onClick={() => handleAddMemberToGroup(member.id, showManageMembersModal)}
-                        className="p-1.5 text-emerald-600 hover:bg-emerald-50 rounded-lg transition-all"
-                      >
-                        <Plus size={18} />
-                      </button>
-                    </div>
-                  ))}
-                  {unassignedMembers.length === 0 && (
-                    <p className="text-sm text-slate-400 italic text-center py-4">All members are already assigned to groups.</p>
-                  )}
+              {isAdmin && (
+                <div>
+                  <h3 className="text-sm font-bold text-slate-900 mb-4 flex items-center gap-2">
+                    <Plus size={16} className="text-emerald-600" />
+                    Add Members
+                  </h3>
+                  
+                  <div className="relative mb-4">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={14} />
+                    <input 
+                      type="text" 
+                      placeholder="Search members to add..."
+                      value={memberSearchTerm}
+                      onChange={(e) => setMemberSearchTerm(e.target.value)}
+                      className="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none text-xs transition-all"
+                    />
+                  </div>
+
+                  <div className="space-y-2 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
+                    {availableMembers.map(member => (
+                      <div key={member.id} className="flex items-center justify-between p-3 bg-white border border-slate-200 rounded-xl hover:border-emerald-200 hover:bg-emerald-50/30 transition-all group/item">
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold text-xs group-hover/item:bg-emerald-600 group-hover/item:text-white transition-colors">
+                            {member.full_name.charAt(0)}
+                          </div>
+                          <span className="text-sm font-medium text-slate-700 group-hover/item:text-emerald-900 transition-colors">{member.full_name}</span>
+                        </div>
+                        <button 
+                          onClick={() => handleAddMemberToGroup(member.id, showManageMembersModal!)}
+                          className="p-1.5 text-emerald-600 hover:bg-emerald-600 hover:text-white rounded-lg transition-all opacity-0 group-hover/item:opacity-100 shadow-sm"
+                        >
+                          <Plus size={18} />
+                        </button>
+                      </div>
+                    ))}
+                    {availableMembers.length === 0 && (
+                      <p className="text-sm text-slate-400 italic text-center py-4">
+                        {memberSearchTerm ? "No matching members found." : "All members are already in this group."}
+                      </p>
+                    )}
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
 
             <div className="p-6 border-t border-slate-100 bg-slate-50/50">

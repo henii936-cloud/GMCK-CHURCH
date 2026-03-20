@@ -29,6 +29,7 @@ export default function Members() {
     gender: "Male",
     group_id: "",
     address: "",
+    ministry: "",
     join_date: new Date().toISOString().split('T')[0]
   });
 
@@ -63,6 +64,7 @@ export default function Members() {
         gender: member.gender || "Male",
         group_id: member.group_id || "",
         address: member.address || "",
+        ministry: member.ministry || "",
         join_date: member.join_date || new Date().toISOString().split('T')[0]
       });
     } else {
@@ -74,6 +76,7 @@ export default function Members() {
         gender: "Male",
         group_id: "",
         address: "",
+        ministry: "",
         join_date: new Date().toISOString().split('T')[0]
       });
     }
@@ -209,9 +212,10 @@ export default function Members() {
               <tr style={{ background: 'rgba(255,255,255,0.02)', borderBottom: '1px solid var(--border)' }}>
                 <th style={{ padding: '20px 24px', textAlign: 'left', color: 'var(--text-muted)', fontSize: '0.75rem', fontWeight: '800', textTransform: 'uppercase' }}>Participant Profile</th>
                 <th style={{ padding: '20px 24px', textAlign: 'left', color: 'var(--text-muted)', fontSize: '0.75rem', fontWeight: '800', textTransform: 'uppercase' }}>Contact Info</th>
-                <th style={{ padding: '20px 24px', textAlign: 'left', color: 'var(--text-muted)', fontSize: '0.75rem', fontWeight: '800', textTransform: 'uppercase' }}>Gender</th>
-                <th style={{ padding: '20px 24px', textAlign: 'left', color: 'var(--text-muted)', fontSize: '0.75rem', fontWeight: '800', textTransform: 'uppercase' }}>Study Unit</th>
-                <th style={{ padding: '20px 24px', textAlign: 'left', color: 'var(--text-muted)', fontSize: '0.75rem', fontWeight: '800', textTransform: 'uppercase' }}>Join Date</th>
+                <th style={{ padding: '20px 24px', textAlign: 'left', fontWeight: '700', fontSize: '0.85rem', textTransform: 'uppercase', color: 'var(--text-muted)' }}>Status</th>
+                <th style={{ padding: '20px 24px', textAlign: 'left', fontWeight: '700', fontSize: '0.85rem', textTransform: 'uppercase', color: 'var(--text-muted)' }}>Unit/Group</th>
+                <th style={{ padding: '20px 24px', textAlign: 'left', fontWeight: '700', fontSize: '0.85rem', textTransform: 'uppercase', color: 'var(--text-muted)' }}>Ministry</th>
+                <th style={{ padding: '20px 24px', textAlign: 'left', fontWeight: '700', fontSize: '0.85rem', textTransform: 'uppercase', color: 'var(--text-muted)' }}>Joined</th>
                 <th style={{ padding: '20px 24px', textAlign: 'right' }}>Actions</th>
               </tr>
             </thead>
@@ -247,6 +251,9 @@ export default function Members() {
                   </td>
                   <td style={{ padding: '20px 24px' }}>
                     <p style={{ fontSize: '0.875rem', fontWeight: '600', margin: 0 }}>{m.bible_study_groups?.group_name || 'Unassigned'}</p>
+                  </td>
+                  <td style={{ padding: '20px 24px' }}>
+                    <span style={{ fontSize: '0.875rem', color: 'var(--text-muted)' }}>{m.ministry || 'N/A'}</span>
                   </td>
                   <td style={{ padding: '20px 24px' }}>
                     <span style={{ fontSize: '0.875rem', color: 'var(--text-muted)' }}>
@@ -342,13 +349,20 @@ export default function Members() {
                         </div>
                       </div>
 
-                      <div className="md:col-span-2">
+                      <div className="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6">
                         <Input 
                           label="Residential Address" 
                           placeholder="Home address details" 
-                          value={formData.address} 
-                          onChange={e => setFormData({...formData, address: e.target.value})} 
-                          icon={MapPin} 
+                          value={formData.address || ""} 
+                          onChange={e => setFormData({...formData, address: e.target.value})}
+                          icon={MapPin}
+                        />
+                        <Input 
+                          label="Ministry / Department" 
+                          placeholder="e.g. Worship, Ushering" 
+                          value={formData.ministry || ""} 
+                          onChange={e => setFormData({...formData, ministry: e.target.value})}
+                          icon={ShieldCheck}
                         />
                       </div>
                     </div>

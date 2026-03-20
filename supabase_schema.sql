@@ -28,18 +28,20 @@ CREATE TABLE IF NOT EXISTS public.bible_study_groups (
 );
 
 -- =====================================================
--- 3. MEMBERS (NO LOGIN USERS)
+-- 3. MEMBERS (CHURCH ATTENDEES - NO LOGIN)
 -- =====================================================
 CREATE TABLE IF NOT EXISTS public.members (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   full_name TEXT NOT NULL,
-  gender TEXT,
   phone TEXT,
   email TEXT,
+  gender TEXT CHECK (gender IN ('Male', 'Female', 'Other')),
+  ministry TEXT,
   address TEXT,
   join_date DATE DEFAULT CURRENT_DATE,
   group_id UUID REFERENCES public.bible_study_groups(id) ON DELETE SET NULL,
-  created_at TIMESTAMPTZ DEFAULT timezone('utc', now()) NOT NULL
+  created_at TIMESTAMPTZ DEFAULT timezone('utc', now()) NOT NULL,
+  updated_at TIMESTAMPTZ DEFAULT timezone('utc', now()) NOT NULL
 );
 
 -- =====================================================

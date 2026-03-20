@@ -6,7 +6,7 @@
 CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 
 -- =====================================================
--- 1. TABLES DEFINITION
+-- 1. TABLES DEFINITION (Idempotent)
 -- =====================================================
 
 -- PROFILES: Linked to Supabase Auth
@@ -103,7 +103,7 @@ RETURNS BOOLEAN AS $$
   );
 $$ LANGUAGE sql SECURITY DEFINER;
 
--- Check if user is Leader of a group
+-- Check if user is Leader of a specific group
 CREATE OR REPLACE FUNCTION public.is_group_leader(g_id UUID)
 RETURNS BOOLEAN AS $$
   SELECT EXISTS (
@@ -127,6 +127,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
+-- Ensure the trigger is clean before creating
 DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
 CREATE TRIGGER on_auth_user_created
   AFTER INSERT ON auth.users
@@ -148,53 +149,56 @@ ALTER TABLE public.transactions ENABLE ROW LEVEL SECURITY;
 -- PROFILES POLICIES
 DROP POLICY IF EXISTS "profiles_view_all" ON public.profiles;
 CREATE POLICY "profiles_view_all" ON public.profiles FOR SELECT USING (true);
+
 DROP POLICY IF EXISTS "profiles_update_own" ON public.profiles;
 CREATE POLICY "profiles_update_own" ON public.profiles FOR UPDATE USING (auth.uid() = id);
 
 -- BIBLE STUDY GROUPS POLICIES
 DROP POLICY IF EXISTS "groups_view_all" ON public.bible_study_groups;
 CREATE POLICY "groups_view_all" ON public.bible_study_groups FOR SELECT USING (true);
+
 DROP POLICY IF EXISTS "groups_admin_manage" ON public.bible_study_groups;
 CREATE POLICY "groups_admin_manage" ON public.bible_study_groups FOR ALL USING (public.is_admin());
 
 -- MEMBERS POLICIES (Fixing the RLS violation error)
+DROP POLICY IF EXISTS "members_admin_all" ON public.members;
+CREATE POLICY "members_admin_all" ON public.members FOR ALL USING (public.is_admin());
+
+-- Remove old separate admin policies if they exist from previous runs
 DROP POLICY IF EXISTS "members_admin_select" ON public.members;
 DROP POLICY IF EXISTS "members_admin_insert" ON public.members;
 DROP POLICY IF EXISTS "members_admin_update" ON public.members;
 DROP POLICY IF EXISTS "members_admin_delete" ON public.members;
-CREATE POLICY "members_admin_select" ON public.members FOR SELECT USING (public.is_admin());
-CREATE POLICY "members_admin_insert" ON public.members FOR INSERT WITH CHECK (public.is_admin());
-CREATE POLICY "members_admin_update" ON public.members FOR UPDATE USING (public.is_admin()) WITH CHECK (public.is_admin());
-CREATE POLICY "members_admin_delete" ON public.members FOR DELETE USING (public.is_admin());
-
 DROP POLICY IF EXISTS "leaders_view_members" ON public.members;
-CREATE POLICY "leaders_view_members" ON public.members FOR SELECT USING (public.is_group_leader(group_id));
+
+-- Allow leaders to manage (Insert, Select, Update, Delete) members in THEIR group
+DROP POLICY IF EXISTS "leaders_manage_members" ON public.members;
+CREATE POLICY "leaders_manage_members" ON public.members 
+FOR ALL 
+USING (public.is_group_leader(group_id)) 
+WITH CHECK (public.is_group_leader(group_id));
 
 -- STUDY ATTENDANCE POLICIES
 DROP POLICY IF EXISTS "attendance_admin_view" ON public.study_attendance;
-CREATE POLICY "attendance_admin_view" ON public.study_attendance FOR SELECT USING (public.is_admin());
+CREATE POLICY "attendance_admin_view" ON public.study_attendance FOR ALL USING (public.is_admin());
+
 DROP POLICY IF EXISTS "leaders_manage_attendance" ON public.study_attendance;
 CREATE POLICY "leaders_manage_attendance" ON public.study_attendance FOR ALL USING (public.is_group_leader(group_id));
 
 -- STUDY PROGRESS POLICIES
 DROP POLICY IF EXISTS "progress_admin_view" ON public.study_progress;
-CREATE POLICY "progress_admin_view" ON public.study_progress FOR SELECT USING (public.is_admin());
+CREATE POLICY "progress_admin_view" ON public.study_progress FOR ALL USING (public.is_admin());
+
 DROP POLICY IF EXISTS "leaders_manage_progress" ON public.study_progress;
 CREATE POLICY "leaders_manage_progress" ON public.study_progress FOR ALL USING (public.is_group_leader(group_id));
 
 -- EVENTS POLICIES
 DROP POLICY IF EXISTS "events_view_all" ON public.events;
 CREATE POLICY "events_view_all" ON public.events FOR SELECT USING (true);
+
 DROP POLICY IF EXISTS "events_admin_manage" ON public.events;
 CREATE POLICY "events_admin_manage" ON public.events FOR ALL USING (public.is_admin());
 
 -- TRANSACTIONS POLICIES
 DROP POLICY IF EXISTS "transactions_admin_manage" ON public.transactions;
 CREATE POLICY "transactions_admin_manage" ON public.transactions FOR ALL USING (public.is_admin());
-
--- Gemnia ai
-CREATE POLICY "Allow users to insert their own member record"
-ON members 
-FOR INSERT 
-TO authenticated                   -- Only logged-in users
-WITH CHECK (auth.uid() = user_id); -- They can only insert if the row's user_id matches their token

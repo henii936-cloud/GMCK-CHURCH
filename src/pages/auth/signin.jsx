@@ -1,6 +1,9 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
+import { Button, Card, Input } from "../../components/common/UI";
+import { Mail, Lock, ArrowRight, Layers } from "lucide-react";
+import { motion } from "framer-motion";
 
 export default function SignIn() {
     const navigate = useNavigate();
@@ -41,32 +44,58 @@ export default function SignIn() {
     };
 
     return (
-        <div className="auth-container">
-            <form onSubmit={handleSignIn}>
-                <h2>Sign In</h2>
+        <div className="grid place-items-center min-h-screen bg-background p-5 text-foreground">
+            <motion.div 
+                initial={{ opacity: 0, y: 20 }} 
+                animate={{ opacity: 1, y: 0 }}
+                className="w-full max-w-md"
+            >
+                <Card className="p-8 md:p-10">
+                    <div className="text-center mb-10">
+                        <div className="w-16 h-16 rounded-2xl bg-primary grid place-items-center mx-auto mb-6 shadow-lg shadow-primary/20">
+                            <Layers size={32} className="text-primary-foreground" />
+                        </div>
+                        <h2 className="text-3xl font-extrabold mb-2">Welcome Back</h2>
+                        <p className="text-muted-foreground">Sign in to your GMKC account</p>
+                    </div>
 
-                <input
-                    type="email"
-                    placeholder="Email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                />
+                    <form onSubmit={handleSignIn} className="flex flex-col gap-6">
+                        <Input 
+                            label="Email Address"
+                            type="email"
+                            placeholder="samuel@church.org"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            required
+                            icon={Mail}
+                        />
 
-                <input
-                    type="password"
-                    placeholder="Password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                />
+                        <Input 
+                            label="Password"
+                            type="password"
+                            placeholder="••••••••"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            required
+                            icon={Lock}
+                        />
 
-                {errorMsg && <p className="error">{errorMsg}</p>}
+                        {errorMsg && (
+                            <div className="p-3 rounded-xl bg-destructive/10 text-destructive text-sm font-semibold border border-destructive/20">
+                                {errorMsg}
+                            </div>
+                        )}
 
-                <button type="submit" disabled={loading}>
-                    {loading ? "Signing in..." : "Sign In"}
-                </button>
-            </form>
+                        <Button type="submit" loading={loading} className="h-14 mt-2 text-base">
+                            Sign In <ArrowRight size={20} className="ml-2" />
+                        </Button>
+                    </form>
+
+                    <p className="text-center mt-8 text-muted-foreground text-sm">
+                        Don't have an account? <Link to="/signup" className="text-primary font-bold hover:underline">Sign Up</Link>
+                    </p>
+                </Card>
+            </motion.div>
         </div>
     );
 }

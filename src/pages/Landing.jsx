@@ -20,123 +20,88 @@ export default function Landing() {
   }, [user, loading, navigate]);
 
   if (loading) return (
-    <div style={{ display: 'grid', placeItems: 'center', minHeight: '100vh', background: 'var(--bg)', color: 'white' }}>
-      <div style={{ padding: '24px', borderRadius: '16px', background: 'var(--surface)', backdropFilter: 'var(--glass)', border: '1px solid var(--border)', textAlign: 'center' }}>
-        <h2 style={{ marginBottom: '16px' }}>Preparing Your CMS...</h2>
-        <div style={{ width: '48px', height: '48px', border: '3px solid var(--border)', borderTop: '3px solid var(--primary)', borderRadius: '50%', animation: 'spin 1s linear infinite', margin: '0 auto' }}></div>
+    <div className="grid place-items-center min-h-screen bg-background text-foreground">
+      <div className="p-6 rounded-2xl bg-card/50 backdrop-blur-md border border-border text-center">
+        <h2 className="mb-4 text-xl font-semibold">Preparing Your CMS...</h2>
+        <div className="w-12 h-12 border-4 border-border border-t-primary rounded-full animate-spin mx-auto"></div>
       </div>
-      <style>{`@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }`}</style>
     </div>
   );
 
   return (
-    <div className="landing-page" style={{ background: 'var(--bg)', minHeight: '100vh', color: 'white' }}>
+    <div className="min-h-screen bg-background text-foreground">
       {/* Navigation */}
-      <nav style={{ 
-        padding: '20px 40px', 
-        display: 'flex', 
-        alignItems: 'center', 
-        justifyContent: 'space-between',
-        background: 'rgba(30, 41, 59, 0.4)',
-        backdropFilter: 'var(--glass)',
-        borderBottom: '1px solid var(--border)',
-        position: 'sticky',
-        top: 0,
-        zIndex: 1000
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <div style={{ width: 40, height: 40, borderRadius: 12, background: 'var(--primary)', display: 'grid', placeItems: 'center' }}>
-            <Layers size={24} color="white" />
+      <nav className="sticky top-0 z-50 flex items-center justify-between px-6 py-4 md:px-10 bg-slate-900/40 backdrop-blur-md border-b border-border">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-primary grid place-items-center">
+            <Layers size={24} className="text-primary-foreground" />
           </div>
-          <h2 style={{ fontSize: '1.5rem', fontWeight: '800' }}>GMKC Church</h2>
+          <h2 className="text-2xl font-extrabold tracking-tight">GMKC Church</h2>
         </div>
 
-        <div style={{ display: 'flex', gap: '24px', alignItems: 'center' }}>
-          <div style={{ display: 'flex', gap: '16px' }}>
-            <Link to="/login/admin" className="nav-link">Admin</Link>
-            <Link to="/login/leader" className="nav-link">Leader</Link>
-            <Link to="/login/finance" className="nav-link">Finance</Link>
+        <div className="flex items-center gap-6">
+          <div className="hidden md:flex gap-4">
+            <Link to="/login/admin" className="font-semibold text-muted-foreground hover:text-foreground transition-colors">Admin</Link>
+            <Link to="/login/leader" className="font-semibold text-muted-foreground hover:text-foreground transition-colors">Leader</Link>
+            <Link to="/login/finance" className="font-semibold text-muted-foreground hover:text-foreground transition-colors">Finance</Link>
           </div>
         </div>
       </nav>
 
       {/* Hero Section */}
-      <section style={{ 
-        padding: '100px 40px', 
-        display: 'flex', 
-        flexDirection: 'column', 
-        alignItems: 'center', 
-        textAlign: 'center',
-        background: 'radial-gradient(circle at center, rgba(99, 102, 241, 0.1) 0%, transparent 70%)'
-      }}>
-        <div className="animate-fade-in" style={{ maxWidth: '900px' }}>
-          <div style={{ 
-            display: 'inline-flex', 
-            alignItems: 'center', 
-            gap: '8px', 
-            padding: '8px 20px', 
-            borderRadius: '999px', 
-            background: 'rgba(99, 102, 241, 0.1)',
-            color: 'var(--primary)',
-            fontWeight: '700',
-            fontSize: '0.875rem',
-            marginBottom: '32px',
-            border: '1px solid rgba(99, 102, 241, 0.2)'
-          }}>
+      <section className="px-6 py-24 md:px-10 flex flex-col items-center text-center bg-[radial-gradient(circle_at_center,rgba(99,102,241,0.1)_0%,transparent_70%)]">
+        <div className="animate-in fade-in slide-in-from-bottom-4 duration-1000 max-w-4xl">
+          <div className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-indigo-500/10 text-indigo-400 font-bold text-sm mb-8 border border-indigo-500/20">
             <Sparkles size={16} /> Empowering Your Spiritual Community
           </div>
 
-          <h1 style={{ fontSize: '4.5rem', fontWeight: '900', letterSpacing: '-0.04em', lineHeight: '1.1', marginBottom: '32px' }}>
-            The Modern Pulse of <br /><span style={{ 
-              background: 'linear-gradient(90deg, #6366f1, #ec4899)', 
-              WebkitBackgroundClip: 'text', 
-              WebkitTextFillColor: 'transparent' 
-            }}>GMKC Church Management</span>
+          <h1 className="text-5xl md:text-7xl font-black tracking-tighter leading-tight mb-8">
+            The Modern Pulse of <br />
+            <span className="bg-gradient-to-r from-indigo-500 to-pink-500 bg-clip-text text-transparent">
+              GMKC Church Management
+            </span>
           </h1>
           
-          <p style={{ fontSize: '1.25rem', color: 'var(--text-muted)', marginBottom: '48px', lineHeight: '1.6', maxWidth: '700px', margin: '0 auto 48px' }}>
+          <p className="text-lg md:text-xl text-muted-foreground mb-12 leading-relaxed max-w-2xl mx-auto">
             A unified ecosystem for bible studies, financial governance, and leadership activities. Designed to grow with your faith.
           </p>
 
-          <div style={{ display: 'flex', gap: '20px', justifyContent: 'center' }}>
+          <div className="flex flex-col sm:flex-row gap-5 justify-center">
             <Link to="/login">
-              <Button style={{ padding: '16px 40px', fontSize: '1.1rem' }}>Access Portal <ArrowRight size={20} style={{ marginLeft: '12px' }} /></Button>
+              <Button className="px-10 py-6 text-lg h-auto">
+                Access Portal <ArrowRight size={20} className="ml-3" />
+              </Button>
             </Link>
             <Link to="/signup">
-              <Button variant="secondary" style={{ padding: '16px 40px', fontSize: '1.1rem' }}>Create Account</Button>
+              <Button variant="outline" className="px-10 py-6 text-lg h-auto">
+                Create Account
+              </Button>
             </Link>
           </div>
         </div>
       </section>
 
       {/* Role Access Grid */}
-      <section style={{ padding: '20px 40px 80px' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '24px', maxWidth: '1200px', margin: '0 auto' }}>
+      <section className="px-6 py-10 pb-20 md:px-10">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto">
           {[
-            { id: 'admin', name: 'Admin', icon: Layers, color: '#6366f1', loginPath: '/login/admin' },
-            { id: 'bible_leader', name: 'Leader', icon: Users, color: '#10b981', loginPath: '/login/leader' },
-            { id: 'finance', name: 'Finance', icon: DollarSign, color: '#f59e0b', loginPath: '/login/finance' }
+            { id: 'admin', name: 'Admin', icon: Layers, color: 'text-indigo-500', bg: 'bg-indigo-500', shadow: 'shadow-indigo-500/20', border: 'border-indigo-500', hoverBg: 'hover:bg-indigo-500/10', loginPath: '/login/admin' },
+            { id: 'bible_leader', name: 'Leader', icon: Users, color: 'text-emerald-500', bg: 'bg-emerald-500', shadow: 'shadow-emerald-500/20', border: 'border-emerald-500', hoverBg: 'hover:bg-emerald-500/10', loginPath: '/login/leader' },
+            { id: 'finance', name: 'Finance', icon: DollarSign, color: 'text-amber-500', bg: 'bg-amber-500', shadow: 'shadow-amber-500/20', border: 'border-amber-500', hoverBg: 'hover:bg-amber-500/10', loginPath: '/login/finance' }
           ].map((r) => (
-            <div key={r.id} style={{ 
-              padding: '32px', 
-              borderRadius: '24px', 
-              background: 'rgba(255,255,255,0.03)', 
-              border: '1px solid var(--border)', 
-              textAlign: 'center',
-              transition: '0.3s',
-            }} className="role-card">
-              <div style={{ width: 56, height: 56, borderRadius: 16, background: r.color, display: 'grid', placeItems: 'center', margin: '0 auto 20px', boxShadow: `0 8px 16px ${r.color}33` }}>
-                <r.icon color="white" size={28} />
+            <div key={r.id} className="p-8 rounded-3xl bg-white/5 border border-border text-center transition-all duration-300 hover:border-primary hover:bg-white/10 hover:-translate-y-2 group">
+              <div className={`w-14 h-14 rounded-2xl ${r.bg} grid place-items-center mx-auto mb-5 shadow-lg ${r.shadow}`}>
+                <r.icon className="text-white" size={28} />
               </div>
-              <h3 style={{ fontSize: '1.25rem', fontWeight: '800', marginBottom: '8px', color: 'white' }}>{r.name} Portal</h3>
-              <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem', marginBottom: '24px' }}>Access your {r.name.toLowerCase()} tools and management.</p>
+              <h3 className="text-xl font-extrabold mb-2 text-foreground">{r.name} Portal</h3>
+              <p className="text-muted-foreground text-sm mb-6">Access your {r.name.toLowerCase()} tools and management.</p>
               
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                <Link to={r.loginPath} style={{ textDecoration: 'none' }}>
-                  <Button style={{ width: '100%', background: r.color }}>Sign In as {r.name}</Button>
+              <div className="flex flex-col gap-3">
+                <Link to={r.loginPath} className="w-full">
+                  <Button className={`w-full ${r.bg} hover:opacity-90 text-white border-none`}>Sign In as {r.name}</Button>
                 </Link>
-                <Link to="/signup" state={{ role: r.id }} style={{ textDecoration: 'none' }}>
-                  <Button variant="secondary" style={{ width: '100%', borderColor: r.color, color: r.color }}>Sign Up as {r.name}</Button>
+                <Link to="/signup" state={{ role: r.id }} className="w-full">
+                  <Button variant="outline" className={`w-full ${r.border} ${r.color} ${r.hoverBg}`}>Sign Up as {r.name}</Button>
                 </Link>
               </div>
             </div>
@@ -145,41 +110,23 @@ export default function Landing() {
       </section>
 
       {/* Feature Grid */}
-      <section style={{ padding: '80px 40px' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '32px', maxWidth: '1200px', margin: '0 auto' }}>
+      <section className="px-6 py-20 md:px-10">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
           <Card icon={Users} title="Community Hub" subtitle="Member & Group Management">
-            <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem' }}>Organize your congregation with ease. Assign leaders and track spiritual growth in one click.</p>
+            <p className="text-muted-foreground text-sm">Organize your congregation with ease. Assign leaders and track spiritual growth in one click.</p>
           </Card>
           <Card icon={BookOpen} title="Study Insights" subtitle="Bible Study Progress Tracking">
-            <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem' }}>Log topics, verses, and key themes. Admins see real-time updates from every group leader.</p>
+            <p className="text-muted-foreground text-sm">Log topics, verses, and key themes. Admins see real-time updates from every group leader.</p>
           </Card>
           <Card icon={DollarSign} title="Finance Protocol" subtitle="Secure Giving & Budgeting">
-            <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem' }}>Tithe and offering logs with professional-grade security and full budget transparency.</p>
+            <p className="text-muted-foreground text-sm">Tithe and offering logs with professional-grade security and full budget transparency.</p>
           </Card>
         </div>
       </section>
 
-      <footer style={{ padding: '40px', textAlign: 'center', borderTop: '1px solid var(--border)', marginTop: '100px', color: 'var(--text-muted)', fontSize: '0.875rem' }}>
+      <footer className="p-10 text-center border-t border-border mt-24 text-muted-foreground text-sm">
         &copy; 2026 GMKC Church. All Rights Reserved. Built with Antigravity.
       </footer>
-
-      <style>{`
-        .nav-link { 
-          text-decoration: none; 
-          font-weight: 600; 
-          color: var(--text-muted); 
-          transition: 0.2s; 
-        }
-        .nav-link:hover { color: white; }
-        .animate-fade-in {
-          animation: fadeIn 0.8s ease-out forwards;
-        }
-        .role-card:hover { 
-          border-color: var(--primary) !important;
-          background: rgba(255,255,255,0.05) !important;
-          transform: translateY(-8px);
-        }
-      `}</style>
     </div>
   );
 }

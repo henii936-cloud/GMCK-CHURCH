@@ -31,14 +31,24 @@ export default function Signup() {
       id: 'admin', 
       name: 'Administrator', 
       icon: ShieldCheck, 
-      color: '#6366f1', 
+      color: 'text-indigo-500',
+      bg: 'bg-indigo-500',
+      border: 'border-indigo-500',
+      bgLight: 'bg-indigo-500/10',
+      shadow: 'shadow-indigo-500/20',
+      gradient: 'from-indigo-500/20 to-transparent',
       desc: 'Oversee all church activities and group performance.' 
     },
     { 
       id: 'bible_leader', 
       name: 'Bible Study Leader', 
       icon: Users, 
-      color: '#10b981', 
+      color: 'text-emerald-500',
+      bg: 'bg-emerald-500',
+      border: 'border-emerald-500',
+      bgLight: 'bg-emerald-500/10',
+      shadow: 'shadow-emerald-500/20',
+      gradient: 'from-emerald-500/20 to-transparent',
       desc: 'Manage your study group and track member engagement.' 
     }
   ];
@@ -97,14 +107,14 @@ export default function Signup() {
 
   if (success) {
     return (
-      <div style={{ display: 'grid', placeItems: 'center', minHeight: '100vh', background: 'var(--bg)', padding: '20px' }}>
+      <div className="grid place-items-center min-h-screen bg-background p-5">
         <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}>
-          <Card style={{ maxWidth: '500px', textAlign: 'center', padding: '48px' }}>
-            <div style={{ width: 80, height: 80, borderRadius: '50%', background: 'rgba(16, 185, 129, 0.1)', color: '#10b981', display: 'grid', placeItems: 'center', margin: '0 auto 24px' }}>
+          <Card className="max-w-lg text-center p-12">
+            <div className="w-20 h-20 rounded-full bg-emerald-500/10 text-emerald-500 grid place-items-center mx-auto mb-6">
               <CheckCircle2 size={48} />
             </div>
-            <h2 style={{ fontSize: '2rem', fontWeight: '800', marginBottom: '16px' }}>Account Created!</h2>
-            <p style={{ color: 'var(--text-muted)', marginBottom: '32px' }}>
+            <h2 className="text-3xl font-extrabold mb-4">Account Created!</h2>
+            <p className="text-muted-foreground mb-8">
               Welcome to the Church ERP System. Redirecting to login...
             </p>
           </Card>
@@ -114,106 +124,71 @@ export default function Signup() {
   }
 
   return (
-    <div style={{ 
-      display: 'grid', 
-      gridTemplateColumns: 'minmax(300px, 450px) 1fr', 
-      minHeight: '100vh', 
-      background: 'var(--bg)',
-      color: 'white'
-    }}>
+    <div className="grid grid-cols-1 md:grid-cols-[minmax(300px,450px)_1fr] min-h-screen bg-background text-foreground">
       {/* Sidebar Info */}
-      <div style={{ 
-        background: `linear-gradient(135deg, ${activeRole.color}22 0%, ${activeRole.color}00 100%)`, 
-        padding: '60px 40px',
-        borderRight: '1px solid var(--border)',
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'center'
-      }}>
-        <div style={{ marginBottom: '40px' }}>
-          <Link to="/" style={{ textDecoration: 'none', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '8px', fontWeight: '700' }}>
+      <div className={`bg-gradient-to-br ${activeRole.gradient} p-10 md:p-16 border-r border-border flex flex-col justify-center`}>
+        <div className="mb-10">
+          <Link to="/" className="text-muted-foreground flex items-center gap-2 font-bold hover:text-foreground transition-colors">
             <ChevronLeft size={20} /> Home Page
           </Link>
         </div>
         
-        <h1 style={{ fontSize: '3rem', fontWeight: '900', letterSpacing: '-0.04em', lineHeight: '1.2', marginBottom: '24px' }}>
-          Join the <br /><span style={{ color: activeRole.color }}>{activeRole.name}</span> Team
+        <h1 className="text-5xl font-black tracking-tighter leading-tight mb-6">
+          Join the <br /><span className={activeRole.color}>{activeRole.name}</span> Team
         </h1>
-        <p style={{ fontSize: '1.1rem', color: 'var(--text-muted)', lineHeight: '1.6' }}>
+        <p className="text-lg text-muted-foreground leading-relaxed">
           {activeRole.desc}
         </p>
         
-        <div style={{ marginTop: 'auto', paddingTop: '40px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '16px', borderRadius: '16px', background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border)' }}>
-            <Zap size={20} color={activeRole.color} />
-            <span style={{ fontSize: '0.9rem', fontWeight: '600' }}>Access granted to {activeRole.name} special features.</span>
+        <div className="mt-auto pt-10">
+          <div className="flex items-center gap-3 p-4 rounded-2xl bg-white/5 border border-border">
+            <Zap size={20} className={activeRole.color} />
+            <span className="text-sm font-semibold">Access granted to {activeRole.name} special features.</span>
           </div>
         </div>
       </div>
 
       {/* Main Form Area */}
-      <div style={{ padding: '60px 40px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+      <div className="p-10 md:p-16 flex flex-col items-center justify-center">
         <motion.div 
           key={role}
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
-          style={{ width: '100%', maxWidth: '500px' }}
+          className="w-full max-w-lg"
         >
-          <div style={{ textAlign: 'center', marginBottom: '40px' }}>
-            <div style={{ display: 'flex', justifyContent: 'center', gap: '16px', marginBottom: '32px' }}>
+          <div className="text-center mb-10">
+            <div className="flex justify-center gap-4 mb-8">
               {roles.map(r => (
                 <button 
                   key={r.id}
                   onClick={() => setRole(r.id)}
-                  style={{ 
-                    padding: '12px 24px', 
-                    borderRadius: '12px', 
-                    border: '1px solid',
-                    borderColor: role === r.id ? r.color : 'var(--border)',
-                    background: role === r.id ? `${r.color}11` : 'transparent',
-                    color: role === r.id ? r.color : 'var(--text-muted)',
-                    fontWeight: '700',
-                    transition: '0.3s',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    gap: '4px',
-                    width: '120px'
-                  }}
+                  className={`px-6 py-3 rounded-xl border font-bold transition-all duration-300 flex flex-col items-center gap-1 w-32
+                    ${role === r.id ? `${r.border} ${r.bgLight} ${r.color}` : 'border-border bg-transparent text-muted-foreground hover:border-primary/50'}`}
                 >
                   <r.icon size={20} />
-                  <span style={{ fontSize: '0.7rem', textTransform: 'uppercase' }}>{r.id.replace('_', ' ')}</span>
+                  <span className="text-[11px] uppercase tracking-wider">{r.id.replace('_', ' ')}</span>
                 </button>
               ))}
             </div>
-            <h2 style={{ fontSize: '1.5rem', fontWeight: '800' }}>Establish Your Identity</h2>
-            <p style={{ color: 'var(--text-muted)' }}>Complete the registration to activate your church credentials.</p>
+            <h2 className="text-2xl font-extrabold mb-2">Establish Your Identity</h2>
+            <p className="text-muted-foreground">Complete the registration to activate your church credentials.</p>
           </div>
 
-          <form onSubmit={handleSignup} style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+          <form onSubmit={handleSignup} className="flex flex-col gap-6">
             <Input label="Full Display Name" placeholder="e.g. Samuel Adekunle" value={name} onChange={e => setName(e.target.value)} required icon={User} />
             <Input label="Official Email Address" type="email" placeholder="samuel@church.org" value={email} onChange={e => setEmail(e.target.value)} required icon={Mail} />
             <Input label="Secure Password" type="password" placeholder="••••••••" value={password} onChange={e => setPassword(e.target.value)} required icon={Lock} />
 
             {role === 'bible_leader' && (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                <label style={{ fontSize: '0.875rem', fontWeight: '600', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <div className="flex flex-col gap-2">
+                <label className="text-sm font-semibold text-muted-foreground flex items-center gap-2">
                   <MapPin size={16} /> Select Bible Study Group
                 </label>
                 <select 
                   value={groupId} 
                   onChange={e => setGroupId(e.target.value)}
                   required
-                  style={{ 
-                    width: '100%', 
-                    padding: '12px 16px', 
-                    borderRadius: '12px', 
-                    background: 'var(--surface)', 
-                    border: '1px solid var(--border)', 
-                    color: 'white',
-                    fontSize: '1rem',
-                    outline: 'none'
-                  }}
+                  className="w-full px-4 py-3 rounded-xl bg-card border border-border text-foreground text-base outline-none focus:ring-2 focus:ring-primary/50 transition-all"
                 >
                   <option value="">-- Choose a Group --</option>
                   {groups.map(g => (
@@ -221,24 +196,24 @@ export default function Signup() {
                   ))}
                 </select>
                 {groups.length === 0 && (
-                  <p style={{ fontSize: '0.75rem', color: '#f59e0b' }}>No available groups. Please contact Admin to create one.</p>
+                  <p className="text-xs text-amber-500">No available groups. Please contact Admin to create one.</p>
                 )}
               </div>
             )}
 
             {error && (
-              <div style={{ padding: '12px', borderRadius: '12px', background: 'rgba(239,68,68,0.1)', color: '#ef4444', fontSize: '0.875rem', fontWeight: '600', border: '1px solid rgba(239,68,68,0.2)' }}>
+              <div className="p-3 rounded-xl bg-destructive/10 text-destructive text-sm font-semibold border border-destructive/20">
                 {error}
               </div>
             )}
 
-            <Button type="submit" loading={loading} style={{ height: '56px', background: activeRole.color, boxShadow: `0 8px 16px ${activeRole.color}22` }}>
-              Sign Up <ArrowRight size={20} style={{ marginLeft: '12px' }} />
+            <Button type="submit" loading={loading} className={`h-14 ${activeRole.bg} hover:opacity-90 text-white border-none shadow-lg ${activeRole.shadow}`}>
+              Sign Up <ArrowRight size={20} className="ml-3" />
             </Button>
           </form>
 
-          <p style={{ textAlign: 'center', marginTop: '32px', color: 'var(--text-muted)', fontSize: '0.9rem' }}>
-            Already part of the ecosystem? <Link to="/login" style={{ color: activeRole.color, fontWeight: '700', textDecoration: 'none' }}>Sign In here</Link>
+          <p className="text-center mt-8 text-muted-foreground text-sm">
+            Already part of the ecosystem? <Link to="/login" className={`${activeRole.color} font-bold hover:underline`}>Sign In here</Link>
           </p>
         </motion.div>
       </div>

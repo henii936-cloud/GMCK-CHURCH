@@ -17,7 +17,10 @@ export default function LeaderLogin() {
 
   const theme = {
     name: "Bible Study Leader",
-    color: "#10b981",
+    color: "text-emerald-500",
+    bg: "bg-emerald-500",
+    shadow: "shadow-emerald-500/30",
+    gradient: "from-emerald-500/20 to-transparent",
     icon: BookOpen
   };
 
@@ -50,15 +53,9 @@ export default function LeaderLogin() {
   };
 
   return (
-    <div style={{ 
-      display: 'grid', 
-      placeItems: 'center', 
-      minHeight: '100vh', 
-      padding: '20px',
-      background: `radial-gradient(at 0% 0%, ${theme.color}33 0, transparent 40%)`
-    }}>
-      <div style={{ position: 'fixed', top: '40px', left: '40px' }}>
-        <Link to="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--text-muted)', fontWeight: '600' }}>
+    <div className={`grid place-items-center min-h-screen p-5 bg-[radial-gradient(at_0%_0%,rgba(16,185,129,0.2)_0,transparent_40%)] bg-background text-foreground`}>
+      <div className="fixed top-10 left-10">
+        <Link to="/" className="flex items-center gap-2 text-muted-foreground font-semibold hover:text-foreground transition-colors">
           <ChevronLeft size={20} /> Back to Home
         </Link>
       </div>
@@ -66,30 +63,24 @@ export default function LeaderLogin() {
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        style={{ width: '100%', maxWidth: '460px' }}
+        className="w-full max-w-[460px]"
       >
-        <div style={{ textAlign: 'center', marginBottom: '40px' }}>
-          <div style={{ 
-            width: 72, height: 72, borderRadius: 24, 
-            background: theme.color, 
-            display: 'grid', placeItems: 'center', 
-            margin: '0 auto 20px', 
-            boxShadow: `0 12px 30px ${theme.color}44` 
-          }}>
-            <theme.icon size={36} color="white" />
+        <div className="text-center mb-10">
+          <div className={`w-20 h-20 rounded-3xl ${theme.bg} grid place-items-center mx-auto mb-6 shadow-xl ${theme.shadow}`}>
+            <theme.icon size={36} className="text-white" />
           </div>
 
-          <h1 style={{ fontSize: '2.5rem', fontWeight: '800' }}>
-            Leader<span style={{ color: theme.color }}> Portal</span>
+          <h1 className="text-4xl font-extrabold mb-2">
+            Leader<span className={theme.color}> Portal</span>
           </h1>
 
-          <p style={{ color: 'var(--text-muted)' }}>
+          <p className="text-muted-foreground">
             Bible Study Leaders Authentication
           </p>
         </div>
 
-        <Card style={{ padding: '48px' }}>
-          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+        <Card className="p-10 md:p-12">
+          <form onSubmit={handleSubmit} className="flex flex-col gap-6">
             
             <Input 
               label="Leader Email" 
@@ -110,26 +101,20 @@ export default function LeaderLogin() {
             />
 
             {error && (
-              <div style={{ 
-                color: '#ef4444', 
-                fontSize: '0.875rem', 
-                background: 'rgba(239, 68, 68, 0.1)', 
-                padding: '12px', 
-                borderRadius: '8px' 
-              }}>
+              <div className="text-destructive text-sm bg-destructive/10 p-3 rounded-xl border border-destructive/20 font-semibold">
                 {error}
               </div>
             )}
 
-            <Button type="submit" loading={loading} style={{ height: '52px', background: theme.color }}>
-              Sign In as Leader <ArrowRight size={18} style={{ marginLeft: '8px' }} />
+            <Button type="submit" loading={loading} className={`h-14 ${theme.bg} hover:opacity-90 text-white border-none shadow-lg ${theme.shadow}`}>
+              Sign In as Leader <ArrowRight size={18} className="ml-2" />
             </Button>
           </form>
         </Card>
 
-        <div style={{ marginTop: '32px', textAlign: 'center' }}>
-          <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>
-            Not a Leader? <Link to="/login/admin" style={{ color: theme.color, fontWeight: '600', textDecoration: 'none' }}>Admin Login</Link> or <Link to="/login/finance" style={{ color: theme.color, fontWeight: '600', textDecoration: 'none' }}>Finance Login</Link>
+        <div className="mt-8 text-center">
+          <p className="text-muted-foreground text-sm">
+            Not a Leader? <Link to="/login/admin" className={`${theme.color} font-semibold hover:underline`}>Admin Login</Link> or <Link to="/login/finance" className={`${theme.color} font-semibold hover:underline`}>Finance Login</Link>
           </p>
         </div>
       </motion.div>

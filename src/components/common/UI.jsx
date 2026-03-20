@@ -14,14 +14,9 @@ export const Button = ({ children, onClick, type = "button", variant = "primary"
     <button 
       type={type} 
       onClick={onClick} 
-      className={`${getBaseClass()} ${className} hover:scale-[1.02] active:scale-[0.98]`} 
+      className={`${getBaseClass()} ${className} hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2.5 transition-all duration-300 ease-out`} 
       style={{
         ...style,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        gap: '10px',
-        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
         cursor: (loading || disabled) ? 'not-allowed' : 'pointer',
         opacity: (loading || disabled) ? 0.7 : 1,
         transform: (loading || disabled) ? 'none' : undefined,
@@ -44,12 +39,12 @@ export const Card = ({ children, className = "", title, subtitle, icon: Icon, st
   return (
     <div className={`glass-card ${className}`} style={style}>
       {(title || Icon) && (
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
+        <div className="flex items-center justify-between mb-5">
           <div>
-            {title && <h3 style={{ fontSize: '1.25rem', fontWeight: '600' }}>{title}</h3>}
-            {subtitle && <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem' }}>{subtitle}</p>}
+            {title && <h3 className="text-xl font-semibold">{title}</h3>}
+            {subtitle && <p className="text-muted-foreground text-sm">{subtitle}</p>}
           </div>
-          {Icon && <Icon size={24} style={{ color: 'var(--primary)', opacity: 0.8 }} />}
+          {Icon && <Icon size={24} className="text-primary opacity-80" />}
         </div>
       )}
       {children}
@@ -59,11 +54,11 @@ export const Card = ({ children, className = "", title, subtitle, icon: Icon, st
 
 export const Input = ({ label, type = "text", placeholder, value, onChange, className = "", required, icon: Icon }) => {
   return (
-    <div className={`form-group ${className}`} style={{ marginBottom: '16px' }}>
-      {label && <label style={{ display: 'block', marginBottom: '6px', fontSize: '0.875rem', fontWeight: '500', color: 'var(--text-muted)' }}>{label}</label>}
-      <div style={{ position: 'relative' }}>
+    <div className={`form-group mb-4 ${className}`}>
+      {label && <label className="block mb-1.5 text-sm font-medium text-muted-foreground">{label}</label>}
+      <div className="relative">
         {Icon && (
-          <div style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)', pointerEvents: 'none' }}>
+          <div className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none">
             <Icon size={18} />
           </div>
         )}
@@ -73,18 +68,7 @@ export const Input = ({ label, type = "text", placeholder, value, onChange, clas
           value={value} 
           onChange={onChange}
           required={required}
-          className="input-field"
-          style={{
-            paddingLeft: Icon ? '40px' : '16px',
-            width: '100%',
-            height: '48px',
-            background: 'rgba(255, 255, 255, 0.05)',
-            border: '1px solid var(--border)',
-            borderRadius: '12px',
-            color: 'white',
-            outline: 'none',
-            transition: 'border-color 0.2s'
-          }}
+          className={`input-field ${Icon ? 'pl-10' : 'pl-4'}`}
         />
       </div>
     </div>
@@ -95,42 +79,15 @@ export const Modal = ({ isOpen, onClose, title, children }) => {
   if (!isOpen) return null;
 
   return (
-    <div style={{
-      position: 'fixed',
-      inset: 0,
-      background: 'rgba(0,0,0,0.5)',
-      backdropFilter: 'blur(8px)',
-      display: 'grid',
-      placeItems: 'center',
-      zIndex: 1000,
-      padding: '20px'
-    }}>
-      <div 
-        className="glass-card" 
-        style={{ 
-          width: '100%', 
-          maxWidth: '500px', 
-          padding: '40px',
-          position: 'relative'
-        }}
-      >
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm grid place-items-center z-[1000] p-5">
+      <div className="glass-card w-full max-w-[500px] p-10 relative">
         <button 
           onClick={onClose}
-          style={{
-            position: 'absolute',
-            top: '20px',
-            right: '20px',
-            background: 'none',
-            border: 'none',
-            color: 'var(--text-muted)',
-            cursor: 'pointer',
-            fontSize: '1.5rem',
-            lineHeight: 1
-          }}
+          className="absolute top-5 right-5 bg-transparent border-none text-muted-foreground hover:text-foreground cursor-pointer text-2xl leading-none"
         >
           &times;
         </button>
-        {title && <h2 style={{ fontSize: '1.75rem', fontWeight: '800', marginBottom: '24px' }}>{title}</h2>}
+        {title && <h2 className="text-2xl font-extrabold mb-6">{title}</h2>}
         {children}
       </div>
     </div>

@@ -38,64 +38,54 @@ export default function Sidebar() {
 
   return (
     <aside className="sidebar">
-      <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
-        <div style={{ width: 40, height: 40, borderRadius: 12, background: 'var(--primary)', display: 'grid', placeItems: 'center' }}>
-          <Layers size={24} color="white" />
+      <div className="flex items-center gap-3 mb-5">
+        <div className="w-10 h-10 rounded-xl bg-primary grid place-items-center">
+          <Layers size={24} className="text-primary-foreground" />
         </div>
         <div>
-          <h2 style={{ fontSize: '1.25rem', fontWeight: '700', letterSpacing: '-0.025em' }}>ChurchERP</h2>
-          <span style={{ fontSize: '0.75rem', textTransform: 'uppercase', color: 'var(--primary)', fontWeight: '700', letterSpacing: '0.05em' }}>{user?.role?.replace('_', ' ')} Portal</span>
+          <h2 className="text-xl font-bold tracking-tight">ChurchERP</h2>
+          <span className="text-xs uppercase text-primary font-bold tracking-wider">{user?.role?.replace('_', ' ')} Portal</span>
         </div>
       </div>
 
-      <nav style={{ flex: 1, overflowY: 'auto' }}>
-        <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-          {navItems.map((item) => (
-            <li key={item.path}>
-              <Link 
-                to={item.path} 
-                style={{ 
-                  display: 'flex', 
-                  alignItems: 'center', 
-                  gap: '12px', 
-                  padding: '12px 16px', 
-                  borderRadius: 'var(--radius)',
-                  textDecoration: 'none',
-                  color: location.pathname === item.path ? 'white' : 'var(--text-muted)',
-                  background: location.pathname === item.path ? 'rgba(99, 102, 241, 0.15)' : 'transparent',
-                  fontWeight: location.pathname === item.path ? '600' : '500',
-                  transition: '0.2s',
-                  position: 'relative',
-                  overflow: 'hidden'
-                }}
-              >
-                {location.pathname === item.path && (
-                  <div style={{ position: 'absolute', left: 0, top: '20%', bottom: '20%', width: '4px', background: 'var(--primary)', borderRadius: '0 4px 4px 0' }} />
-                )}
-                <item.icon size={20} style={{ color: location.pathname === item.path ? 'var(--primary)' : 'inherit' }} />
-                <span>{item.name}</span>
-                {location.pathname === item.path && <ChevronRight size={14} style={{ marginLeft: 'auto', opacity: 0.5 }} />}
-              </Link>
-            </li>
-          ))}
+      <nav className="flex-1 overflow-y-auto">
+        <ul className="list-none flex flex-col gap-2">
+          {navItems.map((item) => {
+            const isActive = location.pathname === item.path;
+            return (
+              <li key={item.path}>
+                <Link 
+                  to={item.path} 
+                  className={`flex items-center gap-3 px-4 py-3 rounded-lg no-underline transition-all duration-200 relative overflow-hidden ${isActive ? 'text-foreground bg-primary/15 font-semibold' : 'text-muted-foreground hover:bg-secondary/50 font-medium'}`}
+                >
+                  {isActive && (
+                    <div className="absolute left-0 top-[20%] bottom-[20%] w-1 bg-primary rounded-r-md" />
+                  )}
+                  <item.icon size={20} className={isActive ? 'text-primary' : 'text-inherit'} />
+                  <span>{item.name}</span>
+                  {isActive && <ChevronRight size={14} className="ml-auto opacity-50" />}
+                </Link>
+              </li>
+            );
+          })}
         </ul>
       </nav>
 
-      <div className="glass-card" style={{ padding: '16px', marginTop: 'auto', background: 'rgba(255, 255, 255, 0.03)' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
-          <div style={{ width: 36, height: 36, borderRadius: '50%', background: 'var(--primary)', opacity: 0.8, display: 'grid', placeItems: 'center', fontWeight: '700' }}>
+      <div className="glass-card p-4 mt-auto bg-white/5">
+        <div className="flex items-center gap-3 mb-4">
+          <div className="w-9 h-9 rounded-full bg-primary/80 grid place-items-center font-bold text-primary-foreground">
             {user?.full_name?.charAt(0) || 'U'}
           </div>
-          <div style={{ overflow: 'hidden' }}>
-            <p style={{ fontWeight: '600', fontSize: '0.875rem', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>{user?.full_name}</p>
-            <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'capitalize' }}>{user?.role?.replace('_', ' ')}</p>
+          <div className="overflow-hidden">
+            <p className="font-semibold text-sm whitespace-nowrap text-ellipsis">{user?.full_name}</p>
+            <p className="text-xs text-muted-foreground capitalize">{user?.role?.replace('_', ' ')}</p>
           </div>
         </div>
         <Button 
           variant="danger" 
           onClick={handleLogout} 
           icon={LogOut}
-          style={{ width: '100%', justifyContent: 'center' }}
+          className="w-full justify-center"
         >
           Sign Out
         </Button>

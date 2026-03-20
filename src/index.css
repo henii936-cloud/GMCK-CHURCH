@@ -113,19 +113,19 @@
 }
 
 .btn-primary {
-  @apply bg-primary text-primary-foreground hover:bg-primary/90 px-4 py-2 rounded-md font-medium inline-flex items-center gap-2 transition-colors;
+  @apply bg-primary text-primary-foreground hover:bg-primary/90 px-5 h-11 rounded-xl font-semibold inline-flex items-center justify-center gap-2 transition-all shadow-sm;
 }
 
 .btn-secondary {
-  @apply bg-secondary text-secondary-foreground hover:bg-secondary/80 px-4 py-2 rounded-md font-medium inline-flex items-center gap-2 transition-colors;
+  @apply bg-secondary text-secondary-foreground hover:bg-secondary/80 px-5 h-11 rounded-xl font-semibold inline-flex items-center justify-center gap-2 transition-all;
 }
 
 .btn-danger {
-  @apply bg-destructive text-destructive-foreground hover:bg-destructive/90 px-4 py-2 rounded-md font-medium inline-flex items-center gap-2 transition-colors;
+  @apply bg-destructive text-destructive-foreground hover:bg-destructive/90 px-5 h-11 rounded-xl font-semibold inline-flex items-center justify-center gap-2 transition-all shadow-sm;
 }
 
 .input-field {
-  @apply flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50;
+  @apply flex h-11 w-full rounded-xl border border-input bg-background px-4 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:border-primary disabled:cursor-not-allowed disabled:opacity-50 transition-all;
 }
 
 .dashboard-layout {

@@ -52,13 +52,13 @@ export const Card = ({ children, className = "", title, subtitle, icon: Icon, st
   );
 };
 
-export const Input = ({ label, type = "text", placeholder, value, onChange, className = "", required, icon: Icon }) => {
+export const Input = ({ label, type = "text", placeholder, value, onChange, className = "", inputClassName = "", required, icon: Icon }) => {
   return (
-    <div className={`form-group mb-4 ${className}`}>
-      {label && <label className="block mb-1.5 text-sm font-medium text-muted-foreground">{label}</label>}
+    <div className={`form-group ${className}`}>
+      {label && <label className="block mb-2 text-sm font-semibold text-foreground">{label}</label>}
       <div className="relative">
         {Icon && (
-          <div className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none">
+          <div className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none">
             <Icon size={18} />
           </div>
         )}
@@ -68,7 +68,7 @@ export const Input = ({ label, type = "text", placeholder, value, onChange, clas
           value={value} 
           onChange={onChange}
           required={required}
-          className={`input-field ${Icon ? 'pl-10' : 'pl-4'}`}
+          className={`flex w-full h-11 rounded-xl border border-input bg-background px-4 py-2 text-sm text-foreground ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:border-primary disabled:cursor-not-allowed disabled:opacity-50 transition-all ${Icon ? 'pl-11' : 'pl-4'} ${inputClassName}`}
         />
       </div>
     </div>

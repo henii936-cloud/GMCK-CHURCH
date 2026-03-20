@@ -5,7 +5,7 @@ import {
   Users, UserPlus, Search, Filter, Mail, Phone, 
   MoreVertical, Edit2, Trash2, CheckCircle2, 
   XCircle, FilterX, UserCheck, MapPin, 
-  Calendar, CreditCard, ChevronDown
+  Calendar, CreditCard, ChevronDown, BookOpen
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -267,58 +267,158 @@ export default function Members() {
       </Card>
 
       {/* Editor Modal */}
-      {showModal && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(10px)', display: 'grid', placeItems: 'center', zIndex: 1000, padding: '20px' }}>
-          <motion.div initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="glass-card" style={{ maxWidth: '750px', width: '100%', padding: '48px' }}>
-            <h2 style={{ fontSize: '2rem', fontWeight: '900', marginBottom: '8px' }}>
-              {editingMember ? 'Update Profile' : 'New Registration'}
-            </h2>
-            <p style={{ color: 'var(--text-muted)', marginBottom: '32px' }}>
-              Maintain accurate records for church planning and outreach.
-            </p>
-            
-            <form onSubmit={handleSaveMember} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
-              <div style={{ gridColumn: 'span 2' }}>
-                <Input label="Full Legal Name" placeholder="e.g. Johnathan Doe" value={formData.full_name} onChange={e => setFormData({...formData, full_name: e.target.value})} required />
+      <AnimatePresence>
+        {showModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/60 backdrop-blur-sm">
+            <motion.div 
+              initial={{ scale: 0.95, opacity: 0, y: 20 }} 
+              animate={{ scale: 1, opacity: 1, y: 0 }} 
+              exit={{ scale: 0.95, opacity: 0, y: 20 }}
+              className="w-full max-w-2xl bg-card border border-border rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]"
+            >
+              <div className="px-8 py-6 border-b border-border bg-muted/30 flex justify-between items-center sticky top-0 z-10">
+                <div>
+                  <h2 className="text-2xl font-bold text-foreground">
+                    {editingMember ? 'Update Profile' : 'New Registration'}
+                  </h2>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Maintain accurate records for church planning and outreach.
+                  </p>
+                </div>
+                <button 
+                  onClick={() => setShowModal(false)}
+                  className="p-2 rounded-full hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  <XCircle size={24} />
+                </button>
               </div>
               
-              <Input label="Email Interface" placeholder="member@domain.com" value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} icon={Mail} />
-              <Input label="Direct Line" placeholder="+234 ..." value={formData.phone} onChange={e => setFormData({...formData, phone: e.target.value})} icon={Phone} />
-              
-              <div className="form-group">
-                <label className="form-label">Gender</label>
-                <select className="input-field" value={formData.gender} onChange={e => setFormData({...formData, gender: e.target.value})}>
-                  {['Male', 'Female', 'Other'].map(s => <option key={s}>{s}</option>)}
-                </select>
+              <div className="p-8 overflow-y-auto custom-scrollbar">
+                <form id="member-form" onSubmit={handleSaveMember} className="space-y-8">
+                  
+                  {/* Personal Information Section */}
+                  <div>
+                    <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
+                      <UserCheck size={20} className="text-primary" />
+                      Personal Information
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="md:col-span-2">
+                        <Input 
+                          label="Full Legal Name" 
+                          placeholder="e.g. Johnathan Doe" 
+                          value={formData.full_name} 
+                          onChange={e => setFormData({...formData, full_name: e.target.value})} 
+                          required 
+                        />
+                      </div>
+                      
+                      <Input 
+                        label="Email Address" 
+                        placeholder="member@domain.com" 
+                        value={formData.email} 
+                        onChange={e => setFormData({...formData, email: e.target.value})} 
+                        icon={Mail} 
+                      />
+                      <Input 
+                        label="Phone Number" 
+                        placeholder="+1 (555) 000-0000" 
+                        value={formData.phone} 
+                        onChange={e => setFormData({...formData, phone: e.target.value})} 
+                        icon={Phone} 
+                      />
+                      
+                      <div className="space-y-2">
+                        <label className="text-sm font-semibold text-foreground">Gender</label>
+                        <div className="relative">
+                          <select 
+                            className="w-full h-11 px-4 rounded-xl border border-input bg-background text-foreground focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all appearance-none" 
+                            value={formData.gender} 
+                            onChange={e => setFormData({...formData, gender: e.target.value})}
+                          >
+                            {['Male', 'Female', 'Other'].map(s => <option key={s} value={s}>{s}</option>)}
+                          </select>
+                          <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" size={18} />
+                        </div>
+                      </div>
+
+                      <div className="md:col-span-2">
+                        <Input 
+                          label="Residential Address" 
+                          placeholder="Home address details" 
+                          value={formData.address} 
+                          onChange={e => setFormData({...formData, address: e.target.value})} 
+                          icon={MapPin} 
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  <hr className="border-border" />
+
+                  {/* Church Details Section */}
+                  <div>
+                    <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
+                      <BookOpen size={20} className="text-primary" />
+                      Church Details
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="space-y-2">
+                        <label className="text-sm font-semibold text-foreground">Bible Study Unit</label>
+                        <div className="relative">
+                          <select 
+                            className="w-full h-11 px-4 rounded-xl border border-input bg-background text-foreground focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all appearance-none" 
+                            value={formData.group_id} 
+                            onChange={e => setFormData({...formData, group_id: e.target.value})}
+                          >
+                            <option value="">Unassigned (General Pool)</option>
+                            {groups.map(g => <option key={g.id} value={g.id}>{g.name}</option>)}
+                          </select>
+                          <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" size={18} />
+                        </div>
+                      </div>
+
+                      <Input 
+                        label="Join Date" 
+                        type="date" 
+                        value={formData.join_date} 
+                        onChange={e => setFormData({...formData, join_date: e.target.value})} 
+                        icon={Calendar} 
+                      />
+                    </div>
+                  </div>
+                </form>
+
+                {error && (
+                  <div className="mt-6 p-4 rounded-xl bg-destructive/10 text-destructive flex items-center gap-3 border border-destructive/20">
+                    <XCircle size={20} /> 
+                    <span className="text-sm font-medium">{error}</span>
+                  </div>
+                )}
               </div>
 
-              <div className="form-group">
-                <label className="form-label">Bible Study Unit</label>
-                <select className="input-field" value={formData.group_id} onChange={e => setFormData({...formData, group_id: e.target.value})}>
-                  <option value="">Unassigned (General Pool)</option>
-                  {groups.map(g => <option key={g.id} value={g.id}>{g.name}</option>)}
-                </select>
-              </div>
-
-              <div style={{ gridColumn: 'span 2' }}>
-                <Input label="Residential Locality" placeholder="Home address details" value={formData.address} onChange={e => setFormData({...formData, address: e.target.value})} icon={MapPin} />
-              </div>
-
-              <div style={{ gridColumn: 'span 2' }}>
-                <Input label="Join Date" type="date" value={formData.join_date} onChange={e => setFormData({...formData, join_date: e.target.value})} icon={Calendar} />
-              </div>
-              
-              <div style={{ gridColumn: 'span 2', display: 'flex', gap: '16px', marginTop: '12px' }}>
-                <Button type="submit" style={{ flex: 1, height: '56px' }}>
-                  {editingMember ? 'Apply Updates' : 'Commit Registration'}
+              <div className="px-8 py-6 border-t border-border bg-muted/10 flex gap-4 justify-end sticky bottom-0 z-10">
+                <Button 
+                  variant="secondary" 
+                  onClick={() => setShowModal(false)} 
+                  className="px-8"
+                  disabled={isSaving}
+                >
+                  Cancel
                 </Button>
-                <Button variant="secondary" onClick={() => setShowModal(false)} style={{ height: '56px', flex: 1 }}>Discard</Button>
+                <Button 
+                  type="submit" 
+                  form="member-form"
+                  className="px-8"
+                  loading={isSaving}
+                >
+                  {editingMember ? 'Save Changes' : 'Register Member'}
+                </Button>
               </div>
-            </form>
-            {error && <div style={{ marginTop: '16px', color: '#ef4444' }}><XCircle size={18} /> {error}</div>}
-          </motion.div>
-        </div>
-      )}
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
 
       {/* Delete Confirmation */}
       {deleteId && (

@@ -11,16 +11,72 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     let mounted = true;
 
+    const loadUser = async (currentSession) => {
+      if (!currentSession?.user) {
+        if (mounted) {
+          setUser(null);
+          setLoading(false);
+        }
+        return;
+      }
+
+      const authUser = currentSession.user;
+      
+      // 1. Fast path: check cache
+      const cachedProfile = localStorage.getItem(`profile_${authUser.id}`);
+      if (cachedProfile) {
+        if (mounted) {
+          setUser({ ...authUser, ...JSON.parse(cachedProfile) });
+          setLoading(false); // UI can render immediately
+        }
+      }
+
+      // 2. Fetch fresh profile with timeout
+      try {
+        const fetchPromise = supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', authUser.id)
+          .single();
+          
+        // 5 second timeout for profile fetch
+        const timeoutPromise = new Promise((_, reject) => 
+          setTimeout(() => reject(new Error("Profile fetch timeout")), 5000)
+        );
+
+        const { data, error } = await Promise.race([fetchPromise, timeoutPromise]);
+
+        if (error) throw error;
+        
+        localStorage.setItem(`profile_${authUser.id}`, JSON.stringify(data));
+        if (mounted) {
+          setUser({ ...authUser, ...data });
+        }
+      } catch (err) {
+        console.error("Error fetching profile:", err.message);
+        if (mounted && !cachedProfile) {
+          setUser(authUser); // Fallback to just auth user
+        }
+      } finally {
+        if (mounted) {
+          setLoading(false);
+        }
+      }
+    };
+
     const initializeAuth = async () => {
       try {
-        const { data: { session } } = await supabase.auth.getSession();
+        // 3 second timeout for getSession
+        const sessionPromise = supabase.auth.getSession();
+        const timeoutPromise = new Promise((_, reject) => 
+          setTimeout(() => reject(new Error("Session fetch timeout")), 3000)
+        );
+        
+        const { data: { session } } = await Promise.race([sessionPromise, timeoutPromise]);
+        
         if (mounted) {
           setSession(session);
-          if (session?.user) {
-            await fetchProfile(session.user);
-          } else {
-            setLoading(false);
-          }
+          loadUser(session);
         }
       } catch (error) {
         console.error("Error getting session:", error);
@@ -37,9 +93,10 @@ export const AuthProvider = ({ children }) => {
         
         setSession(newSession);
         
-        if (event === 'SIGNED_IN' && newSession?.user) {
-          setLoading(true);
-          await fetchProfile(newSession.user);
+        if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'USER_UPDATED') {
+          // Don't set loading to true if we already have a user, to prevent flicker
+          if (!user) setLoading(true);
+          loadUser(newSession);
         } else if (event === 'SIGNED_OUT') {
           setUser(null);
           setLoading(false);
@@ -52,35 +109,6 @@ export const AuthProvider = ({ children }) => {
       listener.subscription.unsubscribe();
     };
   }, []);
-
-  const fetchProfile = async (authUser) => {
-    try {
-      // Check local storage for cached profile to speed up initial load
-      const cachedProfile = localStorage.getItem(`profile_${authUser.id}`);
-      if (cachedProfile) {
-        setUser({ ...authUser, ...JSON.parse(cachedProfile) });
-        setLoading(false); // Stop loading immediately if we have cached data
-      }
-
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', authUser.id)
-        .single();
-
-      if (error) throw error;
-      
-      // Update cache and state with fresh data
-      localStorage.setItem(`profile_${authUser.id}`, JSON.stringify(data));
-      setUser({ ...authUser, ...data });
-    } catch (err) {
-      console.error("Error fetching profile:", err.message);
-      // Still set user even if profile fetch fails, so they aren't completely locked out
-      if (!user) setUser(authUser);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   // 🔐 UNIVERSAL LOGIN FUNCTION
   const login = async (email, password, role) => {

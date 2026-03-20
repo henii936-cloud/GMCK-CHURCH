@@ -90,3 +90,49 @@ export const Input = ({ label, type = "text", placeholder, value, onChange, clas
     </div>
   );
 };
+
+export const Modal = ({ isOpen, onClose, title, children }) => {
+  if (!isOpen) return null;
+
+  return (
+    <div style={{
+      position: 'fixed',
+      inset: 0,
+      background: 'rgba(0,0,0,0.5)',
+      backdropFilter: 'blur(8px)',
+      display: 'grid',
+      placeItems: 'center',
+      zIndex: 1000,
+      padding: '20px'
+    }}>
+      <div 
+        className="glass-card" 
+        style={{ 
+          width: '100%', 
+          maxWidth: '500px', 
+          padding: '40px',
+          position: 'relative'
+        }}
+      >
+        <button 
+          onClick={onClose}
+          style={{
+            position: 'absolute',
+            top: '20px',
+            right: '20px',
+            background: 'none',
+            border: 'none',
+            color: 'var(--text-muted)',
+            cursor: 'pointer',
+            fontSize: '1.5rem',
+            lineHeight: 1
+          }}
+        >
+          &times;
+        </button>
+        {title && <h2 style={{ fontSize: '1.75rem', fontWeight: '800', marginBottom: '24px' }}>{title}</h2>}
+        {children}
+      </div>
+    </div>
+  );
+};

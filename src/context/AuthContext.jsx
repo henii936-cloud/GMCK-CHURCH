@@ -10,23 +10,47 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     // Get session on load
-    supabase.auth.getSession().then(({ data }) => {
-      setSession(data.session);
-      setUser(data.session?.user ?? null);
-      setLoading(false);
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      if (session?.user) {
+        fetchProfile(session.user.id);
+      } else {
+        setLoading(false);
+      }
     });
 
     // Listen to auth changes
     const { data: listener } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
+      async (_event, session) => {
         setSession(session);
-        setUser(session?.user ?? null);
-        setLoading(false);
+        if (session?.user) {
+          await fetchProfile(session.user.id);
+        } else {
+          setUser(null);
+          setLoading(false);
+        }
       }
     );
 
     return () => listener.subscription.unsubscribe();
   }, []);
+
+  const fetchProfile = async (userId) => {
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', userId)
+        .single();
+
+      if (error) throw error;
+      setUser({ ...supabase.auth.user, ...data });
+    } catch (err) {
+      console.error("Error fetching profile:", err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // 🔐 UNIVERSAL LOGIN FUNCTION
   const login = async (email, password, role) => {
@@ -38,40 +62,22 @@ export const AuthProvider = ({ children }) => {
 
       if (error) {
         if (error.message === "Invalid login credentials") {
-          throw new Error("Invalid email or password. If you haven't registered yet, please use the 'Create Demo Account' button below.");
+          throw new Error("Invalid email or password. Please check your credentials and try again.");
         }
         throw error;
       }
 
-      let user = data.user;
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', data.user.id)
+        .single();
 
-      // 🔍 Check if user exists
-      if (!user) {
-        throw new Error("User not found");
-      }
+      if (profileError) throw profileError;
 
-      // 🔍 Get role from metadata
-      let userRole = user.user_metadata?.role;
-
-      // ❗ If role required but not set, and it's a demo account, auto-assign it
-      if (role && !userRole && email.includes("@demo.com")) {
-        console.log(`Auto-assigning role ${role} to demo account ${email}`);
-        const { data: updatedData, error: updateError } = await supabase.auth.updateUser({
-          data: { role }
-        });
-        if (updateError) throw updateError;
-        userRole = role;
-        user = updatedData.user;
-      }
-
-      // ❗ If role still required but not set
-      if (role && !userRole) {
-        throw new Error("User role not assigned to this account. Please contact an administrator.");
-      }
-
-      // 🔒 ROLE VALIDATION (for all roles)
-      if (role && userRole !== role) {
-        throw new Error(`Access denied: This account is registered as a ${userRole}, not a ${role}.`);
+      // 🔒 ROLE VALIDATION
+      if (role && profile.role !== role) {
+        throw new Error(`Access denied: This account is registered as a ${profile.role}, not a ${role}.`);
       }
 
       return data;
@@ -84,14 +90,18 @@ export const AuthProvider = ({ children }) => {
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
-      options: {
-        data: {
-          name,
-          role
-        }
-      }
     });
+    
     if (error) throw error;
+
+    if (data.user) {
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .insert([{ id: data.user.id, full_name: name, role: role }]);
+      
+      if (profileError) throw profileError;
+    }
+
     return data;
   };
 

@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { groupService, memberService } from "../../services/api";
 import { Card, Button, Input } from "../../components/common/UI";
 import { MapPin, Users, User, Plus, Search, BookOpen, Layers, MoreVertical, Settings, Activity } from "lucide-react";
-import { motion, AnimatePresence } from "motion/react";
+import { motion, AnimatePresence } from "framer-motion";
 import { supabase } from "../../services/supabaseClient";
 
 export default function Groups() {
@@ -28,7 +28,7 @@ export default function Groups() {
       // Get groups and profiles for leaders
       const [groupsData, { data: leadersData }] = await Promise.all([
         groupService.getGroups(),
-        supabase.from("profiles").select("id, name").eq("role", "leader")
+        supabase.from("profiles").select("id, full_name").eq("role", "bible_leader")
       ]);
       setGroups(groupsData);
       setLeaders(leadersData || []);
@@ -53,7 +53,7 @@ export default function Groups() {
 
   const filteredGroups = groups.filter(g => 
     g.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-    g.profiles?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    g.profiles?.full_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     g.location?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
@@ -109,7 +109,7 @@ export default function Groups() {
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '24px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.875rem', color: 'var(--text-muted)' }}>
                       <User size={16} /> 
-                      <span style={{ fontWeight: '600', color: 'var(--text)' }}>Leader: {group.profiles?.name || 'Unassigned'}</span>
+                      <span style={{ fontWeight: '600', color: 'var(--text)' }}>Leader: {group.profiles?.full_name || 'Unassigned'}</span>
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.875rem', color: 'var(--text-muted)' }}>
                       <MapPin size={16} /> 
@@ -156,7 +156,7 @@ export default function Groups() {
                 <label style={{ display: 'block', marginBottom: '6px', fontSize: '0.875rem', fontWeight: '500', color: 'var(--text-muted)' }}>Assigned Leader</label>
                 <select className="input-field" value={newGroup.leader_id} onChange={e => setNewGroup({...newGroup, leader_id: e.target.value})} required>
                   <option value="">Select a leader</option>
-                  {leaders.map(l => <option key={l.id} value={l.id}>{l.name}</option>)}
+                  {leaders.map(l => <option key={l.id} value={l.id}>{l.full_name}</option>)}
                 </select>
               </div>
 

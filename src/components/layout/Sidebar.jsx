@@ -2,7 +2,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "../common/UI";
 import { 
   Users, Layers, DollarSign, Activity, Settings, 
-  MapPin, BookOpen, ClipboardList, LogOut, ChevronRight
+  MapPin, BookOpen, ClipboardList, LogOut, ChevronRight, ShieldCheck
 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 
@@ -20,21 +20,17 @@ export default function Sidebar() {
     admin: [
       { name: "Dashboard", icon: Layers, path: "/admin" },
       { name: "Members", icon: Users, path: "/admin/members" },
-      { name: "Groups", icon: MapPin, path: "/admin/groups" },
-      { name: "Budgets", icon: DollarSign, path: "/admin/budgets" },
-      { name: "Activities", icon: Activity, path: "/admin/activities" },
-      { name: "Reports", icon: ClipboardList, path: "/admin/reports" },
+      { name: "Bible Study Groups", icon: MapPin, path: "/admin/groups" },
+      { name: "Group Leaders", icon: ShieldCheck, path: "/admin/leaders" },
+      { name: "Attendance Reports", icon: ClipboardList, path: "/admin/reports" },
+      { name: "Study Progress", icon: BookOpen, path: "/admin/progress" },
+      { name: "Events", icon: Activity, path: "/admin/events" },
+      { name: "Finance", icon: DollarSign, path: "/admin/finance" },
     ],
     bible_leader: [
-      { name: "My Group", icon: Users, path: "/leader" },
-      { name: "Attendance", icon: ClipboardList, path: "/leader/attendance" },
-      { name: "Study Progress", icon: BookOpen, path: "/leader/study" },
-    ],
-    finance: [
-      { name: "Finance Hub", icon: DollarSign, path: "/finance" },
-      { name: "Approved Budgets", icon: Layers, path: "/finance/budgets" },
-      { name: "Record Giving", icon: Activity, path: "/finance/giving" },
-      { name: "Transactions", icon: ClipboardList, path: "/finance/transactions" },
+      { name: "My Group Members", icon: Users, path: "/leader" },
+      { name: "Take Attendance", icon: ClipboardList, path: "/leader/attendance" },
+      { name: "Record Study Progress", icon: BookOpen, path: "/leader/study" },
     ]
   };
 
@@ -48,11 +44,11 @@ export default function Sidebar() {
         </div>
         <div>
           <h2 style={{ fontSize: '1.25rem', fontWeight: '700', letterSpacing: '-0.025em' }}>ChurchERP</h2>
-          <span style={{ fontSize: '0.75rem', textTransform: 'uppercase', color: 'var(--primary)', fontWeight: '700', letterSpacing: '0.05em' }}>{user?.role} Portal</span>
+          <span style={{ fontSize: '0.75rem', textTransform: 'uppercase', color: 'var(--primary)', fontWeight: '700', letterSpacing: '0.05em' }}>{user?.role?.replace('_', ' ')} Portal</span>
         </div>
       </div>
 
-      <nav style={{ flex: 1 }}>
+      <nav style={{ flex: 1, overflowY: 'auto' }}>
         <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '8px' }}>
           {navItems.map((item) => (
             <li key={item.path}>
@@ -88,11 +84,11 @@ export default function Sidebar() {
       <div className="glass-card" style={{ padding: '16px', marginTop: 'auto', background: 'rgba(255, 255, 255, 0.03)' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
           <div style={{ width: 36, height: 36, borderRadius: '50%', background: 'var(--primary)', opacity: 0.8, display: 'grid', placeItems: 'center', fontWeight: '700' }}>
-            {user?.name?.charAt(0) || 'U'}
+            {user?.full_name?.charAt(0) || 'U'}
           </div>
           <div style={{ overflow: 'hidden' }}>
-            <p style={{ fontWeight: '600', fontSize: '0.875rem', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>{user?.name}</p>
-            <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'capitalize' }}>{user?.role}</p>
+            <p style={{ fontWeight: '600', fontSize: '0.875rem', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>{user?.full_name}</p>
+            <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'capitalize' }}>{user?.role?.replace('_', ' ')}</p>
           </div>
         </div>
         <Button 

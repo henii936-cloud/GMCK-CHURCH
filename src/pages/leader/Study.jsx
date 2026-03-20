@@ -9,10 +9,9 @@ export default function Study() {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [formData, setFormData] = useState({
-    book: "",
-    chapter: "",
-    verse: "",
-    topic: ""
+    study_topic: "",
+    completion_date: new Date().toISOString().split('T')[0],
+    notes: ""
   });
 
   const handleSubmit = async (e) => {
@@ -22,13 +21,11 @@ export default function Study() {
     try {
       await studyService.saveStudy({
         ...formData,
-        chapter: parseInt(formData.chapter),
-        group_id: user.group_id,
-        leader_id: user.id
-      }, user.group_id, user.id);
+        group_id: user.group_id
+      });
       
       setMessage("Study progress logged for Admin review!");
-      setFormData({ book: "", chapter: "", verse: "", topic: "" });
+      setFormData({ study_topic: "", completion_date: new Date().toISOString().split('T')[0], notes: "" });
       setTimeout(() => setMessage(""), 3000);
     } catch (err) {
       setMessage("Error logging progress. Please try again.");
@@ -47,38 +44,32 @@ export default function Study() {
 
         <Card style={{ padding: '40px' }}>
           <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-            <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr', gap: '20px' }}>
-              <Input 
-                label="Book" 
-                placeholder="e.g. Ephesians" 
-                value={formData.book}
-                onChange={(e) => setFormData({...formData, book: e.target.value})}
-                required
-              />
-              <Input 
-                label="Chapter" 
-                type="number" 
-                placeholder="1" 
-                value={formData.chapter}
-                onChange={(e) => setFormData({...formData, chapter: e.target.value})}
-                required
-              />
-              <Input 
-                label="Verse(s)" 
-                placeholder="1-10" 
-                value={formData.verse}
-                onChange={(e) => setFormData({...formData, verse: e.target.value})}
-                required
-              />
-            </div>
-            
             <Input 
-              label="Topic / Key Theme" 
-              placeholder="e.g. Unity in Christ" 
-              value={formData.topic}
-              onChange={(e) => setFormData({...formData, topic: e.target.value})}
+              label="Study Topic / Key Theme" 
+              placeholder="e.g. Ephesians 1:1-10 • Unity in Christ" 
+              value={formData.study_topic}
+              onChange={(e) => setFormData({...formData, study_topic: e.target.value})}
               required
             />
+            
+            <Input 
+              label="Completion Date" 
+              type="date" 
+              value={formData.completion_date}
+              onChange={(e) => setFormData({...formData, completion_date: e.target.value})}
+              required
+            />
+
+            <div className="form-group">
+              <label className="form-label">Notes / Reflections</label>
+              <textarea 
+                className="input-field" 
+                style={{ minHeight: '120px', padding: '12px' }}
+                placeholder="Key takeaways or group reflections..."
+                value={formData.notes}
+                onChange={(e) => setFormData({...formData, notes: e.target.value})}
+              />
+            </div>
 
             {message && <p style={{ fontWeight: '700', color: message.includes('Error') ? '#ef4444' : '#10b981', textAlign: 'center' }}>{message}</p>}
 

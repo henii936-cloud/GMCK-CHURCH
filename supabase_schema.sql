@@ -1,264 +1,128 @@
+-- ⛪ COMPLETE CHURCH ERP SUPABASE SCHEMA (SQL)
+-- Paste this into Supabase SQL Editor to set up your backend instantly.
 
--- =========================================
--- 🔥 RESET
--- =========================================
-DROP TABLE IF EXISTS public.activities CASCADE;
-DROP TABLE IF EXISTS public.attendance CASCADE;
-DROP TABLE IF EXISTS public.study_progress CASCADE;
-DROP TABLE IF EXISTS public.transactions CASCADE;
-DROP TABLE IF EXISTS public.budgets CASCADE;
-DROP TABLE IF EXISTS public.member_history CASCADE;
-DROP TABLE IF EXISTS public.members CASCADE;
-DROP TABLE IF EXISTS public.groups CASCADE;
-DROP TABLE IF EXISTS public.profiles CASCADE;
-
-CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
-
--- =========================================
--- 👤 PROFILES (NO TRIGGER)
--- =========================================
-CREATE TABLE public.profiles (
-  id UUID PRIMARY KEY, -- MUST match auth.users.id
-  email TEXT UNIQUE,
-  name TEXT,
-  role TEXT CHECK (role IN ('admin','leader','finance')) DEFAULT 'leader',
-  group_id UUID,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+-- 1. PROFILES TABLE (Linked to Auth)
+CREATE TABLE profiles (
+  id UUID REFERENCES auth.users ON DELETE CASCADE PRIMARY KEY,
+  full_name TEXT,
+  role TEXT CHECK (role IN ('admin', 'bible_leader')),
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL
 );
 
--- =========================================
--- 👥 GROUPS
--- =========================================
-CREATE TABLE public.groups (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  name TEXT NOT NULL,
-  type TEXT,
-  capacity INT,
-  leader_id UUID REFERENCES public.profiles(id),
-  created_by UUID REFERENCES public.profiles(id),
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+-- 2. BIBLE STUDY GROUPS TABLE
+CREATE TABLE bible_study_groups (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  group_name TEXT NOT NULL,
+  leader_id UUID REFERENCES profiles(id) ON DELETE SET NULL,
+  created_by_admin UUID REFERENCES profiles(id),
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL
 );
 
-ALTER TABLE public.profiles
-ADD CONSTRAINT fk_profiles_group
-FOREIGN KEY (group_id) REFERENCES public.groups(id) ON DELETE SET NULL;
-
--- =========================================
--- 👨👩👧 MEMBERS
--- =========================================
-CREATE TABLE public.members (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  name TEXT NOT NULL,
+-- 3. MEMBERS TABLE (Church Attendees - No Login)
+CREATE TABLE members (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  full_name TEXT NOT NULL,
+  gender TEXT,
   phone TEXT,
-  email TEXT UNIQUE,
+  email TEXT,
   address TEXT,
-  marital_status TEXT DEFAULT 'Single',
-  group_id UUID REFERENCES public.groups(id) ON DELETE SET NULL,
-  status TEXT DEFAULT 'Active',
-  engagement_score INT DEFAULT 0,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+  join_date DATE DEFAULT CURRENT_DATE,
+  group_id UUID REFERENCES bible_study_groups(id) ON DELETE SET NULL,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL
 );
 
--- =========================================
--- 📊 ATTENDANCE
--- =========================================
-CREATE TABLE public.attendance (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  member_id UUID REFERENCES public.members(id) ON DELETE CASCADE,
-  group_id UUID REFERENCES public.groups(id) ON DELETE CASCADE,
-  present BOOLEAN DEFAULT TRUE,
-  taken_by UUID,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+-- 4. STUDY ATTENDANCE TABLE
+CREATE TABLE study_attendance (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  group_id UUID REFERENCES bible_study_groups(id) ON DELETE CASCADE,
+  member_id UUID REFERENCES members(id) ON DELETE CASCADE,
+  date DATE DEFAULT CURRENT_DATE,
+  status TEXT CHECK (status IN ('present', 'absent')),
+  recorded_by UUID REFERENCES profiles(id),
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL
 );
 
--- =========================================
--- 📖 STUDY
--- =========================================
-CREATE TABLE public.study_progress (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  group_id UUID REFERENCES public.groups(id) ON DELETE CASCADE,
-  leader_id UUID,
+-- 5. STUDY PROGRESS TABLE
+CREATE TABLE study_progress (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  group_id UUID REFERENCES bible_study_groups(id) ON DELETE CASCADE,
+  leader_id UUID REFERENCES profiles(id),
+  book TEXT NOT NULL,
+  chapter TEXT NOT NULL,
+  verse TEXT,
   topic TEXT,
+  date DATE DEFAULT CURRENT_DATE,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL
+);
+
+-- 6. EVENTS TABLE
+CREATE TABLE events (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  title TEXT NOT NULL,
+  description TEXT,
+  date TIMESTAMP WITH TIME ZONE NOT NULL,
+  location TEXT,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL
+);
+
+-- 7. FINANCE TRANSACTIONS TABLE
+CREATE TABLE transactions (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  member_id UUID REFERENCES members(id) ON DELETE SET NULL,
+  type TEXT CHECK (type IN ('tithe', 'offering', 'donation', 'other')),
+  amount DECIMAL(12,2) NOT NULL,
+  date DATE DEFAULT CURRENT_DATE,
   notes TEXT,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL
 );
 
--- =========================================
--- 💰 BUDGETS
--- =========================================
-CREATE TABLE public.budgets (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  name TEXT,
-  amount NUMERIC,
-  used_amount NUMERIC DEFAULT 0,
-  status TEXT DEFAULT 'pending',
-  approved_by UUID REFERENCES public.profiles(id),
-  created_by UUID,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-);
+-- 8. RLS POLICIES (Row Level Security)
 
--- =========================================
--- 💳 TRANSACTIONS
--- =========================================
-CREATE TABLE public.transactions (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  type TEXT CHECK (type IN ('tithe','offering','donation','expense')),
-  amount NUMERIC,
-  budget_id UUID REFERENCES public.budgets(id),
-  recorded_by UUID,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-);
+-- Enable RLS on all tables
+ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
+ALTER TABLE bible_study_groups ENABLE ROW LEVEL SECURITY;
+ALTER TABLE members ENABLE ROW LEVEL SECURITY;
+ALTER TABLE study_attendance ENABLE ROW LEVEL SECURITY;
+ALTER TABLE study_progress ENABLE ROW LEVEL SECURITY;
+ALTER TABLE events ENABLE ROW LEVEL SECURITY;
+ALTER TABLE transactions ENABLE ROW LEVEL SECURITY;
 
--- =========================================
--- 📜 ACTIVITIES
--- =========================================
-CREATE TABLE public.activities (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  group_id UUID REFERENCES public.groups(id),
-  leader_id UUID REFERENCES public.profiles(id),
-  type TEXT,
-  reference_id UUID,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-);
+-- Profiles: Users can read all profiles, but only update their own
+CREATE POLICY "Public profiles are viewable by everyone." ON profiles FOR SELECT USING (true);
+CREATE POLICY "Users can update own profile." ON profiles FOR UPDATE USING (auth.uid() = id);
 
--- =========================================
--- 🔐 ENABLE RLS
--- =========================================
-ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.groups ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.members ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.attendance ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.study_progress ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.budgets ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.transactions ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.activities ENABLE ROW LEVEL SECURITY;
+-- Admin: Full access to everything
+-- (We'll use a helper function or check metadata in real app, but for SQL we can check role in profiles)
 
--- =========================================
--- 🧠 HELPER FUNCTIONS
--- =========================================
-DROP FUNCTION IF EXISTS public.get_user_role();
-DROP FUNCTION IF EXISTS public.get_user_role(UUID);
-
-CREATE OR REPLACE FUNCTION public.get_user_role()
-RETURNS TEXT AS $$
-  SELECT role FROM public.profiles WHERE id = auth.uid();
+-- Helper function to check if user is admin
+CREATE OR REPLACE FUNCTION is_admin() RETURNS BOOLEAN AS $$
+  SELECT EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role = 'admin');
 $$ LANGUAGE sql SECURITY DEFINER;
 
-DROP FUNCTION IF EXISTS public.is_admin();
-DROP FUNCTION IF EXISTS public.is_admin(UUID);
-
-CREATE OR REPLACE FUNCTION public.is_admin()
-RETURNS BOOLEAN AS $$
-  SELECT EXISTS (
-    SELECT 1 FROM public.profiles
-    WHERE id = auth.uid() AND role = 'admin'
-  );
+-- Helper function to check if user is leader of a group
+CREATE OR REPLACE FUNCTION is_group_leader(g_id UUID) RETURNS BOOLEAN AS $$
+  SELECT EXISTS (SELECT 1 FROM bible_study_groups WHERE id = g_id AND leader_id = auth.uid());
 $$ LANGUAGE sql SECURITY DEFINER;
 
--- =========================================
--- 🔐 RLS POLICIES
--- =========================================
+-- Members Policies
+CREATE POLICY "Admins can manage members" ON members FOR ALL USING (is_admin());
+CREATE POLICY "Leaders can view their group members" ON members FOR SELECT USING (is_group_leader(group_id));
 
--- PROFILES
-CREATE POLICY "Insert own profile"
-ON public.profiles
-FOR INSERT
-WITH CHECK (
-  auth.uid() IS NOT NULL AND id = auth.uid()
-);
+-- Bible Study Groups Policies
+CREATE POLICY "Admins can manage groups" ON bible_study_groups FOR ALL USING (is_admin());
+CREATE POLICY "Everyone can view groups" ON bible_study_groups FOR SELECT USING (true);
 
-CREATE POLICY "View profiles"
-ON public.profiles
-FOR SELECT
-USING (true);
+-- Study Attendance Policies
+CREATE POLICY "Admins can view attendance" ON study_attendance FOR SELECT USING (is_admin());
+CREATE POLICY "Leaders can manage their group attendance" ON study_attendance FOR ALL USING (is_group_leader(group_id));
 
-CREATE POLICY "Update own profile"
-ON public.profiles
-FOR UPDATE
-USING (id = auth.uid());
+-- Study Progress Policies
+CREATE POLICY "Admins can view progress" ON study_progress FOR SELECT USING (is_admin());
+CREATE POLICY "Leaders can manage their group progress" ON study_progress FOR ALL USING (is_group_leader(group_id));
 
--- GROUPS
-CREATE POLICY "View groups"
-ON public.groups FOR SELECT USING (true);
+-- Events Policies
+CREATE POLICY "Admins can manage events" ON events FOR ALL USING (is_admin());
+CREATE POLICY "Everyone can view events" ON events FOR SELECT USING (true);
 
-CREATE POLICY "Admin manage groups"
-ON public.groups FOR ALL USING (is_admin());
-
--- MEMBERS
-CREATE POLICY "Leader manage members"
-ON public.members
-FOR ALL
-USING (
-  group_id = (SELECT group_id FROM public.profiles WHERE id = auth.uid())
-);
-
--- ATTENDANCE
-CREATE POLICY "Leader manage attendance"
-ON public.attendance
-FOR ALL
-USING (
-  group_id = (SELECT group_id FROM public.profiles WHERE id = auth.uid())
-);
-
--- STUDY
-CREATE POLICY "Leader manage study"
-ON public.study_progress
-FOR ALL
-USING (
-  group_id = (SELECT group_id FROM public.profiles WHERE id = auth.uid())
-);
-
--- TRANSACTIONS
-CREATE POLICY "Finance manage transactions"
-ON public.transactions
-FOR ALL
-USING (
-  get_user_role() = 'finance' OR is_admin()
-);
-
--- BUDGETS
-CREATE POLICY "Finance view budgets"
-ON public.budgets
-FOR SELECT
-USING (
-  get_user_role() = 'finance' OR is_admin()
-);
-
--- ACTIVITIES
-CREATE POLICY "View activities"
-ON public.activities FOR SELECT USING (true);
-
--- =========================================
--- 🔓 GRANTS
--- =========================================
-GRANT USAGE ON SCHEMA public TO anon, authenticated;
-GRANT ALL ON ALL TABLES IN SCHEMA public TO anon, authenticated;
-
--- =========================================
--- 🚀 SECURE INITIALIZATION (ZERO-TRIGGER)
--- =========================================
-CREATE OR REPLACE FUNCTION public.initialize_new_profile(
-  p_id UUID, 
-  p_email TEXT, 
-  p_name TEXT, 
-  p_role TEXT
-)
-RETURNS void AS $$
-BEGIN
-  INSERT INTO public.profiles (id, email, name, role)
-  VALUES (p_id, p_email, p_name, p_role)
-  ON CONFLICT (id) DO NOTHING;
-END;
-$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;
-
--- =========================================
--- ⚡ ATOMIC UTILITIES
--- =========================================
-CREATE OR REPLACE FUNCTION public.increment_budget_usage(b_id UUID, amount NUMERIC)
-RETURNS VOID AS $$
-BEGIN
-  UPDATE public.budgets
-  SET used_amount = used_amount + amount
-  WHERE id = b_id;
-END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+-- Transactions Policies
+CREATE POLICY "Admins can manage transactions" ON transactions FOR ALL USING (is_admin());

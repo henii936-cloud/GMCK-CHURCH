@@ -1,23 +1,27 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { 
-  ShieldCheck, UserPlus, Mail, Lock, 
-  ArrowRight, ChevronLeft, Users, DollarSign, 
-  Zap, CheckCircle2, Loader2, Sparkles, User
+  ShieldCheck, Mail, Lock, 
+  ArrowRight, ChevronLeft, Users, 
+  Zap, CheckCircle2, User, MapPin
 } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { Button, Card, Input } from '../../components/common/UI';
 import { supabase } from '../../services/supabaseClient';
+import { useAuth } from '../../context/AuthContext';
 
 export default function Signup() {
   const navigate = useNavigate();
   const location = useLocation();
+  const { signup } = useAuth();
   const initialRole = location.state?.role || 'bible_leader';
   
   const [role, setRole] = useState(initialRole);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
+  const [groupId, setGroupId] = useState("");
+  const [groups, setGroups] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
@@ -36,45 +40,51 @@ export default function Signup() {
       icon: Users, 
       color: '#10b981', 
       desc: 'Manage your study group and track member engagement.' 
-    },
-    { 
-      id: 'finance', 
-      name: 'Finance Officer', 
-      icon: DollarSign, 
-      color: '#f59e0b', 
-      desc: 'Record giving, tithes, and manage church budgets.' 
     }
   ];
 
+  useEffect(() => {
+    if (role === 'bible_leader') {
+      fetchAvailableGroups();
+    }
+  }, [role]);
+
+  const fetchAvailableGroups = async () => {
+    const { data, error } = await supabase
+      .from('bible_study_groups')
+      .select('*')
+      .is('leader_id', null);
+    
+    if (!error) setGroups(data);
+  };
+
   const handleSignup = async (e) => {
     e.preventDefault();
-    if (loading) return; // 🚫 Prevent duplicate concurrent calls
+    if (loading) return;
     
+    if (role === 'bible_leader' && !groupId) {
+      setError("Please select a Bible study group to lead.");
+      return;
+    }
+
     setLoading(true);
     setError(null);
 
     try {
-      console.log("Attempting signup with:", email, password, name, role); // Point 5: Wrong Credentials / Case Issues
-      const { data, error: signupError } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          data: {
-            name,
-            role
-          }
-        }
-      });
-
-      if (signupError) {
-        console.error("Signup error:", signupError.message); // Point 2: Handle Errors
-        alert(signupError.message); // Point 2: Handle Errors
-        throw signupError;
+      const data = await signup(email, password, name, role);
+      
+      if (role === 'bible_leader' && data.user) {
+        // Assign leader to group
+        const { error: groupError } = await supabase
+          .from('bible_study_groups')
+          .update({ leader_id: data.user.id })
+          .eq('id', groupId);
+        
+        if (groupError) throw groupError;
       }
       
-      console.log("Signup success:", data);
-      // Redirect to Home page as requested
-      navigate("/");
+      setSuccess(true);
+      setTimeout(() => navigate("/login"), 3000);
     } catch (err) {
       console.error("Signup error:", err.message);
       setError(err.message || "An error occurred during account creation.");
@@ -83,7 +93,7 @@ export default function Signup() {
     }
   };
 
-  const activeRole = roles.find(r => r.id === role);
+  const activeRole = roles.find(r => r.id === role) || roles[1];
 
   if (success) {
     return (
@@ -95,11 +105,8 @@ export default function Signup() {
             </div>
             <h2 style={{ fontSize: '2rem', fontWeight: '800', marginBottom: '16px' }}>Account Created!</h2>
             <p style={{ color: 'var(--text-muted)', marginBottom: '32px' }}>
-              Welcome to the GMKC Church Management System. Please check your email for a verification link to activate your portal.
+              Welcome to the Church ERP System. Redirecting to login...
             </p>
-            <Link to="/login" style={{ width: '100%', textDecoration: 'none' }}>
-              <Button style={{ width: '100%', height: '56px' }}>Proceed to Login</Button>
-            </Link>
           </Card>
         </motion.div>
       </div>
@@ -133,7 +140,7 @@ export default function Signup() {
           Join the <br /><span style={{ color: activeRole.color }}>{activeRole.name}</span> Team
         </h1>
         <p style={{ fontSize: '1.1rem', color: 'var(--text-muted)', lineHeight: '1.6' }}>
-          {activeRole.desc} GMKC Church empowers its people through modern leadership tools.
+          {activeRole.desc}
         </p>
         
         <div style={{ marginTop: 'auto', paddingTop: '40px' }}>
@@ -175,7 +182,7 @@ export default function Signup() {
                   }}
                 >
                   <r.icon size={20} />
-                  <span style={{ fontSize: '0.7rem', textTransform: 'uppercase' }}>{r.id}</span>
+                  <span style={{ fontSize: '0.7rem', textTransform: 'uppercase' }}>{r.id.replace('_', ' ')}</span>
                 </button>
               ))}
             </div>
@@ -185,8 +192,39 @@ export default function Signup() {
 
           <form onSubmit={handleSignup} style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
             <Input label="Full Display Name" placeholder="e.g. Samuel Adekunle" value={name} onChange={e => setName(e.target.value)} required icon={User} />
-            <Input label="Official Email Address" type="email" placeholder="samuel@gmkc-church.org" value={email} onChange={e => setEmail(e.target.value)} required icon={Mail} />
+            <Input label="Official Email Address" type="email" placeholder="samuel@church.org" value={email} onChange={e => setEmail(e.target.value)} required icon={Mail} />
             <Input label="Secure Password" type="password" placeholder="••••••••" value={password} onChange={e => setPassword(e.target.value)} required icon={Lock} />
+
+            {role === 'bible_leader' && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                <label style={{ fontSize: '0.875rem', fontWeight: '600', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <MapPin size={16} /> Select Bible Study Group
+                </label>
+                <select 
+                  value={groupId} 
+                  onChange={e => setGroupId(e.target.value)}
+                  required
+                  style={{ 
+                    width: '100%', 
+                    padding: '12px 16px', 
+                    borderRadius: '12px', 
+                    background: 'var(--surface)', 
+                    border: '1px solid var(--border)', 
+                    color: 'white',
+                    fontSize: '1rem',
+                    outline: 'none'
+                  }}
+                >
+                  <option value="">-- Choose a Group --</option>
+                  {groups.map(g => (
+                    <option key={g.id} value={g.id}>{g.name}</option>
+                  ))}
+                </select>
+                {groups.length === 0 && (
+                  <p style={{ fontSize: '0.75rem', color: '#f59e0b' }}>No available groups. Please contact Admin to create one.</p>
+                )}
+              </div>
+            )}
 
             {error && (
               <div style={{ padding: '12px', borderRadius: '12px', background: 'rgba(239,68,68,0.1)', color: '#ef4444', fontSize: '0.875rem', fontWeight: '600', border: '1px solid rgba(239,68,68,0.2)' }}>

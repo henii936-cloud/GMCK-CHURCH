@@ -14,7 +14,6 @@ export default function LeaderLogin() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [showCreateDemo, setShowCreateDemo] = useState(false);
 
   const theme = {
     name: "Bible Study Leader",
@@ -45,32 +44,6 @@ export default function LeaderLogin() {
     } catch (err) {
       console.error("Leader Login Error:", err.message);
       setError(err.message || "Invalid credentials.");
-      if (email.includes("@demo.com")) {
-        setShowCreateDemo(true);
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleDemoLogin = async () => {
-    const demoEmail = "leader@demo.com";
-    const demoPass = "password123";
-
-    setEmail(demoEmail);
-    setPassword(demoPass);
-    setShowCreateDemo(false);
-  };
-
-  const createDemoAccount = async () => {
-    setLoading(true);
-    setError("");
-    try {
-      await signup(email, password, "Demo Leader", "bible_leader");
-      setError("Demo account created! You can now sign in.");
-      setShowCreateDemo(false);
-    } catch (err) {
-      setError(err.message || "Failed to create demo account.");
     } finally {
       setLoading(false);
     }
@@ -151,35 +124,6 @@ export default function LeaderLogin() {
             <Button type="submit" loading={loading} style={{ height: '52px', background: theme.color }}>
               Sign In as Leader <ArrowRight size={18} style={{ marginLeft: '8px' }} />
             </Button>
-
-            {showCreateDemo && (
-              <motion.div 
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                style={{ textAlign: 'center' }}
-              >
-                <p style={{ fontSize: '0.875rem', color: 'var(--text-muted)', marginBottom: '8px' }}>
-                  Account not found. Would you like to create it?
-                </p>
-                <Button 
-                  onClick={createDemoAccount} 
-                  variant="secondary" 
-                  style={{ width: '100%', borderColor: theme.color, color: theme.color }}
-                >
-                  Create Demo Leader Account
-                </Button>
-              </motion.div>
-            )}
-
-            <div style={{ textAlign: 'center', marginTop: '8px' }}>
-              <button 
-                type="button" 
-                onClick={handleDemoLogin}
-                style={{ fontSize: '0.875rem', color: 'var(--text-muted)', textDecoration: 'underline' }}
-              >
-                Use Demo Credentials
-              </button>
-            </div>
           </form>
         </Card>
 

@@ -26,7 +26,7 @@ export default function Attendance() {
       
       // Initialize attendance
       const initial = {};
-      filtered.forEach(m => initial[m.id] = true);
+      filtered.forEach(m => initial[m.id] = 'Present');
       setAttendance(initial);
     } catch (err) {
       console.error(err);
@@ -35,8 +35,8 @@ export default function Attendance() {
     }
   };
 
-  const toggle = (memberId) => {
-    setAttendance(prev => ({ ...prev, [memberId]: !prev[memberId] }));
+  const setStatus = (memberId, status) => {
+    setAttendance(prev => ({ ...prev, [memberId]: status }));
   };
 
   const handleSave = async () => {
@@ -46,11 +46,11 @@ export default function Attendance() {
       const records = members.map(m => ({
         member_id: m.id,
         group_id: user.group_id,
-        present: attendance[m.id],
-        taken_by: user.id
+        status: attendance[m.id],
+        date: new Date().toISOString().split('T')[0]
       }));
 
-      await attendanceService.saveAttendance(records, user.group_id, user.id);
+      await attendanceService.saveAttendance(records);
       setMessage("Attendance saved successfully!");
       // Reset after success
       setTimeout(() => setMessage(""), 3000);
@@ -62,7 +62,7 @@ export default function Attendance() {
   };
 
   const filteredMembers = members.filter(m => 
-    m.name.toLowerCase().includes(searchTerm.toLowerCase())
+    m.full_name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
@@ -107,33 +107,42 @@ export default function Attendance() {
             </thead>
             <tbody>
               {filteredMembers.map((m) => (
-                <tr key={m.id} onClick={() => toggle(m.id)} style={{ cursor: 'pointer', transition: '0.2s' }}>
+                <tr key={m.id} style={{ transition: '0.2s' }}>
                   <td>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                       <div style={{ width: 36, height: 36, borderRadius: '50%', background: 'rgba(99, 102, 241, 0.1)', display: 'grid', placeItems: 'center', fontWeight: '800', color: 'var(--primary)' }}>
-                        {m.name.charAt(0)}
+                        {m.full_name.charAt(0)}
                       </div>
-                      <span style={{ fontWeight: '600' }}>{m.name}</span>
+                      <span style={{ fontWeight: '600' }}>{m.full_name}</span>
                     </div>
                   </td>
                   <td>
-                    <span className={`badge ${attendance[m.id] ? 'badge-approved' : 'badge-pending'}`} style={{ opacity: 0.8 }}>
-                      {attendance[m.id] ? 'Present' : 'Absent'}
+                    <span className={`badge ${attendance[m.id] === 'Present' ? 'badge-approved' : attendance[m.id] === 'Absent' ? 'badge-pending' : 'badge-tertiary'}`} style={{ opacity: 0.8 }}>
+                      {attendance[m.id]}
                     </span>
                   </td>
                   <td style={{ textAlign: 'right' }}>
                     <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px' }}>
                       <button 
-                        onClick={(e) => { e.stopPropagation(); setAttendance(prev => ({ ...prev, [m.id]: true })); }}
-                        style={{ width: 32, height: 32, borderRadius: 8, background: attendance[m.id] ? 'var(--primary)' : 'rgba(255,255,255,0.05)', display: 'grid', placeItems: 'center', transition: '0.2s' }}
+                        onClick={() => setStatus(m.id, 'Present')}
+                        style={{ width: 32, height: 32, borderRadius: 8, background: attendance[m.id] === 'Present' ? 'var(--primary)' : 'rgba(255,255,255,0.05)', display: 'grid', placeItems: 'center', transition: '0.2s' }}
+                        title="Present"
                       >
-                        <Check size={16} color={attendance[m.id] ? 'white' : 'var(--text-muted)'} />
+                        <Check size={16} color={attendance[m.id] === 'Present' ? 'white' : 'var(--text-muted)'} />
                       </button>
                       <button 
-                        onClick={(e) => { e.stopPropagation(); setAttendance(prev => ({ ...prev, [m.id]: false })); }}
-                        style={{ width: 32, height: 32, borderRadius: 8, background: !attendance[m.id] ? '#ef4444' : 'rgba(255,255,255,0.05)', display: 'grid', placeItems: 'center', transition: '0.2s' }}
+                        onClick={() => setStatus(m.id, 'Absent')}
+                        style={{ width: 32, height: 32, borderRadius: 8, background: attendance[m.id] === 'Absent' ? '#ef4444' : 'rgba(255,255,255,0.05)', display: 'grid', placeItems: 'center', transition: '0.2s' }}
+                        title="Absent"
                       >
-                        <X size={16} color={!attendance[m.id] ? 'white' : 'var(--text-muted)'} />
+                        <X size={16} color={attendance[m.id] === 'Absent' ? 'white' : 'var(--text-muted)'} />
+                      </button>
+                      <button 
+                        onClick={() => setStatus(m.id, 'Excused')}
+                        style={{ width: 32, height: 32, borderRadius: 8, background: attendance[m.id] === 'Excused' ? '#f59e0b' : 'rgba(255,255,255,0.05)', display: 'grid', placeItems: 'center', transition: '0.2s' }}
+                        title="Excused"
+                      >
+                        <span style={{ fontSize: '0.75rem', fontWeight: '800', color: attendance[m.id] === 'Excused' ? 'white' : 'var(--text-muted)' }}>E</span>
                       </button>
                     </div>
                   </td>

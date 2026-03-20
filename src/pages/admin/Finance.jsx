@@ -1,230 +1,160 @@
 import { useState, useEffect } from "react";
-import { supabase } from "../../services/supabaseClient";
-import { Card, Button, Input, Modal } from "../../components/common/UI";
-import { DollarSign, TrendingUp, TrendingDown, Plus, Filter, Search, Trash2, Calendar } from "lucide-react";
-import { motion } from "framer-motion";
+import { financeService } from "../../services/api";
+import { Card, Button } from "../../components/common/UI";
+import { DollarSign, TrendingUp, CheckCircle, Clock, LogOut } from "lucide-react";
+import { useAuth } from "../../context/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 export default function Finance() {
+  const { logout } = useAuth();
+  const navigate = useNavigate();
   const [transactions, setTransactions] = useState([]);
+  const [budgets, setBudgets] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [formData, setFormData] = useState({
-    type: "Income",
-    category: "Tithes",
-    amount: "",
-    description: "",
-    transaction_date: new Date().toISOString().split('T')[0]
-  });
 
   useEffect(() => {
-    fetchTransactions();
+    fetchData();
   }, []);
 
-  const fetchTransactions = async () => {
+  const fetchData = async () => {
     try {
       setLoading(true);
-      const { data, error } = await supabase
-        .from('transactions')
-        .select('*')
-        .order('transaction_date', { ascending: false });
-
-      if (error) throw error;
-      setTransactions(data || []);
+      const [transData, budgetData] = await Promise.all([
+        financeService.getTransactions(),
+        financeService.getBudgets()
+      ]);
+      setTransactions(transData || []);
+      setBudgets(budgetData || []);
     } catch (error) {
-      console.error("Error fetching transactions:", error);
+      console.error("Error fetching finance data:", error);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleApproveBudget = async (id) => {
     try {
-      const { error } = await supabase
-        .from('transactions')
-        .insert([{
-          ...formData,
-          amount: parseFloat(formData.amount)
-        }]);
-      if (error) throw error;
-      
-      setIsModalOpen(false);
-      setFormData({ type: "Income", category: "Tithes", amount: "", description: "", transaction_date: new Date().toISOString().split('T')[0] });
-      fetchTransactions();
+      await financeService.updateBudgetStatus(id, "Approved");
+      fetchData();
     } catch (error) {
-      console.error("Error saving transaction:", error);
+      console.error("Error approving budget:", error);
     }
   };
 
-  const handleDelete = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this transaction?")) return;
-    try {
-      const { error } = await supabase
-        .from('transactions')
-        .delete()
-        .eq('id', id);
-      if (error) throw error;
-      fetchTransactions();
-    } catch (error) {
-      console.error("Error deleting transaction:", error);
-    }
+  const handleLogout = async () => {
+    await logout();
+    navigate("/login/admin");
   };
 
-  const totalIncome = transactions.filter(t => t.type === 'Income').reduce((sum, t) => sum + t.amount, 0);
-  const totalExpense = transactions.filter(t => t.type === 'Expense').reduce((sum, t) => sum + t.amount, 0);
-  const balance = totalIncome - totalExpense;
+  const totalTithes = transactions.filter(t => t.type === 'tithe' || t.category === 'Tithes').reduce((sum, t) => sum + t.amount, 0);
+  const totalOfferings = transactions.filter(t => t.type === 'offering' || t.category === 'Offering').reduce((sum, t) => sum + t.amount, 0);
+  const totalDonations = transactions.filter(t => t.type === 'donation' || t.category === 'Donation').reduce((sum, t) => sum + t.amount, 0);
+  const totalIncome = totalTithes + totalOfferings + totalDonations;
 
-  const filteredTransactions = transactions.filter(t => 
-    t.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    t.category?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const approvedBudgets = budgets.filter(b => b.status === 'Approved');
+  const pendingBudgets = budgets.filter(b => b.status === 'Pending');
+  
+  const totalBudgeted = approvedBudgets.reduce((sum, b) => sum + b.amount, 0);
+  const budgetUsage = totalIncome > 0 ? ((totalBudgeted / totalIncome) * 100).toFixed(1) : 0;
 
   return (
     <div className="animate-fade-in">
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '32px' }}>
+      <div style={{ marginBottom: '32px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
         <div>
-          <h1 style={{ fontSize: '2rem', fontWeight: '800' }}>Church Finance</h1>
-          <p style={{ color: 'var(--text-muted)' }}>Track tithes, offerings, and church expenses</p>
+          <h1 style={{ fontSize: '2rem', fontWeight: '800' }}>Finance Overview</h1>
+          <p style={{ color: 'var(--text-muted)' }}>Read-only view of church finances and budget approvals</p>
         </div>
-        <Button icon={Plus} onClick={() => setIsModalOpen(true)}>New Transaction</Button>
+        <Button variant="danger" icon={LogOut} onClick={handleLogout}>Sign Out</Button>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '24px', marginBottom: '32px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '24px', marginBottom: '32px' }}>
         <Card style={{ padding: '24px', borderLeft: '4px solid #10b981' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px', color: '#10b981', marginBottom: '12px' }}>
             <TrendingUp size={20} />
-            <span style={{ fontSize: '0.875rem', fontWeight: '700', textTransform: 'uppercase' }}>Total Income</span>
+            <span style={{ fontSize: '0.875rem', fontWeight: '700', textTransform: 'uppercase' }}>Total Tithes</span>
           </div>
-          <h2 style={{ fontSize: '2rem', fontWeight: '900', margin: 0 }}>${totalIncome.toLocaleString()}</h2>
+          <h2 style={{ fontSize: '2rem', fontWeight: '900', margin: 0 }}>${totalTithes.toLocaleString()}</h2>
         </Card>
-        <Card style={{ padding: '24px', borderLeft: '4px solid #ef4444' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', color: '#ef4444', marginBottom: '12px' }}>
-            <TrendingDown size={20} />
-            <span style={{ fontSize: '0.875rem', fontWeight: '700', textTransform: 'uppercase' }}>Total Expenses</span>
+        <Card style={{ padding: '24px', borderLeft: '4px solid #3b82f6' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', color: '#3b82f6', marginBottom: '12px' }}>
+            <TrendingUp size={20} />
+            <span style={{ fontSize: '0.875rem', fontWeight: '700', textTransform: 'uppercase' }}>Total Offerings</span>
           </div>
-          <h2 style={{ fontSize: '2rem', fontWeight: '900', margin: 0 }}>${totalExpense.toLocaleString()}</h2>
+          <h2 style={{ fontSize: '2rem', fontWeight: '900', margin: 0 }}>${totalOfferings.toLocaleString()}</h2>
+        </Card>
+        <Card style={{ padding: '24px', borderLeft: '4px solid #8b5cf6' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', color: '#8b5cf6', marginBottom: '12px' }}>
+            <TrendingUp size={20} />
+            <span style={{ fontSize: '0.875rem', fontWeight: '700', textTransform: 'uppercase' }}>Total Donations</span>
+          </div>
+          <h2 style={{ fontSize: '2rem', fontWeight: '900', margin: 0 }}>${totalDonations.toLocaleString()}</h2>
         </Card>
         <Card style={{ padding: '24px', borderLeft: '4px solid var(--primary)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px', color: 'var(--primary)', marginBottom: '12px' }}>
             <DollarSign size={20} />
-            <span style={{ fontSize: '0.875rem', fontWeight: '700', textTransform: 'uppercase' }}>Current Balance</span>
+            <span style={{ fontSize: '0.875rem', fontWeight: '700', textTransform: 'uppercase' }}>Total Income</span>
           </div>
-          <h2 style={{ fontSize: '2rem', fontWeight: '900', margin: 0 }}>${balance.toLocaleString()}</h2>
+          <h2 style={{ fontSize: '2rem', fontWeight: '900', margin: 0 }}>${totalIncome.toLocaleString()}</h2>
         </Card>
       </div>
 
-      <Card style={{ padding: '0', overflow: 'hidden' }}>
-        <div style={{ padding: '24px', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <h3 style={{ fontSize: '1.25rem', fontWeight: '800', margin: 0 }}>Recent Transactions</h3>
-          <div style={{ display: 'flex', gap: '12px' }}>
-            <div style={{ position: 'relative' }}>
-              <Search size={18} style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', opacity: 0.5 }} />
-              <input 
-                type="text" 
-                placeholder="Search transactions..." 
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="input-field"
-                style={{ paddingLeft: '44px', width: '250px' }}
-              />
-            </div>
-            <Button variant="outline" icon={Filter}>Filter</Button>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '32px' }}>
+        <Card style={{ padding: '32px' }}>
+          <h3 style={{ fontSize: '1.25rem', fontWeight: '800', marginBottom: '24px' }}>Budget Usage</h3>
+          <div style={{ display: 'flex', alignItems: 'flex-end', gap: '16px', marginBottom: '16px' }}>
+            <h2 style={{ fontSize: '3rem', fontWeight: '900', margin: 0, lineHeight: 1 }}>{budgetUsage}%</h2>
+            <span style={{ color: 'var(--text-muted)', paddingBottom: '8px', fontWeight: '600' }}>of total income allocated</span>
           </div>
-        </div>
-
-        <div style={{ overflowX: 'auto' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-            <thead>
-              <tr style={{ background: 'rgba(0,0,0,0.02)', textAlign: 'left' }}>
-                <th style={{ padding: '16px 24px', fontSize: '0.75rem', fontWeight: '800', textTransform: 'uppercase', color: 'var(--text-muted)' }}>Date</th>
-                <th style={{ padding: '16px 24px', fontSize: '0.75rem', fontWeight: '800', textTransform: 'uppercase', color: 'var(--text-muted)' }}>Description</th>
-                <th style={{ padding: '16px 24px', fontSize: '0.75rem', fontWeight: '800', textTransform: 'uppercase', color: 'var(--text-muted)' }}>Category</th>
-                <th style={{ padding: '16px 24px', fontSize: '0.75rem', fontWeight: '800', textTransform: 'uppercase', color: 'var(--text-muted)' }}>Type</th>
-                <th style={{ padding: '16px 24px', fontSize: '0.75rem', fontWeight: '800', textTransform: 'uppercase', color: 'var(--text-muted)', textAlign: 'right' }}>Amount</th>
-                <th style={{ padding: '16px 24px', width: '80px' }}></th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredTransactions.map((t, index) => (
-                <tr key={t.id} style={{ borderBottom: '1px solid var(--border)' }}>
-                  <td style={{ padding: '16px 24px', fontSize: '0.9rem' }}>{new Date(t.transaction_date).toLocaleDateString()}</td>
-                  <td style={{ padding: '16px 24px', fontWeight: '700' }}>{t.description}</td>
-                  <td style={{ padding: '16px 24px' }}>
-                    <span style={{ padding: '4px 10px', borderRadius: '6px', background: 'rgba(0,0,0,0.05)', fontSize: '0.75rem', fontWeight: '600' }}>
-                      {t.category}
-                    </span>
-                  </td>
-                  <td style={{ padding: '16px 24px' }}>
-                    <span style={{ 
-                      padding: '4px 10px', borderRadius: '6px', 
-                      background: t.type === 'Income' ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)',
-                      color: t.type === 'Income' ? '#10b981' : '#ef4444',
-                      fontSize: '0.75rem', fontWeight: '800'
-                    }}>
-                      {t.type}
-                    </span>
-                  </td>
-                  <td style={{ padding: '16px 24px', textAlign: 'right', fontWeight: '900', color: t.type === 'Income' ? '#10b981' : '#ef4444' }}>
-                    {t.type === 'Income' ? '+' : '-'}${t.amount.toLocaleString()}
-                  </td>
-                  <td style={{ padding: '16px 24px', textAlign: 'right' }}>
-                    <button onClick={() => handleDelete(t.id)} style={{ padding: '8px', borderRadius: '8px', background: 'rgba(239, 68, 68, 0.05)', color: '#ef4444', border: 'none', cursor: 'pointer' }}>
-                      <Trash2 size={16} />
-                    </button>
-                  </td>
-                </tr>
+          <div style={{ width: '100%', height: '12px', background: 'rgba(255,255,255,0.1)', borderRadius: '6px', overflow: 'hidden' }}>
+            <div style={{ width: `${Math.min(budgetUsage, 100)}%`, height: '100%', background: 'var(--primary)', borderRadius: '6px' }}></div>
+          </div>
+          
+          <div style={{ marginTop: '32px' }}>
+            <h4 style={{ fontSize: '1rem', fontWeight: '700', marginBottom: '16px' }}>Approved Budgets</h4>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              {approvedBudgets.map(b => (
+                <div key={b.id} style={{ display: 'flex', justifyContent: 'space-between', padding: '12px', background: 'rgba(255,255,255,0.03)', borderRadius: '8px', border: '1px solid var(--border)' }}>
+                  <span style={{ fontWeight: '600' }}>{b.name}</span>
+                  <span style={{ fontWeight: '700', color: 'var(--primary)' }}>${b.amount.toLocaleString()}</span>
+                </div>
               ))}
-            </tbody>
-          </table>
-          {filteredTransactions.length === 0 && (
-            <div style={{ textAlign: 'center', padding: '40px', color: 'var(--text-muted)' }}>
-              No transactions found.
-            </div>
-          )}
-        </div>
-      </Card>
-
-      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title="Add Transaction">
-        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
-            <div className="form-group">
-              <label className="form-label">Type</label>
-              <select className="input-field" value={formData.type} onChange={(e) => setFormData({...formData, type: e.target.value})}>
-                <option value="Income">Income</option>
-                <option value="Expense">Expense</option>
-              </select>
-            </div>
-            <div className="form-group">
-              <label className="form-label">Category</label>
-              <select className="input-field" value={formData.category} onChange={(e) => setFormData({...formData, category: e.target.value})}>
-                {formData.type === 'Income' ? (
-                  <>
-                    <option value="Tithes">Tithes</option>
-                    <option value="Offering">Offering</option>
-                    <option value="Donation">Donation</option>
-                    <option value="Fundraising">Fundraising</option>
-                    <option value="Other">Other</option>
-                  </>
-                ) : (
-                  <>
-                    <option value="Utilities">Utilities</option>
-                    <option value="Maintenance">Maintenance</option>
-                    <option value="Salaries">Salaries</option>
-                    <option value="Events">Events</option>
-                    <option value="Missions">Missions</option>
-                    <option value="Other">Other</option>
-                  </>
-                )}
-              </select>
+              {approvedBudgets.length === 0 && <p style={{ color: 'var(--text-muted)' }}>No approved budgets.</p>}
             </div>
           </div>
-          <Input label="Amount ($)" type="number" step="0.01" required value={formData.amount} onChange={(e) => setFormData({...formData, amount: e.target.value})} />
-          <Input label="Description" required value={formData.description} onChange={(e) => setFormData({...formData, description: e.target.value})} />
-          <Input label="Date" type="date" required value={formData.transaction_date} onChange={(e) => setFormData({...formData, transaction_date: e.target.value})} />
-          <Button type="submit" style={{ marginTop: '12px' }}>Save Transaction</Button>
-        </form>
-      </Modal>
+        </Card>
+
+        <Card style={{ padding: '32px' }}>
+          <h3 style={{ fontSize: '1.25rem', fontWeight: '800', marginBottom: '24px' }}>Pending Budget Approvals</h3>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            {pendingBudgets.map(b => (
+              <div key={b.id} style={{ padding: '16px', background: 'rgba(255,255,255,0.03)', borderRadius: '12px', border: '1px solid var(--border)' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px' }}>
+                  <div>
+                    <h4 style={{ fontSize: '1.1rem', fontWeight: '700', margin: '0 0 4px 0' }}>{b.name}</h4>
+                    <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                      <Clock size={14} className="text-yellow-500" /> Requested
+                    </span>
+                  </div>
+                  <span style={{ fontSize: '1.25rem', fontWeight: '900' }}>${b.amount.toLocaleString()}</span>
+                </div>
+                <Button 
+                  onClick={() => handleApproveBudget(b.id)} 
+                  style={{ width: '100%', justifyContent: 'center', background: '#10b981', color: 'white' }}
+                  icon={CheckCircle}
+                >
+                  Approve Budget
+                </Button>
+              </div>
+            ))}
+            {pendingBudgets.length === 0 && (
+              <div style={{ textAlign: 'center', padding: '40px', color: 'var(--text-muted)', background: 'rgba(255,255,255,0.02)', borderRadius: '12px' }}>
+                <CheckCircle size={32} style={{ margin: '0 auto 12px', opacity: 0.5 }} />
+                <p>All caught up! No pending requests.</p>
+              </div>
+            )}
+          </div>
+        </Card>
+      </div>
     </div>
   );
 }

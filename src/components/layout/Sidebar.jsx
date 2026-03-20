@@ -31,6 +31,9 @@ export default function Sidebar() {
       { name: "My Group Members", icon: Users, path: "/leader" },
       { name: "Take Attendance", icon: ClipboardList, path: "/leader/attendance" },
       { name: "Record Study Progress", icon: BookOpen, path: "/leader/study" },
+    ],
+    finance: [
+      { name: "Record Giving", icon: DollarSign, path: "/finance" },
     ]
   };
 

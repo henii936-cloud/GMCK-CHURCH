@@ -18,8 +18,10 @@ import AdminGroups from "./pages/admin/Groups";
 import AdminReports from "./pages/admin/Reports";
 import LeaderAttendance from "./pages/leader/Attendance";
 import LeaderStudy from "./pages/leader/Study";
+import RecordGiving from "./pages/finance/RecordGiving";
 import LeaderRoute from "./routes/LeaderRoute";
 import AdminRoute from "./routes/AdminRoute";
+import FinanceRoute from "./routes/FinanceRoute";
 
 // We'll use simple components for pages we didn't implement fully for brevity, 
 // but the core features requested are above.
@@ -62,6 +64,10 @@ export default function App() {
             <Route index element={<LeaderDashboard />} />
             <Route path="attendance" element={<LeaderAttendance />} />
             <Route path="study" element={<LeaderStudy />} />
+          </Route>
+
+          <Route path="/finance" element={<FinanceRoute><Layout allowedRoles={['finance']} /></FinanceRoute>}>
+            <Route index element={<RecordGiving />} />
           </Route>
 
           <Route path="/" element={<Landing />} />

@@ -1,16 +1,22 @@
 import { useEffect, useState } from "react";
 import { financeService, memberService } from "../../services/api";
 import { useAuth } from "../../context/AuthContext";
-import { Card, Button, Input } from "../../components/common/UI";
-import { DollarSign, ShieldCheck, User, Users, Search, Loader2 } from "lucide-react";
+import { Card, Button, Input, Modal } from "../../components/common/UI";
+import { DollarSign, ShieldCheck, User, Users, Search, Loader2, Plus, Clock, CheckCircle, LogOut } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 export default function RecordGiving() {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
   const [members, setMembers] = useState([]);
   const [budgets, setBudgets] = useState([]);
+  const [allBudgets, setAllBudgets] = useState([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState("");
+  const [isBudgetModalOpen, setIsBudgetModalOpen] = useState(false);
+  const [budgetForm, setBudgetForm] = useState({ name: "", amount: "" });
+  
   const [formData, setFormData] = useState({
     member_id: "",
     budget_id: "",
@@ -24,12 +30,14 @@ export default function RecordGiving() {
 
   const load = async () => {
     try {
-      const [membersData, budgetsData] = await Promise.all([
+      const [membersData, approvedBudgets, allBudgetsData] = await Promise.all([
         memberService.getMembers(),
-        financeService.getApprovedBudgets()
+        financeService.getApprovedBudgets(),
+        financeService.getBudgets()
       ]);
       setMembers(membersData);
-      setBudgets(budgetsData);
+      setBudgets(approvedBudgets);
+      setAllBudgets(allBudgetsData);
     } catch (err) {
       console.error(err);
     } finally {
@@ -45,7 +53,8 @@ export default function RecordGiving() {
       await financeService.createTransaction({
         ...formData,
         amount: parseFloat(formData.amount),
-        recorded_by: user.id
+        recorded_by: user.id,
+        transaction_date: new Date().toISOString().split('T')[0]
       });
       setMessage("Transaction recorded successfully!");
       setFormData({
@@ -62,12 +71,35 @@ export default function RecordGiving() {
     }
   };
 
+  const handleCreateBudget = async (e) => {
+    e.preventDefault();
+    try {
+      await financeService.createBudget({
+        name: budgetForm.name,
+        amount: parseFloat(budgetForm.amount)
+      });
+      setIsBudgetModalOpen(false);
+      setBudgetForm({ name: "", amount: "" });
+      load();
+    } catch (err) {
+      console.error("Error creating budget:", err);
+    }
+  };
+
+  const handleLogout = async () => {
+    await logout();
+    navigate("/login/finance");
+  };
+
   return (
     <div className="animate-fade-in" style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '32px' }}>
       <div>
-        <div style={{ marginBottom: '32px' }}>
-          <h1 style={{ fontSize: '2rem', fontWeight: '800' }}>Record Offering / Tithe</h1>
-          <p style={{ color: 'var(--text-muted)' }}>Securely input giving records for your congregation</p>
+        <div style={{ marginBottom: '32px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+          <div>
+            <h1 style={{ fontSize: '2rem', fontWeight: '800' }}>Record Offering / Tithe</h1>
+            <p style={{ color: 'var(--text-muted)' }}>Securely input giving records for your congregation</p>
+          </div>
+          <Button variant="danger" icon={LogOut} onClick={handleLogout}>Sign Out</Button>
         </div>
 
         <Card style={{ padding: '40px' }}>
@@ -83,7 +115,7 @@ export default function RecordGiving() {
               >
                 <option value="" style={{ background: '#0f172a' }}>Select Member</option>
                 {members.map(m => (
-                  <option key={m.id} value={m.id} style={{ background: '#0f172a' }}>{m.name}</option>
+                  <option key={m.id} value={m.id} style={{ background: '#0f172a' }}>{m.full_name || m.name}</option>
                 ))}
               </select>
             </div>
@@ -153,18 +185,48 @@ export default function RecordGiving() {
         </Card>
 
         <Card style={{ padding: '32px' }}>
-          <h3 style={{ fontSize: '1.25rem', fontWeight: '700', marginBottom: '16px' }}>Available Budgets</h3>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+            <h3 style={{ fontSize: '1.25rem', fontWeight: '700' }}>Budget Requests</h3>
+            <Button size="sm" icon={Plus} onClick={() => setIsBudgetModalOpen(true)}>New</Button>
+          </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-            {budgets.map(b => (
+            {allBudgets.map(b => (
               <div key={b.id} style={{ padding: '12px', borderRadius: '8px', background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ fontWeight: '600' }}>{b.name}</span>
+                <div>
+                  <span style={{ fontWeight: '600', display: 'block' }}>{b.name}</span>
+                  <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '4px', marginTop: '4px' }}>
+                    {b.status === 'Pending' ? <Clock size={12} className="text-yellow-500" /> : <CheckCircle size={12} className="text-emerald-500" />}
+                    {b.status}
+                  </span>
+                </div>
                 <span style={{ color: 'var(--primary)', fontWeight: '700' }}>${b.amount}</span>
               </div>
             ))}
-            {budgets.length === 0 && <p style={{ color: 'var(--text-muted)', textAlign: 'center' }}>No approved budgets available.</p>}
+            {allBudgets.length === 0 && <p style={{ color: 'var(--text-muted)', textAlign: 'center' }}>No budgets requested.</p>}
           </div>
         </Card>
       </div>
+
+      <Modal isOpen={isBudgetModalOpen} onClose={() => setIsBudgetModalOpen(false)} title="Request Budget">
+        <form onSubmit={handleCreateBudget} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+          <Input 
+            label="Budget Name" 
+            placeholder="e.g., Youth Ministry" 
+            required 
+            value={budgetForm.name} 
+            onChange={(e) => setBudgetForm({...budgetForm, name: e.target.value})} 
+          />
+          <Input 
+            label="Amount ($)" 
+            type="number" 
+            step="0.01" 
+            required 
+            value={budgetForm.amount} 
+            onChange={(e) => setBudgetForm({...budgetForm, amount: e.target.value})} 
+          />
+          <Button type="submit" style={{ marginTop: '12px' }}>Submit Request</Button>
+        </form>
+      </Modal>
     </div>
   );
 }

@@ -23,6 +23,20 @@ export const attendanceService = {
     
     if (error) throw error;
     return data;
+  },
+
+  getAllAttendance: async () => {
+    const { data, error } = await supabase
+      .from("study_attendance")
+      .select(`
+        *,
+        members(full_name),
+        bible_study_groups(name)
+      `)
+      .order("date", { ascending: false });
+    
+    if (error) throw error;
+    return data;
   }
 };
 
@@ -46,6 +60,19 @@ export const studyService = {
     
     if (error) throw error;
     return data;
+  },
+
+  getAllStudyProgress: async () => {
+    const { data, error } = await supabase
+      .from("study_progress")
+      .select(`
+        *,
+        bible_study_groups(name)
+      `)
+      .order("completion_date", { ascending: false });
+    
+    if (error) throw error;
+    return data;
   }
 };
 
@@ -64,6 +91,44 @@ export const financeService = {
         profiles(full_name)
       `)
       .order("date", { ascending: false });
+    if (error) throw error;
+    return data;
+  },
+
+  getBudgets: async () => {
+    const { data, error } = await supabase
+      .from("budgets")
+      .select("*")
+      .order("created_at", { ascending: false });
+    if (error) throw error;
+    return data;
+  },
+
+  getApprovedBudgets: async () => {
+    const { data, error } = await supabase
+      .from("budgets")
+      .select("*")
+      .eq("status", "Approved")
+      .order("created_at", { ascending: false });
+    if (error) throw error;
+    return data;
+  },
+
+  createBudget: async (budget) => {
+    const { data, error } = await supabase
+      .from("budgets")
+      .insert([{ ...budget, status: "Pending" }])
+      .select();
+    if (error) throw error;
+    return data;
+  },
+
+  updateBudgetStatus: async (id, status) => {
+    const { data, error } = await supabase
+      .from("budgets")
+      .update({ status })
+      .eq("id", id)
+      .select();
     if (error) throw error;
     return data;
   }

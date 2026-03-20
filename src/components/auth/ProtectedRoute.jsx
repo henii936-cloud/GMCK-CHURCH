@@ -5,12 +5,11 @@ export default function ProtectedRoute({ children, allowedRoles }) {
   const { user, loading } = useAuth();
 
   if (loading) return (
-    <div style={{ display: 'grid', placeItems: 'center', minHeight: '100vh', background: 'var(--bg)', color: 'white' }}>
-      <div style={{ padding: '24px', borderRadius: '16px', background: 'var(--surface)', backdropFilter: 'var(--glass)', border: '1px solid var(--border)', textAlign: 'center' }}>
-        <h2 style={{ marginBottom: '16px' }}>Verifying Access...</h2>
-        <div style={{ width: '48px', height: '48px', border: '3px solid var(--border)', borderTop: '3px solid var(--primary)', borderRadius: '50%', animation: 'spin 1s linear infinite', margin: '0 auto' }}></div>
+    <div className="grid place-items-center min-h-screen bg-background text-foreground">
+      <div className="p-6 rounded-2xl bg-card/50 backdrop-blur-md border border-border text-center">
+        <h2 className="mb-4 text-xl font-semibold">Verifying Access...</h2>
+        <div className="w-12 h-12 border-4 border-border border-t-primary rounded-full animate-spin mx-auto"></div>
       </div>
-      <style>{`@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }`}</style>
     </div>
   );
 

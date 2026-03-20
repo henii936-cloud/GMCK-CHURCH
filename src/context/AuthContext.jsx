@@ -9,47 +9,74 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Get session on load
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      if (session?.user) {
-        fetchProfile(session.user.id);
-      } else {
-        setLoading(false);
+    let mounted = true;
+
+    const initializeAuth = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (mounted) {
+          setSession(session);
+          if (session?.user) {
+            await fetchProfile(session.user);
+          } else {
+            setLoading(false);
+          }
+        }
+      } catch (error) {
+        console.error("Error getting session:", error);
+        if (mounted) setLoading(false);
       }
-    });
+    };
+
+    initializeAuth();
 
     // Listen to auth changes
     const { data: listener } = supabase.auth.onAuthStateChange(
-      async (_event, session) => {
-        setSession(session);
-        if (session?.user) {
+      async (event, newSession) => {
+        if (!mounted) return;
+        
+        setSession(newSession);
+        
+        if (event === 'SIGNED_IN' && newSession?.user) {
           setLoading(true);
-          await fetchProfile(session.user.id);
-        } else {
+          await fetchProfile(newSession.user);
+        } else if (event === 'SIGNED_OUT') {
           setUser(null);
           setLoading(false);
         }
       }
     );
 
-    return () => listener.subscription.unsubscribe();
+    return () => {
+      mounted = false;
+      listener.subscription.unsubscribe();
+    };
   }, []);
 
-  const fetchProfile = async (userId) => {
+  const fetchProfile = async (authUser) => {
     try {
+      // Check local storage for cached profile to speed up initial load
+      const cachedProfile = localStorage.getItem(`profile_${authUser.id}`);
+      if (cachedProfile) {
+        setUser({ ...authUser, ...JSON.parse(cachedProfile) });
+        setLoading(false); // Stop loading immediately if we have cached data
+      }
+
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
-        .eq('id', userId)
+        .eq('id', authUser.id)
         .single();
 
       if (error) throw error;
       
-      const { data: { session } } = await supabase.auth.getSession();
-      setUser({ ...session?.user, ...data });
+      // Update cache and state with fresh data
+      localStorage.setItem(`profile_${authUser.id}`, JSON.stringify(data));
+      setUser({ ...authUser, ...data });
     } catch (err) {
       console.error("Error fetching profile:", err.message);
+      // Still set user even if profile fetch fails, so they aren't completely locked out
+      if (!user) setUser(authUser);
     } finally {
       setLoading(false);
     }
@@ -80,11 +107,17 @@ export const AuthProvider = ({ children }) => {
 
       // 🔒 ROLE VALIDATION
       if (role && profile.role !== role) {
+        // Sign out immediately if role doesn't match
+        await supabase.auth.signOut();
         throw new Error(`Access denied: This account is registered as a ${profile.role}, not a ${role}.`);
       }
 
+      // Cache profile for faster reloads
+      localStorage.setItem(`profile_${data.user.id}`, JSON.stringify(profile));
+      
       setSession(data.session);
       setUser({ ...data.session?.user, ...profile });
+      setLoading(false);
 
       return data;
     } catch (err) {
@@ -101,17 +134,25 @@ export const AuthProvider = ({ children }) => {
     if (error) throw error;
 
     if (data.user) {
+      const profileData = { id: data.user.id, full_name: name, role: role };
       const { error: profileError } = await supabase
         .from('profiles')
-        .insert([{ id: data.user.id, full_name: name, role: role }]);
+        .insert([profileData]);
       
       if (profileError) throw profileError;
+      
+      // Cache profile for faster reloads
+      localStorage.setItem(`profile_${data.user.id}`, JSON.stringify(profileData));
     }
 
     return data;
   };
 
   const logout = async () => {
+    setLoading(true);
+    if (user?.id) {
+      localStorage.removeItem(`profile_${user.id}`);
+    }
     await supabase.auth.signOut();
   };
 

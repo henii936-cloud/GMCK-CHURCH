@@ -94,7 +94,7 @@ export default function Reports() {
                   <tr key={a.id}>
                     <td>{new Date(a.date).toLocaleDateString()}</td>
                     <td style={{ fontWeight: '600' }}>{a.members?.full_name || 'Unknown'}</td>
-                    <td>{a.bible_study_groups?.name || 'Unknown'}</td>
+                    <td>{a.bible_study_groups?.group_name || 'Unknown'}</td>
                     <td>
                       <span style={{ 
                         padding: '4px 8px', borderRadius: '4px', fontSize: '0.75rem', fontWeight: '700',
@@ -129,7 +129,7 @@ export default function Reports() {
                 {studyProgress.slice(0, 10).map(s => (
                   <tr key={s.id}>
                     <td>{new Date(s.completion_date).toLocaleDateString()}</td>
-                    <td style={{ fontWeight: '600' }}>{s.bible_study_groups?.name || 'Unknown'}</td>
+                    <td style={{ fontWeight: '600' }}>{s.bible_study_groups?.group_name || 'Unknown'}</td>
                     <td>{s.topic_or_book}</td>
                     <td>{s.chapter}</td>
                   </tr>

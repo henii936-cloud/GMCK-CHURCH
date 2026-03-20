@@ -56,8 +56,8 @@ export default function AdminDashboard() {
   const fetchRecentData = async () => {
     try {
       const [studyData, eventsData] = await Promise.all([
-        supabase.from('study_progress').select('*, bible_study_groups(name)').order('completion_date', { ascending: false }).limit(5),
-        supabase.from('events').select('*').gte('event_date', new Date().toISOString().split('T')[0]).order('event_date', { ascending: true }).limit(3)
+        supabase.from('study_progress').select('*, bible_study_groups(group_name)').order('completion_date', { ascending: false }).limit(5),
+        supabase.from('events').select('*').gte('date', new Date().toISOString().split('T')[0]).order('date', { ascending: true }).limit(3)
       ]);
       setRecentStudy(studyData.data || []);
       setUpcomingEvents(eventsData.data || []);
@@ -144,7 +144,7 @@ export default function AdminDashboard() {
                   <BookOpen size={20} color="var(--primary)" />
                 </div>
                 <div style={{ flex: 1 }}>
-                  <p style={{ fontWeight: '600', fontSize: '0.9rem' }}>{study.bible_study_groups?.name}</p>
+                  <p style={{ fontWeight: '600', fontSize: '0.9rem' }}>{study.bible_study_groups?.group_name}</p>
                   <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{study.study_topic}</p>
                 </div>
                 <div style={{ textAlign: 'right' }}>
@@ -162,7 +162,7 @@ export default function AdminDashboard() {
           <h3 style={{ fontWeight: '700', marginBottom: '24px' }}>Upcoming Events</h3>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
             {upcomingEvents.length > 0 ? upcomingEvents.map(event => {
-              const date = new Date(event.event_date);
+              const date = new Date(event.date);
               return (
                 <div key={event.id} style={{ display: 'flex', gap: '16px' }}>
                   <div style={{ textAlign: 'center', minWidth: '45px' }}>
@@ -172,7 +172,7 @@ export default function AdminDashboard() {
                     <p style={{ fontSize: '1.25rem', fontWeight: '800' }}>{date.getDate()}</p>
                   </div>
                   <div>
-                    <p style={{ fontWeight: '600', fontSize: '0.9rem' }}>{event.name}</p>
+                    <p style={{ fontWeight: '600', fontSize: '0.9rem' }}>{event.title}</p>
                     <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{event.location} • {event.event_time}</p>
                   </div>
                 </div>

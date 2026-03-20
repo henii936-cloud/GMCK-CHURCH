@@ -10,9 +10,9 @@ export default function Events() {
   const [searchTerm, setSearchTerm] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [formData, setFormData] = useState({
-    name: "",
+    title: "",
     description: "",
-    event_date: "",
+    date: "",
     event_time: "",
     location: "",
     category: "General"
@@ -29,7 +29,7 @@ export default function Events() {
       const { data, error } = await supabase
         .from('events')
         .select('*')
-        .order('event_date', { ascending: true });
+        .order('date', { ascending: true });
 
       if (error) throw error;
       setEvents(data || []);
@@ -57,7 +57,7 @@ export default function Events() {
       }
       
       setIsModalOpen(false);
-      setFormData({ name: "", description: "", event_date: "", event_time: "", location: "", category: "General" });
+      setFormData({ title: "", description: "", date: "", event_time: "", location: "", category: "General" });
       setEditingId(null);
       fetchEvents();
     } catch (error) {
@@ -67,9 +67,9 @@ export default function Events() {
 
   const handleEdit = (event) => {
     setFormData({
-      name: event.name,
+      title: event.title,
       description: event.description || "",
-      event_date: event.event_date,
+      date: event.date ? new Date(event.date).toISOString().split('T')[0] : "",
       event_time: event.event_time,
       location: event.location || "",
       category: event.category || "General"
@@ -93,7 +93,7 @@ export default function Events() {
   };
 
   const filteredEvents = events.filter(e => 
-    e.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    e.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
     e.location?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
@@ -152,13 +152,13 @@ export default function Events() {
                   </div>
                 </div>
 
-                <h3 style={{ fontSize: '1.25rem', fontWeight: '800', marginBottom: '12px' }}>{event.name}</h3>
+                <h3 style={{ fontSize: '1.25rem', fontWeight: '800', marginBottom: '12px' }}>{event.title}</h3>
                 <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '20px', flex: 1 }}>{event.description}</p>
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: 'auto' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '10px', color: 'var(--text-muted)', fontSize: '0.85rem' }}>
                     <Calendar size={14} />
-                    <span>{new Date(event.event_date).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}</span>
+                    <span>{new Date(event.date).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}</span>
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '10px', color: 'var(--text-muted)', fontSize: '0.85rem' }}>
                     <Clock size={14} />
@@ -177,13 +177,13 @@ export default function Events() {
 
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title={editingId ? "Edit Event" : "Create New Event"}>
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-          <Input label="Event Name" required value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} />
+          <Input label="Event Name" required value={formData.title} onChange={(e) => setFormData({...formData, title: e.target.value})} />
           <div className="form-group">
             <label className="form-label">Description</label>
             <textarea className="input-field" style={{ minHeight: '100px' }} value={formData.description} onChange={(e) => setFormData({...formData, description: e.target.value})} />
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
-            <Input label="Date" type="date" required value={formData.event_date} onChange={(e) => setFormData({...formData, event_date: e.target.value})} />
+            <Input label="Date" type="date" required value={formData.date} onChange={(e) => setFormData({...formData, date: e.target.value})} />
             <Input label="Time" type="time" required value={formData.event_time} onChange={(e) => setFormData({...formData, event_time: e.target.value})} />
           </div>
           <Input label="Location" value={formData.location} onChange={(e) => setFormData({...formData, location: e.target.value})} />

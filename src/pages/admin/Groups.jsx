@@ -13,7 +13,7 @@ export default function Groups() {
   const [searchTerm, setSearchTerm] = useState("");
 
   const [newGroup, setNewGroup] = useState({
-    name: "",
+    group_name: "",
     leader_id: "",
     location: "",
     members_count: 0
@@ -45,14 +45,14 @@ export default function Groups() {
       await groupService.createGroup(newGroup);
       setShowModal(false);
       loadData();
-      setNewGroup({ name: "", leader_id: "", location: "", members_count: 0 });
+      setNewGroup({ group_name: "", leader_id: "", location: "", members_count: 0 });
     } catch (err) {
       console.error("Error creating group:", err);
     }
   };
 
   const filteredGroups = groups.filter(g => 
-    g.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
+    g.group_name?.toLowerCase().includes(searchTerm.toLowerCase()) || 
     g.profiles?.full_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     g.location?.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -105,7 +105,7 @@ export default function Groups() {
                     <button style={{ color: 'var(--text-muted)', padding: '4px' }}><MoreVertical size={20} /></button>
                   </div>
 
-                  <h3 style={{ fontSize: '1.25rem', fontWeight: '700', marginBottom: '8px' }}>{group.name}</h3>
+                  <h3 style={{ fontSize: '1.25rem', fontWeight: '700', marginBottom: '8px' }}>{group.group_name}</h3>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '24px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.875rem', color: 'var(--text-muted)' }}>
                       <User size={16} /> 
@@ -150,7 +150,7 @@ export default function Groups() {
             <h2 style={{ fontSize: '1.75rem', fontWeight: '800', marginBottom: '24px' }}>Create <span style={{ color: 'var(--primary)' }}>Study Group</span></h2>
             
             <form onSubmit={handleCreateGroup} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-              <Input label="Group Name" placeholder="e.g. Young Adults Fellowship" value={newGroup.name} onChange={e => setNewGroup({...newGroup, name: e.target.value})} required />
+              <Input label="Group Name" placeholder="e.g. Young Adults Fellowship" value={newGroup.group_name} onChange={e => setNewGroup({...newGroup, group_name: e.target.value})} required />
               
               <div className="form-group">
                 <label style={{ display: 'block', marginBottom: '6px', fontSize: '0.875rem', fontWeight: '500', color: 'var(--text-muted)' }}>Assigned Leader</label>

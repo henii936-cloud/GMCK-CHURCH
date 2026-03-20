@@ -194,7 +194,7 @@ export default function Members() {
           onChange={(e) => setSelectedGroup(e.target.value)}
         >
           <option value="All">All Congregational Groups</option>
-          {groups.map(g => <option key={g.id} value={g.id}>{g.name}</option>)}
+          {groups.map(g => <option key={g.id} value={g.id}>{g.group_name}</option>)}
         </select>
         <Button variant="secondary" onClick={() => { setSearchTerm(""); setSelectedGroup("All"); }} icon={FilterX} style={{ height: '56px' }}>
           Reset Filters
@@ -246,7 +246,7 @@ export default function Members() {
                     </span>
                   </td>
                   <td style={{ padding: '20px 24px' }}>
-                    <p style={{ fontSize: '0.875rem', fontWeight: '600', margin: 0 }}>{m.bible_study_groups?.name || 'Unassigned'}</p>
+                    <p style={{ fontSize: '0.875rem', fontWeight: '600', margin: 0 }}>{m.bible_study_groups?.group_name || 'Unassigned'}</p>
                   </td>
                   <td style={{ padding: '20px 24px' }}>
                     <span style={{ fontSize: '0.875rem', color: 'var(--text-muted)' }}>
@@ -372,7 +372,7 @@ export default function Members() {
                             onChange={e => setFormData({...formData, group_id: e.target.value})}
                           >
                             <option value="">Unassigned (General Pool)</option>
-                            {groups.map(g => <option key={g.id} value={g.id}>{g.name}</option>)}
+                            {groups.map(g => <option key={g.id} value={g.id}>{g.group_name}</option>)}
                           </select>
                           <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" size={18} />
                         </div>

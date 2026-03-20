@@ -58,7 +58,7 @@ export default function LeaderDashboard() {
           Welcome, {user?.full_name}
         </h1>
         <p style={{ color: 'var(--text-muted)' }}>
-          Leader of <span style={{ color: 'var(--primary)', fontWeight: '700' }}>{group?.name || 'Unassigned Group'}</span>
+          Leader of <span style={{ color: 'var(--primary)', fontWeight: '700' }}>{group?.group_name || 'Unassigned Group'}</span>
         </p>
       </div>
 

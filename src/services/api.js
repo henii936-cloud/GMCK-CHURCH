@@ -138,7 +138,7 @@ export const memberService = {
   getMembers: async () => {
     const { data, error } = await supabase.from("members").select(`
       *,
-      bible_study_groups(name)
+      bible_study_groups(group_name)
     `).order("full_name");
     if (error) throw error;
     return data;
@@ -165,7 +165,7 @@ export const groupService = {
     const { data, error } = await supabase.from("bible_study_groups").select(`
       *,
       profiles!bible_study_groups_leader_id_fkey(full_name)
-    `).order("name");
+    `).order("group_name");
     if (error) throw error;
     return data;
   },

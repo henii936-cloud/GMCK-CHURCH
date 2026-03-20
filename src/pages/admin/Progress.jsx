@@ -20,7 +20,7 @@ export default function Progress() {
         .from('study_progress')
         .select(`
           *,
-          bible_study_groups(name)
+          bible_study_groups(group_name)
         `)
         .order('completion_date', { ascending: false });
 
@@ -35,7 +35,7 @@ export default function Progress() {
 
   const filteredProgress = progress.filter(p => 
     p.study_topic.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    p.bible_study_groups?.name.toLowerCase().includes(searchTerm.toLowerCase())
+    p.bible_study_groups?.group_name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
@@ -90,7 +90,7 @@ export default function Progress() {
                     <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
                       <div style={{ padding: '6px 12px', borderRadius: '100px', background: 'rgba(99, 102, 241, 0.1)', color: 'var(--primary)', fontSize: '0.75rem', fontWeight: '800', display: 'flex', alignItems: 'center', gap: '6px' }}>
                         <MapPin size={12} />
-                        {p.bible_study_groups?.name}
+                        {p.bible_study_groups?.group_name}
                       </div>
                       <div style={{ padding: '6px 12px', borderRadius: '100px', background: 'rgba(16, 185, 129, 0.1)', color: '#10b981', fontSize: '0.75rem', fontWeight: '800' }}>
                         COMPLETED

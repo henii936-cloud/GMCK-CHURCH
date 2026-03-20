@@ -191,3 +191,10 @@ CREATE POLICY "events_admin_manage" ON public.events FOR ALL USING (public.is_ad
 -- TRANSACTIONS POLICIES
 DROP POLICY IF EXISTS "transactions_admin_manage" ON public.transactions;
 CREATE POLICY "transactions_admin_manage" ON public.transactions FOR ALL USING (public.is_admin());
+
+-- Gemnia ai
+CREATE POLICY "Allow users to insert their own member record"
+ON members 
+FOR INSERT 
+TO authenticated                   -- Only logged-in users
+WITH CHECK (auth.uid() = user_id); -- They can only insert if the row's user_id matches their token

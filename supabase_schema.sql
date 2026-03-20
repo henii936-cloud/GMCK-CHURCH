@@ -160,23 +160,71 @@ CREATE POLICY "groups_view_all" ON public.bible_study_groups FOR SELECT USING (t
 DROP POLICY IF EXISTS "groups_admin_manage" ON public.bible_study_groups;
 CREATE POLICY "groups_admin_manage" ON public.bible_study_groups FOR ALL USING (public.is_admin());
 
--- MEMBERS POLICIES (Fixing the RLS violation error)
+-- MEMBERS POLICIES (FINAL FIX)
 DROP POLICY IF EXISTS "members_admin_all" ON public.members;
-CREATE POLICY "members_admin_all" ON public.members FOR ALL USING (public.is_admin());
+DROP POLICY IF EXISTS "members_admin_manage" ON public.members;
+DROP POLICY IF EXISTS "members_view" ON public.members;
+DROP POLICY IF EXISTS "members_insert" ON public.members;
+DROP POLICY IF EXISTS "members_update" ON public.members;
+DROP POLICY IF EXISTS "leaders_view_members" ON public.members;
+DROP POLICY IF EXISTS "leaders_manage_members" ON public.members;
+DROP POLICY IF EXISTS "leaders_insert_members" ON public.members;
+DROP POLICY IF EXISTS "leaders_update_members" ON public.members;
 
 -- Remove old separate admin policies if they exist from previous runs
 DROP POLICY IF EXISTS "members_admin_select" ON public.members;
 DROP POLICY IF EXISTS "members_admin_insert" ON public.members;
 DROP POLICY IF EXISTS "members_admin_update" ON public.members;
 DROP POLICY IF EXISTS "members_admin_delete" ON public.members;
-DROP POLICY IF EXISTS "leaders_view_members" ON public.members;
 
--- Allow leaders to manage (Insert, Select, Update, Delete) members in THEIR group
-DROP POLICY IF EXISTS "leaders_manage_members" ON public.members;
-CREATE POLICY "leaders_manage_members" ON public.members 
-FOR ALL 
-USING (public.is_group_leader(group_id)) 
-WITH CHECK (public.is_group_leader(group_id));
+------------------------------------------------
+-- ADMIN FULL ACCESS
+------------------------------------------------
+CREATE POLICY members_admin_manage
+ON public.members
+FOR ALL
+USING (public.is_admin())
+WITH CHECK (public.is_admin());
+
+------------------------------------------------
+-- VIEW PERMISSIONS
+------------------------------------------------
+CREATE POLICY members_view
+ON public.members
+FOR SELECT
+USING (
+  public.is_admin()
+  OR public.is_group_leader(group_id)
+);
+
+------------------------------------------------
+-- INSERT FIX (Ensures group_id ownership)
+------------------------------------------------
+CREATE POLICY members_insert
+ON public.members
+FOR INSERT
+WITH CHECK (
+  public.is_admin()
+  OR (
+    group_id IS NOT NULL
+    AND public.is_group_leader(group_id)
+  )
+);
+
+------------------------------------------------
+-- UPDATE FIX
+------------------------------------------------
+CREATE POLICY members_update
+ON public.members
+FOR UPDATE
+USING (
+  public.is_admin()
+  OR public.is_group_leader(group_id)
+)
+WITH CHECK (
+  public.is_admin()
+  OR public.is_group_leader(group_id)
+);
 
 -- STUDY ATTENDANCE POLICIES
 DROP POLICY IF EXISTS "attendance_admin_view" ON public.study_attendance;

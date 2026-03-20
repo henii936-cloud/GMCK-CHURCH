@@ -32,7 +32,7 @@ export default function Landing() {
 
   if (loading) return (
     <div className="grid place-items-center min-h-screen bg-[#0f172a] text-white">
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
         className="p-8 rounded-3xl bg-white/5 backdrop-blur-2xl border border-white/10 text-center shadow-2xl"
@@ -80,7 +80,7 @@ export default function Landing() {
         <div className="container mx-auto px-6 h-full">
           <div className={`relative px-6 h-16 rounded-2xl flex items-center justify-between transition-all duration-500 ${scrolled ? 'bg-slate-900/40 backdrop-blur-xl border border-white/10 shadow-lg' : 'bg-transparent'}`}>
             <div className="flex items-center gap-3">
-              <motion.div 
+              <motion.div
                 whileHover={{ rotate: 15 }}
                 className="w-10 h-10 rounded-xl bg-indigo-600 grid place-items-center shadow-lg shadow-indigo-600/20"
               >
@@ -104,7 +104,7 @@ export default function Landing() {
               </div>
             </div>
 
-            <button 
+            <button
               className="md:hidden p-2 text-slate-400 hover:text-white"
               onClick={() => setIsMenuOpen(!isMenuOpen)}
             >
@@ -117,7 +117,7 @@ export default function Landing() {
       {/* Mobile Menu */}
       <AnimatePresence>
         {isMenuOpen && (
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
@@ -138,16 +138,16 @@ export default function Landing() {
       <section className="relative min-h-screen pt-32 pb-20 px-6 flex flex-col items-center justify-center overflow-hidden">
         {/* Hero Background Image */}
         <div className="absolute inset-0 z-0">
-          <img 
-            src="https://images.unsplash.com/photo-1544427928-c49cddee6eac?q=80&w=2000&auto=format&fit=crop" 
-            alt="Church Community Praying" 
+          <img
+            src="https://images.unsplash.com/photo-1544427928-c49cddee6eac?q=80&w=2000&auto=format&fit=crop"
+            alt="Church Community Praying"
             className="w-full h-full object-cover opacity-20 filter grayscale-[20%]"
           />
           <div className="absolute inset-0 bg-gradient-to-b from-[#020617] via-transparent to-[#020617]"></div>
           <div className="absolute inset-0 bg-radial-[at_center_center] from-transparent via-[#020617]/40 to-[#020617]"></div>
         </div>
 
-        <motion.div 
+        <motion.div
           variants={containerVariants}
           initial="hidden"
           whileInView="visible"
@@ -162,7 +162,7 @@ export default function Landing() {
             Lead Your <br />
             <span className="inline-block text-indigo-500 italic">Faith</span> Community.
           </motion.h1>
-          
+
           <motion.p variants={itemVariants} className="text-xl md:text-2xl text-slate-400 mb-12 leading-relaxed max-w-2xl mx-auto font-light">
             A minimalist, powerful ecosystem for modern church administration. Transform how you lead, study, and grow together.
           </motion.p>
@@ -182,8 +182,8 @@ export default function Landing() {
         </motion.div>
 
         {/* Floating Icons for dynamism */}
-        <motion.div 
-          animate={{ y: [0, -20, 0] }} 
+        <motion.div
+          animate={{ y: [0, -20, 0] }}
           transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
           className="absolute top-1/3 left-[15%] hidden lg:block opacity-20 pointer-events-none"
         >
@@ -191,8 +191,8 @@ export default function Landing() {
             <Heart size={32} />
           </div>
         </motion.div>
-        <motion.div 
-          animate={{ y: [0, 20, 0] }} 
+        <motion.div
+          animate={{ y: [0, 20, 0] }}
           transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 1 }}
           className="absolute bottom-1/4 right-[15%] hidden lg:block opacity-20 pointer-events-none"
         >
@@ -216,7 +216,7 @@ export default function Landing() {
               { id: 'bible_leader', name: 'Bible Leader', icon: Users, color: 'text-emerald-400', bg: 'bg-emerald-500/10', glow: 'shadow-emerald-500/10', border: 'border-emerald-500/20', path: '/login/leader', desc: 'Lead groups, track studies, and nurture members.' },
               { id: 'finance', name: 'Financial Office', icon: DollarSign, color: 'text-amber-400', bg: 'bg-amber-500/10', glow: 'shadow-amber-500/10', border: 'border-amber-500/20', path: '/login/finance', desc: 'Secure budget tracking and financial oversight.' }
             ].map((r, i) => (
-              <motion.div 
+              <motion.div
                 key={r.id}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -226,14 +226,14 @@ export default function Landing() {
                 className={`relative p-8 rounded-[2.5rem] bg-slate-900/40 backdrop-blur-md border ${r.border} overflow-hidden group`}
               >
                 <div className={`absolute -right-12 -top-12 w-32 h-32 rounded-full ${r.color === 'text-indigo-400' ? 'bg-indigo-500/5' : r.color === 'text-emerald-400' ? 'bg-emerald-500/5' : 'bg-amber-500/5'} blur-2xl transition-all group-hover:scale-150`}></div>
-                
+
                 <div className={`w-14 h-14 rounded-2xl ${r.bg} ${r.color} flex items-center justify-center mb-8 relative z-10`}>
                   <r.icon size={28} />
                 </div>
-                
+
                 <h3 className="text-2xl font-bold mb-3 relative z-10">{r.name}</h3>
                 <p className="text-slate-400 mb-8 relative z-10 text-sm leading-relaxed">{r.desc}</p>
-                
+
                 <div className="flex flex-col gap-3 relative z-10">
                   <Link to={r.path} className="w-full">
                     <Button className={`w-full py-6 h-auto rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white border-none shadow-lg ${r.glow}`}>
@@ -264,11 +264,11 @@ export default function Landing() {
                   { icon: Shield, title: "Vault-grade Security", desc: "Your congregation's data and finances are protected with top-tier encryption." },
                   { icon: BookOpen, title: "Smart Curriculum", desc: "Organize lessons and tracks development with automated logging." }
                 ].map((f, i) => (
-                  <motion.div 
+                  <motion.div
                     initial={{ opacity: 0, x: -20 }}
                     whileInView={{ opacity: 1, x: 0 }}
                     transition={{ delay: i * 0.1 }}
-                    key={i} 
+                    key={i}
                     className="flex gap-6 items-start"
                   >
                     <div className="w-12 h-12 rounded-xl bg-indigo-600/10 flex items-center justify-center shrink-0">
@@ -285,10 +285,10 @@ export default function Landing() {
             <div className="relative">
               <div className="aspect-square rounded-[3rem] bg-indigo-600/10 border border-indigo-500/20 flex items-center justify-center p-12 overflow-hidden shadow-2xl shadow-indigo-600/5">
                 <div className="grid grid-cols-2 gap-4 w-full h-full opacity-60">
-                   <div className="bg-indigo-500/20 rounded-3xl animate-pulse"></div>
-                   <div className="bg-purple-500/20 rounded-3xl animate-pulse delay-75"></div>
-                   <div className="bg-blue-500/20 rounded-3xl animate-pulse delay-150"></div>
-                   <div className="bg-pink-500/20 rounded-3xl animate-pulse delay-300"></div>
+                  <div className="bg-indigo-500/20 rounded-3xl animate-pulse"></div>
+                  <div className="bg-purple-500/20 rounded-3xl animate-pulse delay-75"></div>
+                  <div className="bg-blue-500/20 rounded-3xl animate-pulse delay-150"></div>
+                  <div className="bg-pink-500/20 rounded-3xl animate-pulse delay-300"></div>
                 </div>
                 <div className="absolute inset-0 flex items-center justify-center">
                   <div className="w-48 h-48 rounded-full bg-indigo-600 blur-[80px] opacity-20"></div>
@@ -302,12 +302,12 @@ export default function Landing() {
 
       {/* CTA Section */}
       <section className="py-32 px-6">
-        <motion.div 
+        <motion.div
           className="container mx-auto max-w-4xl p-12 md:p-20 rounded-[3rem] bg-gradient-to-br from-indigo-600 to-indigo-800 text-center relative overflow-hidden shadow-2xl shadow-indigo-600/20"
         >
           <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 blur-3xl rounded-full -mr-32 -mt-32"></div>
           <div className="absolute bottom-0 left-0 w-64 h-64 bg-indigo-900/40 blur-3xl rounded-full -ml-32 -mb-32"></div>
-          
+
           <div className="relative z-10">
             <h2 className="text-4xl md:text-6xl font-black text-white mb-8 tracking-tight">Ready to Transform Your Church?</h2>
             <p className="text-indigo-100/80 mb-12 text-xl font-light">Join hundreds of leaders managing their community with precision and heart.</p>
@@ -330,7 +330,7 @@ export default function Landing() {
               </div>
               <h2 className="text-lg font-bold tracking-tight text-white">GMKC<span className="text-indigo-400">CHURCH</span></h2>
             </div>
-            
+
             <div className="flex gap-12">
               <div className="flex flex-col gap-4">
                 <h4 className="text-white font-bold text-sm">Product</h4>

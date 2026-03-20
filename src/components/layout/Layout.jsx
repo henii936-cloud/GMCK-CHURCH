@@ -17,7 +17,7 @@ export default function Layout({ allowedRoles }) {
 
   if (!user) return <Navigate to="/login" />;
 
-  const userRole = user?.user_metadata?.role;
+  const userRole = user?.role || user?.user_metadata?.role;
 
   if (allowedRoles && !allowedRoles.includes(userRole)) {
     const rolePath = {

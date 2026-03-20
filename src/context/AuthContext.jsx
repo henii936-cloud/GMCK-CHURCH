@@ -24,6 +24,7 @@ export const AuthProvider = ({ children }) => {
       async (_event, session) => {
         setSession(session);
         if (session?.user) {
+          setLoading(true);
           await fetchProfile(session.user.id);
         } else {
           setUser(null);
@@ -44,7 +45,9 @@ export const AuthProvider = ({ children }) => {
         .single();
 
       if (error) throw error;
-      setUser({ ...supabase.auth.user, ...data });
+      
+      const { data: { session } } = await supabase.auth.getSession();
+      setUser({ ...session?.user, ...data });
     } catch (err) {
       console.error("Error fetching profile:", err.message);
     } finally {
@@ -79,6 +82,9 @@ export const AuthProvider = ({ children }) => {
       if (role && profile.role !== role) {
         throw new Error(`Access denied: This account is registered as a ${profile.role}, not a ${role}.`);
       }
+
+      setSession(data.session);
+      setUser({ ...data.session?.user, ...profile });
 
       return data;
     } catch (err) {

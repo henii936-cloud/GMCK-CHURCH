@@ -47,7 +47,7 @@ export default function App() {
           <Route path="/login" element={<Navigate to="/login/admin" />} />
           <Route path="/signup" element={<Signup />} />
           
-          <Route path="/admin" element={<Layout allowedRoles={['admin']} />}>
+          <Route path="/admin" element={<AdminRoute><Layout allowedRoles={['admin']} /></AdminRoute>}>
             <Route index element={<AdminDashboard />} />
             <Route path="members" element={<AdminMembers />} />
             <Route path="groups" element={<AdminGroups />} />
@@ -58,7 +58,7 @@ export default function App() {
             <Route path="finance" element={<AdminFinance />} />
           </Route>
 
-          <Route path="/leader" element={<Layout allowedRoles={['bible_leader']} />}>
+          <Route path="/leader" element={<LeaderRoute><Layout allowedRoles={['bible_leader']} /></LeaderRoute>}>
             <Route index element={<LeaderDashboard />} />
             <Route path="attendance" element={<LeaderAttendance />} />
             <Route path="study" element={<LeaderStudy />} />

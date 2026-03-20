@@ -1,13 +1,14 @@
 -- =====================================================
--- CHURCH MANAGEMENT SYSTEM (FINAL SAFE VERSION)
+-- ⛪ CHURCH MANAGEMENT SYSTEM - PRODUCTION SCHEMA
+-- SAFE TO RUN MULTIPLE TIMES IN SUPABASE SQL EDITOR
 -- =====================================================
 
+-- REQUIRED EXTENSIONS
 CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 
 -- =====================================================
--- TABLES
+-- 1. PROFILES TABLE (Linked to Supabase Auth)
 -- =====================================================
-
 CREATE TABLE IF NOT EXISTS public.profiles (
   id UUID REFERENCES auth.users ON DELETE CASCADE PRIMARY KEY,
   full_name TEXT,
@@ -15,6 +16,9 @@ CREATE TABLE IF NOT EXISTS public.profiles (
   created_at TIMESTAMPTZ DEFAULT timezone('utc', now()) NOT NULL
 );
 
+-- =====================================================
+-- 2. BIBLE STUDY GROUPS
+-- =====================================================
 CREATE TABLE IF NOT EXISTS public.bible_study_groups (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   group_name TEXT NOT NULL,
@@ -23,6 +27,9 @@ CREATE TABLE IF NOT EXISTS public.bible_study_groups (
   created_at TIMESTAMPTZ DEFAULT timezone('utc', now()) NOT NULL
 );
 
+-- =====================================================
+-- 3. MEMBERS (NO LOGIN USERS)
+-- =====================================================
 CREATE TABLE IF NOT EXISTS public.members (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   full_name TEXT NOT NULL,
@@ -35,6 +42,9 @@ CREATE TABLE IF NOT EXISTS public.members (
   created_at TIMESTAMPTZ DEFAULT timezone('utc', now()) NOT NULL
 );
 
+-- =====================================================
+-- 4. STUDY ATTENDANCE
+-- =====================================================
 CREATE TABLE IF NOT EXISTS public.study_attendance (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   group_id UUID REFERENCES public.bible_study_groups(id) ON DELETE CASCADE,
@@ -45,6 +55,9 @@ CREATE TABLE IF NOT EXISTS public.study_attendance (
   created_at TIMESTAMPTZ DEFAULT timezone('utc', now()) NOT NULL
 );
 
+-- =====================================================
+-- 5. STUDY PROGRESS
+-- =====================================================
 CREATE TABLE IF NOT EXISTS public.study_progress (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   group_id UUID REFERENCES public.bible_study_groups(id) ON DELETE CASCADE,
@@ -57,6 +70,9 @@ CREATE TABLE IF NOT EXISTS public.study_progress (
   created_at TIMESTAMPTZ DEFAULT timezone('utc', now()) NOT NULL
 );
 
+-- =====================================================
+-- 6. EVENTS
+-- =====================================================
 CREATE TABLE IF NOT EXISTS public.events (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   title TEXT NOT NULL,
@@ -66,6 +82,9 @@ CREATE TABLE IF NOT EXISTS public.events (
   created_at TIMESTAMPTZ DEFAULT timezone('utc', now()) NOT NULL
 );
 
+-- =====================================================
+-- 7. FINANCE TRANSACTIONS
+-- =====================================================
 CREATE TABLE IF NOT EXISTS public.transactions (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   member_id UUID REFERENCES public.members(id) ON DELETE SET NULL,
@@ -77,7 +96,7 @@ CREATE TABLE IF NOT EXISTS public.transactions (
 );
 
 -- =====================================================
--- FUNCTIONS
+-- HELPER FUNCTIONS (SECURITY DEFINER)
 -- =====================================================
 
 CREATE OR REPLACE FUNCTION public.is_admin()
@@ -86,10 +105,11 @@ LANGUAGE sql
 SECURITY DEFINER
 SET search_path = public
 AS $$
-SELECT EXISTS (
-  SELECT 1 FROM public.profiles
-  WHERE id = auth.uid() AND role='admin'
-);
+  SELECT EXISTS (
+    SELECT 1 FROM public.profiles
+    WHERE id = auth.uid()
+    AND role = 'admin'
+  );
 $$;
 
 CREATE OR REPLACE FUNCTION public.is_group_leader(g_id UUID)
@@ -98,31 +118,38 @@ LANGUAGE sql
 SECURITY DEFINER
 SET search_path = public
 AS $$
-SELECT EXISTS (
-  SELECT 1 FROM public.bible_study_groups
-  WHERE id=g_id AND leader_id=auth.uid()
-);
+  SELECT EXISTS (
+    SELECT 1
+    FROM public.bible_study_groups
+    WHERE id = g_id
+    AND leader_id = auth.uid()
+  );
 $$;
 
--- AUTO PROFILE CREATION
+-- AUTOMATIC PROFILE TRIGGER
+-- Ensures profiles are created even if email verification is pending
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS trigger AS $$
 BEGIN
-  INSERT INTO public.profiles (id, role)
-  VALUES (NEW.id,'bible_leader')
-  ON CONFLICT DO NOTHING;
-  RETURN NEW;
+  INSERT INTO public.profiles (id, full_name, role)
+  VALUES (
+    new.id, 
+    COALESCE(new.raw_user_meta_data->>'full_name', ''), 
+    COALESCE(new.raw_user_meta_data->>'role', 'bible_leader')
+  )
+  ON CONFLICT (id) DO NOTHING;
+  RETURN new;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
+-- Re-create the trigger for profile creation
 DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
-
 CREATE TRIGGER on_auth_user_created
-AFTER INSERT ON auth.users
-FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
+  AFTER INSERT ON auth.users
+  FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
 
 -- =====================================================
--- ENABLE RLS
+-- ENABLE ROW LEVEL SECURITY
 -- =====================================================
 ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.bible_study_groups ENABLE ROW LEVEL SECURITY;
@@ -135,87 +162,69 @@ ALTER TABLE public.transactions ENABLE ROW LEVEL SECURITY;
 -- =====================================================
 -- PROFILES POLICIES
 -- =====================================================
-DROP POLICY IF EXISTS profiles_select ON public.profiles;
-CREATE POLICY profiles_select ON public.profiles
-FOR SELECT USING (true);
+DROP POLICY IF EXISTS "profiles_select" ON public.profiles;
+CREATE POLICY "profiles_select" ON public.profiles FOR SELECT USING (true);
 
-DROP POLICY IF EXISTS profiles_insert_own ON public.profiles;
-CREATE POLICY profiles_insert_own ON public.profiles
-FOR INSERT WITH CHECK (auth.uid() = id);
+DROP POLICY IF EXISTS "profiles_update_own" ON public.profiles;
+CREATE POLICY "profiles_update_own" ON public.profiles FOR UPDATE USING (auth.uid() = id);
 
-DROP POLICY IF EXISTS profiles_update_own ON public.profiles;
-CREATE POLICY profiles_update_own ON public.profiles
-FOR UPDATE USING (auth.uid()=id)
-WITH CHECK (auth.uid()=id);
+DROP POLICY IF EXISTS "profiles_insert_own" ON public.profiles;
+CREATE POLICY "profiles_insert_own" ON public.profiles FOR INSERT WITH CHECK (auth.uid() = id);
 
 -- =====================================================
 -- GROUP POLICIES
 -- =====================================================
-DROP POLICY IF EXISTS groups_view_all ON public.bible_study_groups;
-CREATE POLICY groups_view_all
-ON public.bible_study_groups FOR SELECT USING (true);
+DROP POLICY IF EXISTS "groups_view_all" ON public.bible_study_groups;
+CREATE POLICY "groups_view_all" ON public.bible_study_groups FOR SELECT USING (true);
 
-DROP POLICY IF EXISTS groups_admin_manage ON public.bible_study_groups;
-CREATE POLICY groups_admin_manage
-ON public.bible_study_groups
-FOR ALL USING (public.is_admin())
-WITH CHECK (public.is_admin());
+DROP POLICY IF EXISTS "groups_admin_manage" ON public.bible_study_groups;
+CREATE POLICY "groups_admin_manage" ON public.bible_study_groups FOR ALL USING (public.is_admin());
 
 -- =====================================================
--- MEMBERS POLICIES (FIXED)
+-- MEMBERS POLICIES (Includes Fix for New Row Violation)
 -- =====================================================
-DROP POLICY IF EXISTS members_admin_manage ON public.members;
-CREATE POLICY members_admin_manage
-ON public.members
-FOR ALL USING (public.is_admin())
-WITH CHECK (public.is_admin());
+DROP POLICY IF EXISTS "members_admin_select" ON public.members;
+DROP POLICY IF EXISTS "members_admin_insert" ON public.members;
+DROP POLICY IF EXISTS "members_admin_update" ON public.members;
+DROP POLICY IF EXISTS "members_admin_delete" ON public.members;
 
-DROP POLICY IF EXISTS leaders_view_members ON public.members;
-CREATE POLICY leaders_view_members
-ON public.members
-FOR SELECT USING (public.is_group_leader(group_id));
+CREATE POLICY "members_admin_select" ON public.members FOR SELECT USING (public.is_admin());
+CREATE POLICY "members_admin_insert" ON public.members FOR INSERT WITH CHECK (public.is_admin());
+CREATE POLICY "members_admin_update" ON public.members FOR UPDATE USING (public.is_admin()) WITH CHECK (public.is_admin());
+CREATE POLICY "members_admin_delete" ON public.members FOR DELETE USING (public.is_admin());
 
-DROP POLICY IF EXISTS leaders_insert_members ON public.members;
-CREATE POLICY leaders_insert_members
-ON public.members
-FOR INSERT
-WITH CHECK (public.is_group_leader(group_id));
-
-DROP POLICY IF EXISTS leaders_update_members ON public.members;
-CREATE POLICY leaders_update_members
-ON public.members
-FOR UPDATE
-USING (public.is_group_leader(group_id))
-WITH CHECK (public.is_group_leader(group_id));
+DROP POLICY IF EXISTS "leaders_view_members" ON public.members;
+CREATE POLICY "leaders_view_members" ON public.members FOR SELECT USING (public.is_group_leader(group_id));
 
 -- =====================================================
--- ATTENDANCE
+-- ATTENDANCE POLICIES
 -- =====================================================
-DROP POLICY IF EXISTS leaders_manage_attendance ON public.study_attendance;
-CREATE POLICY leaders_manage_attendance
-ON public.study_attendance
-FOR ALL
-USING (public.is_group_leader(group_id))
-WITH CHECK (public.is_group_leader(group_id));
+DROP POLICY IF EXISTS "attendance_admin_view" ON public.study_attendance;
+CREATE POLICY "attendance_admin_view" ON public.study_attendance FOR SELECT USING (public.is_admin());
+
+DROP POLICY IF EXISTS "leaders_manage_attendance" ON public.study_attendance;
+CREATE POLICY "leaders_manage_attendance" ON public.study_attendance FOR ALL USING (public.is_group_leader(group_id));
 
 -- =====================================================
--- EVENTS
+-- PROGRESS POLICIES
 -- =====================================================
-DROP POLICY IF EXISTS events_view_all ON public.events;
-CREATE POLICY events_view_all
-ON public.events FOR SELECT USING (true);
+DROP POLICY IF EXISTS "progress_admin_view" ON public.study_progress;
+CREATE POLICY "progress_admin_view" ON public.study_progress FOR SELECT USING (public.is_admin());
 
-DROP POLICY IF EXISTS events_admin_manage ON public.events;
-CREATE POLICY events_admin_manage
-ON public.events
-FOR ALL USING (public.is_admin())
-WITH CHECK (public.is_admin());
+DROP POLICY IF EXISTS "leaders_manage_progress" ON public.study_progress;
+CREATE POLICY "leaders_manage_progress" ON public.study_progress FOR ALL USING (public.is_group_leader(group_id));
 
 -- =====================================================
--- TRANSACTIONS
+-- EVENTS POLICIES
 -- =====================================================
-DROP POLICY IF EXISTS transactions_admin_manage ON public.transactions;
-CREATE POLICY transactions_admin_manage
-ON public.transactions
-FOR ALL USING (public.is_admin())
-WITH CHECK (public.is_admin());
+DROP POLICY IF EXISTS "events_view_all" ON public.events;
+CREATE POLICY "events_view_all" ON public.events FOR SELECT USING (true);
+
+DROP POLICY IF EXISTS "events_admin_manage" ON public.events;
+CREATE POLICY "events_admin_manage" ON public.events FOR ALL USING (public.is_admin());
+
+-- =====================================================
+-- TRANSACTIONS POLICIES
+-- =====================================================
+DROP POLICY IF EXISTS "transactions_admin_manage" ON public.transactions;
+CREATE POLICY "transactions_admin_manage" ON public.transactions FOR ALL USING (public.is_admin());

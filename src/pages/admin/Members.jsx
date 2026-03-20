@@ -7,7 +7,7 @@ import {
   XCircle, FilterX, UserCheck, MapPin, 
   Calendar, CreditCard, ChevronDown, BookOpen
 } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence } from "motion/react";
 
 export default function Members() {
   const [members, setMembers] = useState([]);

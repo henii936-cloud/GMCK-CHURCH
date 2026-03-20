@@ -1,6 +1,6 @@
 import { Loader2 } from "lucide-react";
 
-export const Button = ({ children, onClick, type = "button", variant = "primary", icon: Icon, className = "", style, loading, disabled }) => {
+export const Button = ({ children, onClick, type = "button", variant = "primary", icon: Icon, className = "", style, loading, disabled, ...props }) => {
   const getBaseClass = () => {
     switch (variant) {
       case "primary": return "btn-primary";
@@ -22,6 +22,7 @@ export const Button = ({ children, onClick, type = "button", variant = "primary"
         transform: (loading || disabled) ? 'none' : undefined,
       }}
       disabled={loading || disabled}
+      {...props}
     >
       {loading ? (
         <Loader2 className="animate-spin" size={18} />

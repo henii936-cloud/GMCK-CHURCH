@@ -5,7 +5,7 @@ import {
   ArrowRight, ChevronLeft, Users, 
   Zap, CheckCircle2, User, MapPin
 } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { motion } from 'motion/react';
 import { Button, Card, Input } from '../../components/common/UI';
 import { supabase } from '../../services/supabaseClient';
 import { useAuth } from '../../context/AuthContext';
@@ -192,7 +192,7 @@ export default function Signup() {
                 >
                   <option value="">-- Choose a Group --</option>
                   {groups.map(g => (
-                    <option key={g.id} value={g.id}>{g.name}</option>
+                    <option key={g.id} value={g.id}>{g.group_name}</option>
                   ))}
                 </select>
                 {groups.length === 0 && (

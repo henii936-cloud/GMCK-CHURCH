@@ -1,6 +1,12 @@
 -- ⛪ COMPLETE CHURCH ERP SUPABASE SCHEMA (SQL)
 -- Paste this into Supabase SQL Editor to set up your backend instantly.
 
+DROP TABLE IF EXISTS public.profiles CASCADE;
+DROP TABLE IF EXISTS public.bible_study_groups CASCADE;
+DROP TABLE IF EXISTS public.members CASCADE; 
+DROP TABLE IF EXISTS public.study_progress CASCADE;
+DROP TABLE IF EXISTS public.transactions CASCADE;
+
 -- 1. PROFILES TABLE (Linked to Auth)
 CREATE TABLE profiles (
   id UUID REFERENCES auth.users ON DELETE CASCADE PRIMARY KEY,

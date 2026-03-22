@@ -28,7 +28,7 @@ export default function Groups() {
       // Get groups and profiles for leaders
       const [groupsData, { data: leadersData }] = await Promise.all([
         groupService.getGroups(),
-        supabase.from("profiles").select("id, full_name").eq("role", "bible_leader")
+        supabase.from("profiles").select("id, full_name, role").order("full_name")
       ]);
       setGroups(groupsData);
       setLeaders(leadersData || []);
@@ -156,7 +156,11 @@ export default function Groups() {
                 <label style={{ display: 'block', marginBottom: '6px', fontSize: '0.875rem', fontWeight: '500', color: 'var(--text-muted)' }}>Assigned Leader</label>
                 <select className="input-field" value={newGroup.leader_id} onChange={e => setNewGroup({...newGroup, leader_id: e.target.value})} required>
                   <option value="">Select a leader</option>
-                  {leaders.map(l => <option key={l.id} value={l.id}>{l.full_name}</option>)}
+                  {leaders.map(l => (
+                    <option key={l.id} value={l.id}>
+                      {l.full_name} ({l.role === 'bible_leader' ? 'Leader' : l.role.charAt(0).toUpperCase() + l.role.slice(1)})
+                    </option>
+                  ))}
                 </select>
               </div>
 

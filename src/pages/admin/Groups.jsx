@@ -62,7 +62,7 @@ export default function Groups() {
 
   const filteredGroups = groups.filter(g => 
     g.group_name?.toLowerCase().includes(searchTerm.toLowerCase()) || 
-    g.profiles?.full_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    g.leaders?.some(l => l.full_name?.toLowerCase().includes(searchTerm.toLowerCase())) ||
     g.location?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
@@ -71,54 +71,56 @@ export default function Groups() {
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '32px' }}>
         <div>
           <h1 style={{ fontSize: '2.25rem', fontWeight: '800', letterSpacing: '-0.025em' }}>Bible Study <span style={{ color: 'var(--primary)' }}>Groups</span></h1>
-          <p style={{ color: 'var(--text-muted)', fontSize: '1rem', fontWeight: '500' }}>Manage groups, assign leaders, and track participation across the church</p>
+          <p style={{ color: 'var(--text-muted)', fontSize: '1rem', fontWeight: '500' }}>Manage groups, allow leaders to self-assign, and track participation across the church</p>
         </div>
         <Button onClick={() => setShowModal(true)} icon={Plus}>Create New Group</Button>
       </div>
 
-      <div style={{ display: 'flex', gap: '16px', marginBottom: '32px' }}>
-        <div style={{ flex: 1, position: 'relative' }}>
-          <Search size={20} style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
-          <input 
-            type="text" 
-            placeholder="Search by group name, leader, or location..." 
-            className="input-field" 
-            style={{ paddingLeft: '48px' }}
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
+      <div style={{ position: 'relative', marginBottom: '40px' }}>
+        <div style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }}>
+          <Search size={20} />
         </div>
+        <input 
+          type="text" 
+          placeholder="Search groups by name, leader, or location..." 
+          className="search-input"
+          style={{ width: '100%', padding: '16px 16px 16px 48px', borderRadius: '16px', background: 'var(--card)', border: '1px solid var(--border)', fontSize: '1rem', transition: 'all 0.3s ease' }}
+          value={searchTerm}
+          onChange={e => setSearchTerm(e.target.value)}
+        />
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))', gap: '24px' }}>
-        <AnimatePresence>
-          {filteredGroups.map((group) => (
-            <motion.div 
-              key={group.id}
-              layout
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-            >
-              <Card style={{ padding: '0', overflow: 'hidden', height: '100%', position: 'relative' }}>
-                <div style={{ padding: '24px', position: 'relative' }}>
-                  <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '20px' }}>
-                    <div style={{ 
-                      width: 52, height: 52, borderRadius: 16, 
-                      background: 'linear-gradient(135deg, var(--primary) 0%, #4f46e5 100%)', 
-                      display: 'grid', placeItems: 'center',
-                      boxShadow: '0 8px 16px rgba(99, 102, 241, 0.2)'
-                    }}>
-                      <Layers size={28} color="white" />
+      {loading ? (
+        <div style={{ textAlign: 'center', padding: '100px 0' }}>Creating your view...</div>
+      ) : (
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '24px' }}>
+          <AnimatePresence>
+            {filteredGroups.map(group => (
+              <motion.div 
+                key={group.id}
+                layout
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.9 }}
+                transition={{ duration: 0.2 }}
+              >
+                <Card style={{ padding: '32px', position: 'relative', overflow: 'hidden' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px' }}>
+                    <div style={{ width: 44, height: 44, borderRadius: 12, background: 'rgba(99, 102, 241, 0.1)', display: 'grid', placeItems: 'center' }}>
+                      <Layers size={22} color="var(--primary)" />
                     </div>
-                    <button style={{ color: 'var(--text-muted)', padding: '4px' }}><MoreVertical size={20} /></button>
+                    <button style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}>
+                      <MoreVertical size={20} />
+                    </button>
                   </div>
 
                   <h3 style={{ fontSize: '1.25rem', fontWeight: '700', marginBottom: '8px' }}>{group.group_name}</h3>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '24px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.875rem', color: 'var(--text-muted)' }}>
                       <User size={16} /> 
-                      <span style={{ fontWeight: '600', color: 'var(--text)' }}>Leader: {group.profiles?.full_name || 'Unassigned'}</span>
+                      <span style={{ fontWeight: '600', color: 'var(--text)' }}>
+                        Leader: {group.leaders.length > 0 ? group.leaders.map(l => l.full_name).join(", ") : 'Unassigned'}
+                      </span>
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.875rem', color: 'var(--text-muted)' }}>
                       <MapPin size={16} /> 

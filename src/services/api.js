@@ -164,11 +164,30 @@ export const groupService = {
   getGroups: async () => {
     const { data, error } = await supabase.from("bible_study_groups").select(`
       *,
-      profiles!bible_study_groups_leader_id_fkey(full_name)
+      group_leaders!group_leaders_group_id_fkey(
+        profiles(full_name, role)
+      )
     `).order("group_name");
+    
+    if (error) throw error;
+    
+    // Flatten data for easier consumption in frontend
+    return data.map(g => ({
+      ...g,
+      leaders: g.group_leaders?.map(gl => gl.profiles) || []
+    }));
+  },
+
+  assignLeader: async (groupId, userId) => {
+    const { data, error } = await supabase
+      .from("group_leaders")
+      .insert({ group_id: groupId, user_id: userId })
+      .select();
+    
     if (error) throw error;
     return data;
   },
+
   createGroup: async (group) => {
     const { data, error } = await supabase.from("bible_study_groups").insert([group]).select();
     if (error) throw error;

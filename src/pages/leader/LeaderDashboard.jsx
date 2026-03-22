@@ -26,17 +26,22 @@ export default function LeaderDashboard() {
   const fetchGroupData = async () => {
     try {
       setLoading(true);
-      // Get the group the leader is assigned to
-      const { data: groupData, error: groupError } = await supabase
-        .from('bible_study_groups')
-        .select('*')
-        .eq('leader_id', user.id)
+      // Get the group the leader is assigned to via the mapping table
+      const { data: assignmentData, error: assignmentError } = await supabase
+        .from('group_leaders')
+        .select(`
+          group_id,
+          bible_study_groups (*)
+        `)
+        .eq('user_id', user.id)
         .maybeSingle();
 
-      if (groupError) throw groupError;
+      if (assignmentError) throw assignmentError;
+      
+      const groupData = assignmentData?.bible_study_groups;
       
       if (!groupData) {
-        // If no group is found, fetch available groups
+        // If no group is assigned, fetch available groups
         fetchAvailableGroups();
         return;
       }
@@ -61,12 +66,9 @@ export default function LeaderDashboard() {
 
   const fetchAvailableGroups = async () => {
     try {
-      const { data, error } = await supabase
-        .from('bible_study_groups')
-        .select('*')
-        .is('leader_id', null);
-      
-      if (error) throw error;
+      // Get all groups and filter out ones with leaders (if you want to keep it 1 leader per group)
+      // or simply show all groups
+      const data = await groupService.getGroups();
       setAvailableGroups(data || []);
     } catch (err) {
       console.error("Error fetching available groups:", err);
@@ -78,12 +80,7 @@ export default function LeaderDashboard() {
   const handleClaimGroup = async (groupId) => {
     setClaiming(true);
     try {
-      const { error } = await supabase
-        .from('bible_study_groups')
-        .update({ leader_id: user.id })
-        .eq('id', groupId);
-      
-      if (error) throw error;
+      await groupService.assignLeader(groupId, user.id);
       
       // Refresh to show the newly claimed group
       fetchGroupData();

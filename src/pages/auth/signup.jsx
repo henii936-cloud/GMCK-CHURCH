@@ -9,6 +9,7 @@ import { motion } from 'motion/react';
 import { Button, Card, Input } from '../../components/common/UI';
 import { supabase } from '../../services/supabaseClient';
 import { useAuth } from '../../context/AuthContext';
+import { groupService } from '../../services/api';
 
 export default function Signup() {
   const navigate = useNavigate();
@@ -20,6 +21,8 @@ export default function Signup() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
+  const [groupId, setGroupId] = useState("");
+  const [groups, setGroups] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
@@ -58,28 +61,29 @@ export default function Signup() {
   }, [role]);
 
   const fetchAvailableGroups = async () => {
-    const { data, error } = await supabase
-      .from('bible_study_groups')
-      .select('*')
-      .is('leader_id', null);
-    
-    if (!error) setGroups(data);
+    try {
+      const data = await groupService.getGroups();
+      setGroups(data || []);
+    } catch (err) {
+      console.error("Error fetching groups:", err);
+    }
   };
 
   const handleSignup = async (e) => {
     e.preventDefault();
     if (loading) return;
-    
-    if (role === 'bible_leader' && !groupId) {
-      setError("Please select a Bible study group to lead.");
-      return;
-    }
 
     setLoading(true);
     setError(null);
 
     try {
-      await signup(email, password, name, role);
+      const { user: newUser } = await signup(email, password, name, role);
+      
+      // If a group was selected, create the mapping
+      if (role === 'bible_leader' && newUser?.id && groupId) {
+        await groupService.assignLeader(groupId, newUser.id);
+      }
+      
       setSuccess(true);
       setTimeout(() => navigate("/login"), 3000);
     } catch (err) {
@@ -165,6 +169,34 @@ export default function Signup() {
             <Input label="Full Display Name" placeholder="e.g. Samuel Adekunle" value={name} onChange={e => setName(e.target.value)} required icon={User} />
             <Input label="Official Email Address" type="email" placeholder="samuel@church.org" value={email} onChange={e => setEmail(e.target.value)} required icon={Mail} />
             <Input label="Secure Password" type="password" placeholder="••••••••" value={password} onChange={e => setPassword(e.target.value)} required icon={Lock} />
+
+            {role === 'bible_leader' && (
+              <div className="flex flex-col gap-2">
+                <label className="text-sm font-semibold text-muted-foreground flex items-center gap-2">
+                  <MapPin size={16} /> Select Bible Study Group
+                </label>
+                <select 
+                  value={groupId} 
+                  onChange={e => setGroupId(e.target.value)}
+                  required
+                  className="w-full px-4 py-3 rounded-xl bg-card border border-border text-foreground text-base outline-none focus:ring-2 focus:ring-primary/50 transition-all font-medium appearance-none"
+                  style={{
+                    backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='currentColor'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")`,
+                    backgroundPosition: 'right 1rem center',
+                    backgroundRepeat: 'no-repeat',
+                    backgroundSize: '1.25rem'
+                  }}
+                >
+                  <option value="">-- Choose a Group --</option>
+                  {groups.map(g => (
+                    <option key={g.id} value={g.id}>{g.group_name}</option>
+                  ))}
+                </select>
+                {groups.length === 0 && (
+                  <p className="text-xs text-amber-500 font-medium">No groups available. Contact Admin to create one.</p>
+                )}
+              </div>
+            )}
 
             {error && (
               <div className="p-3 rounded-xl bg-destructive/10 text-destructive text-sm font-semibold border border-destructive/20">

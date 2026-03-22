@@ -21,12 +21,33 @@ CREATE TABLE IF NOT EXISTS public.profiles (
 CREATE TABLE IF NOT EXISTS public.bible_study_groups (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   group_name TEXT NOT NULL,
-  leader_id UUID REFERENCES public.profiles(id) ON DELETE SET NULL,
+  leader_id UUID REFERENCES public.profiles(id) ON DELETE SET NULL, -- Deprecated in favor of group_leaders table
   location TEXT,
   members_count INTEGER DEFAULT 0,
   created_by_admin UUID REFERENCES public.profiles(id),
   created_at TIMESTAMPTZ DEFAULT timezone('utc', now()) NOT NULL
 );
+
+-- MAPPING TABLE (Refined Design)
+CREATE TABLE IF NOT EXISTS public.group_leaders (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  user_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE,
+  group_id UUID REFERENCES public.bible_study_groups(id) ON DELETE CASCADE,
+  assigned_at TIMESTAMPTZ DEFAULT timezone('utc', now()) NOT NULL,
+  UNIQUE(user_id) -- Ensures one leader = one group
+);
+
+-- RLS for group_leaders
+ALTER TABLE public.group_leaders ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "admin_all_access_group_leaders" ON public.group_leaders 
+FOR ALL USING (public.is_admin());
+
+CREATE POLICY "leaders_view_own_group_leaders" ON public.group_leaders 
+FOR SELECT USING (auth.uid() = user_id);
+
+CREATE POLICY "leaders_join_group_group_leaders" ON public.group_leaders 
+FOR INSERT WITH CHECK (auth.uid() = user_id);
 
 -- MEMBERS: Church Attendees (No Login)
 CREATE TABLE IF NOT EXISTS public.members (

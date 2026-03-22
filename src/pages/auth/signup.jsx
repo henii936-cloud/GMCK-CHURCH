@@ -63,7 +63,9 @@ export default function Signup() {
   const fetchAvailableGroups = async () => {
     try {
       const data = await groupService.getGroups();
-      setGroups(data || []);
+      // Only show groups that have no leaders assigned yet
+      const unassignedGroups = data.filter(g => g.leaders.length === 0);
+      setGroups(unassignedGroups);
     } catch (err) {
       console.error("Error fetching groups:", err);
     }

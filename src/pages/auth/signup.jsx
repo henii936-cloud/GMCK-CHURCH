@@ -173,43 +173,29 @@ export default function Signup() {
             <Input label="Secure Password" type="password" placeholder="••••••••" value={password} onChange={e => setPassword(e.target.value)} required icon={Lock} />
 
             {role === 'bible_leader' && (
-              <div className="flex flex-col gap-4 p-5 rounded-2xl bg-primary/5 border border-primary/10">
-                <div className="flex items-start gap-3">
-                  <div className="mt-1 p-2 rounded-lg bg-primary/10 text-primary">
-                    <MapPin size={18} />
-                  </div>
-                  <div>
-                    <h4 className="text-sm font-bold text-foreground">Select Your Study Group</h4>
-                    <p className="text-[13px] text-muted-foreground leading-relaxed mt-1">
-                      You haven't been assigned a group yet. Please select one of the available study groups below to begin leading.
-                    </p>
-                  </div>
-                </div>
-
-                <div className="relative">
-                  <select 
-                    value={groupId} 
-                    onChange={e => setGroupId(e.target.value)}
-                    required
-                    className="w-full pl-4 pr-10 py-3 rounded-xl bg-card border border-border text-foreground text-sm outline-none focus:ring-2 focus:ring-primary/40 transition-all font-semibold appearance-none cursor-pointer"
-                    style={{
-                      backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='currentColor'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")`,
-                      backgroundPosition: 'right 1rem center',
-                      backgroundRepeat: 'no-repeat',
-                      backgroundSize: '1.1rem'
-                    }}
-                  >
-                    <option value="">-- Click to choose a group --</option>
-                    {groups.map(g => (
-                      <option key={g.id} value={g.id}>{g.group_name}</option>
-                    ))}
-                  </select>
-                </div>
+              <div className="flex flex-col gap-2">
+                <label className="text-sm font-semibold text-muted-foreground flex items-center gap-2">
+                  <MapPin size={16} /> Select Bible Study Group
+                </label>
+                <select 
+                  value={groupId} 
+                  onChange={e => setGroupId(e.target.value)}
+                  required
+                  className="w-full px-4 py-3 rounded-xl bg-card border border-border text-foreground text-base outline-none focus:ring-2 focus:ring-primary/50 transition-all font-medium appearance-none"
+                  style={{
+                    backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='currentColor'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")`,
+                    backgroundPosition: 'right 1rem center',
+                    backgroundRepeat: 'no-repeat',
+                    backgroundSize: '1.25rem'
+                  }}
+                >
+                  <option value="">-- Choose a Group --</option>
+                  {groups.map(g => (
+                    <option key={g.id} value={g.id}>{g.group_name}</option>
+                  ))}
+                </select>
                 {groups.length === 0 && (
-                  <div className="flex items-center gap-2 px-1 text- amber-600">
-                    <CheckCircle2 size={14} />
-                    <p className="text-[11px] font-bold uppercase tracking-wider">No groups currently need a leader</p>
-                  </div>
+                  <p className="text-xs text-amber-500 font-medium">No groups available. Contact Admin to create one.</p>
                 )}
               </div>
             )}

@@ -31,7 +31,7 @@ export default function LeaderDashboard() {
         .from('group_leaders')
         .select(`
           group_id,
-          bible_study_groups (*)
+          bible_study_groups:group_id (*)
         `)
         .eq('user_id', user.id)
         .maybeSingle();
@@ -42,7 +42,7 @@ export default function LeaderDashboard() {
       
       if (!groupData) {
         // If no group is assigned, fetch available groups
-        fetchAvailableGroups();
+        await fetchAvailableGroups();
         return;
       }
       

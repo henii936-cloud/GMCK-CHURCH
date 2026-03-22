@@ -125,11 +125,35 @@ export const AuthProvider = ({ children }) => {
         throw error;
       }
 
-      const { data: profile, error: profileError } = await supabase
+      const { data: profileData, error: profileError } = await supabase
         .from('profiles')
         .select('role')
         .eq('id', data.user.id)
         .maybeSingle();
+
+      let profile = profileData;
+
+      if (!profile) {
+        // 🧪 SELF-REPAIR: If profile is missing but we have metadata, create it
+        const metadata = data.user.user_metadata;
+        if (metadata?.role) {
+          console.log("🛠️ Profile missing, attempting self-repair using metadata...");
+          const { data: newProfile, error: repairError } = await supabase
+            .from('profiles')
+            .upsert({
+              id: data.user.id,
+              full_name: metadata.full_name || metadata.name || "User",
+              role: metadata.role
+            })
+            .select('role')
+            .single();
+          
+          if (!repairError) {
+            profile = newProfile;
+            console.log("✅ Profile repaired!");
+          }
+        }
+      }
 
       if (!profile) {
         throw new Error("User profile not found. Please contact an administrator.");
@@ -159,6 +183,12 @@ export const AuthProvider = ({ children }) => {
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
+      options: {
+        data: {
+          full_name: name,
+          role: role
+        }
+      }
     });
     
     if (error) throw error;
@@ -167,7 +197,7 @@ export const AuthProvider = ({ children }) => {
       const profileData = { id: data.user.id, full_name: name, role: role };
       const { error: profileError } = await supabase
         .from('profiles')
-        .insert([profileData]);
+        .upsert(profileData);
       
       if (profileError) throw profileError;
       

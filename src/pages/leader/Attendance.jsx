@@ -8,39 +8,25 @@ export default function Attendance() {
   const { user } = useAuth();
   const [members, setMembers] = useState([]);
   const [attendance, setAttendance] = useState({});
-  const [groupId, setGroupId] = useState(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [message, setMessage] = useState("");
 
   useEffect(() => {
-    if (user?.id) load();
+    load();
   }, [user]);
 
   const load = async () => {
     try {
-      // 1. Get leader's group directly from groups table
-      const { data: group } = await supabase
-        .from('bible_study_groups')
-        .select('id')
-        .eq('leader_id', user.id)
-        .maybeSingle();
-      
-      if (!group) {
-        setLoading(false);
-        return;
-      }
-      setGroupId(group.id);
-
-      // 2. Get members for this group
+      // For simplicity, we fetch all and filter by group_id
       const data = await memberService.getMembers();
-      const filtered = data.filter(m => m.group_id === group.id);
+      const filtered = data.filter(m => m.group_id === user?.group_id);
       setMembers(filtered);
       
-      // Initialize attendance (lowercase to match DB)
+      // Initialize attendance
       const initial = {};
-      filtered.forEach(m => initial[m.id] = 'present');
+      filtered.forEach(m => initial[m.id] = 'Present');
       setAttendance(initial);
     } catch (err) {
       console.error(err);
@@ -54,24 +40,22 @@ export default function Attendance() {
   };
 
   const handleSave = async () => {
-    if (!groupId) return setMessage("No assigned group found.");
     setSaving(true);
     setMessage("");
     try {
       const records = members.map(m => ({
         member_id: m.id,
-        group_id: groupId,
+        group_id: user.group_id,
         status: attendance[m.id],
-        recorded_by: user.id,
         date: new Date().toISOString().split('T')[0]
       }));
 
       await attendanceService.saveAttendance(records);
       setMessage("Attendance saved successfully!");
+      // Reset after success
       setTimeout(() => setMessage(""), 3000);
     } catch (err) {
-      console.error(err);
-      setMessage("Error saving attendance.");
+      setMessage("Error saving attendance. Please try again.");
     } finally {
       setSaving(false);
     }
@@ -79,13 +63,6 @@ export default function Attendance() {
 
   const filteredMembers = members.filter(m => 
     m.full_name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  if (!groupId && !loading) return (
-    <div style={{ padding: '40px', textAlign: 'center' }}>
-      <h2 style={{ fontWeight: '800' }}>No Group Assigned</h2>
-      <p style={{ color: 'var(--text-muted)' }}>You must be assigned to a group to take attendance.</p>
-    </div>
   );
 
   return (
@@ -140,25 +117,32 @@ export default function Attendance() {
                     </div>
                   </td>
                   <td>
-                    <span className={`badge ${attendance[m.id] === 'present' ? 'badge-approved' : 'badge-pending'}`} style={{ opacity: 0.8, textTransform: 'capitalize' }}>
+                    <span className={`badge ${attendance[m.id] === 'Present' ? 'badge-approved' : attendance[m.id] === 'Absent' ? 'badge-pending' : 'badge-tertiary'}`} style={{ opacity: 0.8 }}>
                       {attendance[m.id]}
                     </span>
                   </td>
                   <td style={{ textAlign: 'right' }}>
                     <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px' }}>
                       <button 
-                        onClick={() => setStatus(m.id, 'present')}
-                        style={{ width: 32, height: 32, borderRadius: 8, background: attendance[m.id] === 'present' ? 'var(--primary)' : 'rgba(255,255,255,0.05)', display: 'grid', placeItems: 'center', transition: '0.2s' }}
+                        onClick={() => setStatus(m.id, 'Present')}
+                        style={{ width: 32, height: 32, borderRadius: 8, background: attendance[m.id] === 'Present' ? 'var(--primary)' : 'rgba(255,255,255,0.05)', display: 'grid', placeItems: 'center', transition: '0.2s' }}
                         title="Present"
                       >
-                        <Check size={16} color={attendance[m.id] === 'present' ? 'white' : 'var(--text-muted)'} />
+                        <Check size={16} color={attendance[m.id] === 'Present' ? 'white' : 'var(--text-muted)'} />
                       </button>
                       <button 
-                        onClick={() => setStatus(m.id, 'absent')}
-                        style={{ width: 32, height: 32, borderRadius: 8, background: attendance[m.id] === 'absent' ? '#ef4444' : 'rgba(255,255,255,0.05)', display: 'grid', placeItems: 'center', transition: '0.2s' }}
+                        onClick={() => setStatus(m.id, 'Absent')}
+                        style={{ width: 32, height: 32, borderRadius: 8, background: attendance[m.id] === 'Absent' ? '#ef4444' : 'rgba(255,255,255,0.05)', display: 'grid', placeItems: 'center', transition: '0.2s' }}
                         title="Absent"
                       >
-                        <X size={16} color={attendance[m.id] === 'absent' ? 'white' : 'var(--text-muted)'} />
+                        <X size={16} color={attendance[m.id] === 'Absent' ? 'white' : 'var(--text-muted)'} />
+                      </button>
+                      <button 
+                        onClick={() => setStatus(m.id, 'Excused')}
+                        style={{ width: 32, height: 32, borderRadius: 8, background: attendance[m.id] === 'Excused' ? '#f59e0b' : 'rgba(255,255,255,0.05)', display: 'grid', placeItems: 'center', transition: '0.2s' }}
+                        title="Excused"
+                      >
+                        <span style={{ fontSize: '0.75rem', fontWeight: '800', color: attendance[m.id] === 'Excused' ? 'white' : 'var(--text-muted)' }}>E</span>
                       </button>
                     </div>
                   </td>

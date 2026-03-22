@@ -26,7 +26,7 @@ export default function LeaderDashboard() {
   const fetchGroupData = async () => {
     try {
       setLoading(true);
-      // 🔥 BACK TO ORIGINAL: Look up by leader_id directly
+      // Get the group the leader is assigned to
       const { data: groupData, error: groupError } = await supabase
         .from('bible_study_groups')
         .select('*')
@@ -36,7 +36,7 @@ export default function LeaderDashboard() {
       if (groupError) throw groupError;
       
       if (!groupData) {
-        // If no group is found, fetch available groups (ungassigned)
+        // If no group is found, fetch available groups
         fetchAvailableGroups();
         return;
       }
@@ -61,14 +61,13 @@ export default function LeaderDashboard() {
 
   const fetchAvailableGroups = async () => {
     try {
-      // 🕵️ Fetch groups that have no leader assigned yet
-      const { data: available, error: groupError } = await supabase
+      const { data, error } = await supabase
         .from('bible_study_groups')
         .select('*')
         .is('leader_id', null);
       
-      if (groupError) throw groupError;
-      setAvailableGroups(available || []);
+      if (error) throw error;
+      setAvailableGroups(data || []);
     } catch (err) {
       console.error("Error fetching available groups:", err);
     } finally {
@@ -79,7 +78,6 @@ export default function LeaderDashboard() {
   const handleClaimGroup = async (groupId) => {
     setClaiming(true);
     try {
-      // 🔥 Update the leader_id directly on the group table
       const { error } = await supabase
         .from('bible_study_groups')
         .update({ leader_id: user.id })
@@ -90,8 +88,8 @@ export default function LeaderDashboard() {
       // Refresh to show the newly claimed group
       fetchGroupData();
     } catch (err) {
-      console.error("Error claiming group:", err.message);
-      alert("This group has already been taken.");
+      console.error("Error claiming group:", err);
+      alert("Failed to claim group. It might have been taken by another leader.");
     } finally {
       setClaiming(false);
     }

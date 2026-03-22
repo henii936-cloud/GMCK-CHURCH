@@ -31,7 +31,7 @@ export const attendanceService = {
       .select(`
         *,
         members(full_name),
-        bible_study_groups(group_name)
+        bible_study_groups(name)
       `)
       .order("date", { ascending: false });
     
@@ -56,7 +56,7 @@ export const studyService = {
       .from("study_progress")
       .select("*")
       .eq("group_id", groupId)
-      .order("date", { ascending: false });
+      .order("completion_date", { ascending: false });
     
     if (error) throw error;
     return data;
@@ -67,9 +67,9 @@ export const studyService = {
       .from("study_progress")
       .select(`
         *,
-        bible_study_groups(group_name)
+        bible_study_groups(name)
       `)
-      .order("date", { ascending: false });
+      .order("completion_date", { ascending: false });
     
     if (error) throw error;
     return data;

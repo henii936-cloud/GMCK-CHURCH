@@ -26,28 +26,31 @@ export default function LeaderDashboard() {
   const fetchGroupData = async () => {
     try {
       setLoading(true);
-      // Get the group the leader is assigned to
-      const { data: groupData, error: groupError } = await supabase
-        .from('bible_study_groups')
-        .select('*')
-        .eq('leader_id', user.id)
+      // 🔥 NEW: Check mapping table for leader's group
+      const { data: leaderMapping, error: mappingError } = await supabase
+        .from('group_leaders')
+        .select(`
+          group_id,
+          bible_study_groups (*)
+        `)
+        .eq('user_id', user.id)
         .maybeSingle();
 
-      if (groupError) throw groupError;
+      if (mappingError) throw mappingError;
       
-      if (!groupData) {
+      if (!leaderMapping) {
         // If no group is found, fetch available groups
         fetchAvailableGroups();
         return;
       }
       
-      setGroup(groupData);
+      setGroup(leaderMapping.bible_study_groups);
 
       // Get member count for this group
       const { count, error: memberError } = await supabase
         .from('members')
         .select('*', { count: 'exact', head: true })
-        .eq('group_id', groupData.id);
+        .eq('group_id', leaderMapping.group_id);
 
       if (memberError) throw memberError;
       setMemberCount(count || 0);
@@ -61,13 +64,20 @@ export default function LeaderDashboard() {
 
   const fetchAvailableGroups = async () => {
     try {
-      const { data, error } = await supabase
+      // 🕵️ Fetch groups that are NOT in the mapping table yet
+      // We'll use a join or just filter groups where no leader is assigned
+      const { data: allGroups, error: groupError } = await supabase
         .from('bible_study_groups')
-        .select('*')
-        .is('leader_id', null);
+        .select(`
+          *,
+          group_leaders (user_id)
+        `);
       
-      if (error) throw error;
-      setAvailableGroups(data || []);
+      if (groupError) throw groupError;
+      
+      // Filter out groups that already have a leader assigned in the mapping table
+      const available = allGroups.filter(g => !g.group_leaders || g.group_leaders.length === 0);
+      setAvailableGroups(available);
     } catch (err) {
       console.error("Error fetching available groups:", err);
     } finally {
@@ -78,18 +88,21 @@ export default function LeaderDashboard() {
   const handleClaimGroup = async (groupId) => {
     setClaiming(true);
     try {
+      // 🔥 Insert into the mapping table instead of updating the group
       const { error } = await supabase
-        .from('bible_study_groups')
-        .update({ leader_id: user.id })
-        .eq('id', groupId);
+        .from('group_leaders')
+        .insert({ 
+          user_id: user.id,
+          group_id: groupId 
+        });
       
       if (error) throw error;
       
       // Refresh to show the newly claimed group
       fetchGroupData();
     } catch (err) {
-      console.error("Error claiming group:", err);
-      alert("Failed to claim group. It might have been taken by another leader.");
+      console.error("Error claiming group:", err.message);
+      alert("This group has already been claimed by another leader.");
     } finally {
       setClaiming(false);
     }

@@ -106,7 +106,7 @@ export default function Groups() {
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '24px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.875rem', color: 'var(--text-muted)' }}>
                       <User size={16} /> 
-                      <span style={{ fontWeight: '600', color: 'var(--text)' }}>Leader: {group.profiles?.full_name || 'Unassigned'}</span>
+                      <span style={{ fontWeight: '600', color: 'var(--text)' }}>Leader: {group.group_leaders?.[0]?.profiles?.full_name || 'Unassigned'}</span>
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.875rem', color: 'var(--text-muted)' }}>
                       <MapPin size={16} /> 

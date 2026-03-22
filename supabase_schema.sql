@@ -107,8 +107,8 @@ $$ LANGUAGE sql SECURITY DEFINER;
 CREATE OR REPLACE FUNCTION public.is_group_leader(g_id UUID)
 RETURNS BOOLEAN AS $$
   SELECT EXISTS (
-    SELECT 1 FROM public.bible_study_groups
-    WHERE id = g_id AND leader_id = auth.uid()
+    SELECT 1 FROM public.group_leaders
+    WHERE group_id = g_id AND user_id = auth.uid()
   );
 $$ LANGUAGE sql SECURITY DEFINER;
 
@@ -250,3 +250,26 @@ CREATE POLICY "events_admin_manage" ON public.events FOR ALL USING (public.is_ad
 -- TRANSACTIONS POLICIES
 DROP POLICY IF EXISTS "transactions_admin_manage" ON public.transactions;
 CREATE POLICY "transactions_admin_manage" ON public.transactions FOR ALL USING (public.is_admin());
+
+-- =====================================================
+-- 4. GROUP LEADERS MAPPING (Refactored)
+-- =====================================================
+
+CREATE TABLE IF NOT EXISTS public.group_leaders (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  user_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE,
+  group_id UUID REFERENCES public.bible_study_groups(id) ON DELETE CASCADE,
+  assigned_at TIMESTAMPTZ DEFAULT timezone('utc', now()) NOT NULL,
+  UNIQUE(user_id) -- Ensures one leader = one group
+);
+
+ALTER TABLE public.group_leaders ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "group_leaders_admin_manage" ON public.group_leaders;
+CREATE POLICY "group_leaders_admin_manage" ON public.group_leaders FOR ALL USING (public.is_admin());
+
+DROP POLICY IF EXISTS "group_leaders_view_own" ON public.group_leaders;
+CREATE POLICY "group_leaders_view_own" ON public.group_leaders FOR SELECT USING (auth.uid() = user_id);
+
+DROP POLICY IF EXISTS "group_leaders_join_group" ON public.group_leaders;
+CREATE POLICY "group_leaders_join_group" ON public.group_leaders FOR INSERT WITH CHECK (auth.uid() = user_id);

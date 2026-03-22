@@ -10,11 +10,12 @@ export default function Groups() {
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
-
   const [newGroup, setNewGroup] = useState({
     group_name: "",
     location: ""
   });
+  const [isSaving, setIsSaving] = useState(false);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     loadData();
@@ -33,18 +34,29 @@ export default function Groups() {
 
   const handleCreateGroup = async (e) => {
     e.preventDefault();
+    if (isSaving) return;
+    
+    setIsSaving(true);
+    setError(null);
+    
     try {
       const payload = {
         group_name: newGroup.group_name,
         location: newGroup.location
       };
       
+      console.log("Creating group with payload:", payload);
       await groupService.createGroup(payload);
+      
       setShowModal(false);
       loadData();
       setNewGroup({ group_name: "", location: "" });
+      alert("Group created successfully!"); // Temporary feedback
     } catch (err) {
       console.error("Error creating group:", err);
+      setError(err.message || "Failed to create group. Please try again.");
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -151,9 +163,15 @@ export default function Groups() {
               
               <Input label="Primary Meeting Location" placeholder="e.g. Main Hall / Online" value={newGroup.location} onChange={e => setNewGroup({...newGroup, location: e.target.value})} />
               
+              {error && (
+                <div style={{ color: '#ef4444', fontSize: '0.875rem', fontWeight: '600' }}>
+                  {error}
+                </div>
+              )}
+              
               <div style={{ display: 'flex', gap: '12px', marginTop: '12px' }}>
-                <Button type="submit" style={{ flex: 1 }} icon={Plus}>Save Group</Button>
-                <Button variant="secondary" onClick={() => setShowModal(false)}>Cancel</Button>
+                <Button type="submit" style={{ flex: 1 }} icon={Plus} loading={isSaving}>Save Group</Button>
+                <Button variant="secondary" onClick={() => setShowModal(false)} disabled={isSaving}>Cancel</Button>
               </div>
             </form>
           </motion.div>

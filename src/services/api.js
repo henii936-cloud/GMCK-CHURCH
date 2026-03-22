@@ -31,7 +31,7 @@ export const attendanceService = {
       .select(`
         *,
         members(full_name),
-        bible_study_groups(name)
+        bible_study_groups(group_name)
       `)
       .order("date", { ascending: false });
     
@@ -67,7 +67,7 @@ export const studyService = {
       .from("study_progress")
       .select(`
         *,
-        bible_study_groups(name)
+        bible_study_groups(group_name)
       `)
       .order("completion_date", { ascending: false });
     

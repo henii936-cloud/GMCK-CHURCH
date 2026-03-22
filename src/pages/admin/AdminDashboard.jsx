@@ -56,7 +56,7 @@ export default function AdminDashboard() {
   const fetchRecentData = async () => {
     try {
       const [studyData, eventsData] = await Promise.all([
-        supabase.from('study_progress').select('*, bible_study_groups(group_name)').order('completion_date', { ascending: false }).limit(5),
+        supabase.from('study_progress').select('*, bible_study_groups(group_name)').order('date', { ascending: false }).limit(5),
         supabase.from('events').select('*').gte('date', new Date().toISOString().split('T')[0]).order('date', { ascending: true }).limit(3)
       ]);
       setRecentStudy(studyData.data || []);
@@ -145,10 +145,10 @@ export default function AdminDashboard() {
                 </div>
                 <div style={{ flex: 1 }}>
                   <p style={{ fontWeight: '600', fontSize: '0.9rem' }}>{study.bible_study_groups?.group_name}</p>
-                  <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{study.study_topic}</p>
+                  <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{study.topic}</p>
                 </div>
                 <div style={{ textAlign: 'right' }}>
-                  <p style={{ fontSize: '0.75rem', fontWeight: '600' }}>{new Date(study.completion_date).toLocaleDateString()}</p>
+                  <p style={{ fontSize: '0.75rem', fontWeight: '600' }}>{new Date(study.date).toLocaleDateString()}</p>
                   <p style={{ fontSize: '0.7rem', color: '#10b981' }}>Completed</p>
                 </div>
               </div>

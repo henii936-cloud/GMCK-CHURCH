@@ -41,8 +41,7 @@ export default function LeaderDashboard() {
       const groupData = assignmentData?.bible_study_groups;
       
       if (!groupData) {
-        // If no group is assigned, fetch available groups
-        fetchAvailableGroups();
+        setLoading(false);
         return;
       }
       
@@ -64,34 +63,6 @@ export default function LeaderDashboard() {
     }
   };
 
-  const fetchAvailableGroups = async () => {
-    try {
-      // Get all groups and filter out ones with leaders (if you want to keep it 1 leader per group)
-      // or simply show all groups
-      const data = await groupService.getGroups();
-      setAvailableGroups(data || []);
-    } catch (err) {
-      console.error("Error fetching available groups:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleClaimGroup = async (groupId) => {
-    setClaiming(true);
-    try {
-      await groupService.assignLeader(groupId, user.id);
-      
-      // Refresh to show the newly claimed group
-      fetchGroupData();
-    } catch (err) {
-      console.error("Error claiming group:", err);
-      alert("Failed to claim group. It might have been taken by another leader.");
-    } finally {
-      setClaiming(false);
-    }
-  };
-
   if (loading) return (
     <div style={{ padding: '40px', textAlign: 'center' }}>
       <div className="animate-spin" style={{ width: 40, height: 40, border: '4px solid var(--border)', borderTopColor: 'var(--primary)', borderRadius: '50%', margin: '0 auto 20px' }}></div>
@@ -99,41 +70,17 @@ export default function LeaderDashboard() {
     </div>
   );
 
-  // 🚪 SELECTION VIEW: If leader has no group
+  // 🚪 MESSAGE VIEW: If leader has no group
   if (!group) {
     return (
-      <div className="animate-fade-in" style={{ maxWidth: '800px', margin: '0 auto' }}>
-        <div style={{ textAlign: 'center', marginBottom: '40px' }}>
-          <h1 style={{ fontSize: '2.5rem', fontWeight: '900', marginBottom: '16px' }}>Welcome, {user?.full_name}</h1>
-          <p style={{ color: 'var(--text-muted)', fontSize: '1.1rem' }}>You haven't been assigned a group yet. Please select one of the available study groups below to begin leading.</p>
+      <div className="animate-fade-in" style={{ textAlign: 'center', padding: '100px 20px' }}>
+        <div style={{ width: 80, height: 80, borderRadius: 24, background: 'rgba(99, 102, 241, 0.1)', display: 'grid', placeItems: 'center', margin: '0 auto 32px' }}>
+          <Users size={40} color="var(--primary)" />
         </div>
-
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '24px' }}>
-          {availableGroups.length > 0 ? availableGroups.map(g => (
-            <Card key={g.id} style={{ padding: '24px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '20px' }}>
-                <div style={{ width: 48, height: 48, borderRadius: 12, background: 'rgba(99, 102, 241, 0.1)', display: 'grid', placeItems: 'center' }}>
-                  <Users size={24} color="var(--primary)" />
-                </div>
-                <div>
-                  <h3 style={{ fontWeight: '800', margin: 0 }}>{g.group_name}</h3>
-                  <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', margin: 0 }}>{g.location || 'Location not set'}</p>
-                </div>
-              </div>
-              <Button 
-                onClick={() => handleClaimGroup(g.id)} 
-                style={{ width: '100%', justifyContent: 'center' }}
-                loading={claiming}
-              >
-                Lead This Group <ArrowRight size={18} style={{ marginLeft: '8px' }} />
-              </Button>
-            </Card>
-          )) : (
-            <Card style={{ gridColumn: '1/-1', padding: '40px', textAlign: 'center' }}>
-              <p style={{ color: 'var(--text-muted)' }}>No groups are currently available for selection. Please contact the administrator.</p>
-            </Card>
-          )}
-        </div>
+        <h1 style={{ fontSize: '2rem', fontWeight: '900', marginBottom: '16px' }}>Unassigned Leader</h1>
+        <p style={{ color: 'var(--text-muted)', fontSize: '1.1rem', maxWidth: '500px', margin: '0 auto' }}>
+          You haven't been assigned to lead a Bible study group yet. Please contact the administrator to have a group assigned to your profile.
+        </p>
       </div>
     );
   }

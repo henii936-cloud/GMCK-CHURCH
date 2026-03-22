@@ -37,7 +37,7 @@ export const AuthProvider = ({ children }) => {
           .from('profiles')
           .select('*')
           .eq('id', authUser.id)
-          .single();
+          .maybeSingle();
           
         // 5 second timeout for profile fetch
         const timeoutPromise = new Promise((_, reject) => 
@@ -129,9 +129,11 @@ export const AuthProvider = ({ children }) => {
         .from('profiles')
         .select('role')
         .eq('id', data.user.id)
-        .single();
+        .maybeSingle();
 
-      if (profileError) throw profileError;
+      if (!profile) {
+        throw new Error("User profile not found. Please contact an administrator.");
+      }
 
       // 🔒 ROLE VALIDATION
       if (role && profile.role !== role) {

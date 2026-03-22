@@ -28,9 +28,16 @@ export default function LeaderDashboard() {
         .from('bible_study_groups')
         .select('*')
         .eq('leader_id', user.id)
-        .single();
+        .maybeSingle();
 
       if (groupError) throw groupError;
+      
+      // If no group is found, just return (group state remains null)
+      if (!groupData) {
+        setLoading(false);
+        return;
+      }
+      
       setGroup(groupData);
 
       // Get member count for this group

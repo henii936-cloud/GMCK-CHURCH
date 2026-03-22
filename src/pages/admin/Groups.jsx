@@ -7,16 +7,13 @@ import { supabase } from "../../services/supabaseClient";
 
 export default function Groups() {
   const [groups, setGroups] = useState([]);
-  const [leaders, setLeaders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
 
   const [newGroup, setNewGroup] = useState({
     group_name: "",
-    leader_id: "",
-    location: "",
-    members_count: 0
+    location: ""
   });
 
   useEffect(() => {
@@ -37,10 +34,15 @@ export default function Groups() {
   const handleCreateGroup = async (e) => {
     e.preventDefault();
     try {
-      await groupService.createGroup(newGroup);
+      const payload = {
+        group_name: newGroup.group_name,
+        location: newGroup.location
+      };
+      
+      await groupService.createGroup(payload);
       setShowModal(false);
       loadData();
-      setNewGroup({ group_name: "", leader_id: "", location: "", members_count: 0 });
+      setNewGroup({ group_name: "", location: "" });
     } catch (err) {
       console.error("Error creating group:", err);
     }

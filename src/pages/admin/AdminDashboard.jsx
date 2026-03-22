@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { 
-  Users, MapPin, ShieldCheck, 
-  ClipboardList, BookOpen, Activity, 
+import {
+  Users, MapPin, ShieldCheck,
+  ClipboardList, BookOpen, Activity,
   DollarSign, TrendingUp, Calendar
 } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -56,7 +56,7 @@ export default function AdminDashboard() {
   const fetchRecentData = async () => {
     try {
       const [studyData, eventsData] = await Promise.all([
-        supabase.from('study_progress').select('*, bible_study_groups(group_name)').order('completion_date', { ascending: false }).limit(5),
+        supabase.from('study_progress').select('*, bible_study_groups(group_name)').order('date', { ascending: false }).limit(5),
         supabase.from('events').select('*').gte('date', new Date().toISOString().split('T')[0]).order('date', { ascending: true }).limit(3)
       ]);
       setRecentStudy(studyData.data || []);
@@ -91,9 +91,9 @@ export default function AdminDashboard() {
         </div>
       </div>
 
-      <div style={{ 
-        display: 'grid', 
-        gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', 
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
         gap: '24px',
         marginBottom: '40px'
       }}>
@@ -105,23 +105,23 @@ export default function AdminDashboard() {
             transition={{ delay: index * 0.1 }}
           >
             <Card style={{ padding: '24px', position: 'relative', overflow: 'hidden' }}>
-              <div style={{ 
-                position: 'absolute', 
-                right: '-10px', 
-                top: '-10px', 
+              <div style={{
+                position: 'absolute',
+                right: '-10px',
+                top: '-10px',
                 opacity: 0.05,
                 transform: 'rotate(-15deg)'
               }}>
                 <stat.icon size={100} color={stat.color} />
               </div>
-              
+
               <div style={{ width: 48, height: 48, borderRadius: 12, background: `${stat.color}15`, display: 'grid', placeItems: 'center', marginBottom: '16px' }}>
                 <stat.icon size={24} color={stat.color} />
               </div>
-              
+
               <p style={{ fontSize: '0.875rem', fontWeight: '600', color: 'var(--text-muted)', marginBottom: '4px' }}>{stat.label}</p>
               <h3 style={{ fontSize: '1.75rem', fontWeight: '800' }}>{loading ? '...' : stat.value}</h3>
-              
+
               <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginTop: '12px', fontSize: '0.75rem', color: '#10b981' }}>
                 <TrendingUp size={14} />
                 <span>+12% from last month</span>
@@ -145,10 +145,10 @@ export default function AdminDashboard() {
                 </div>
                 <div style={{ flex: 1 }}>
                   <p style={{ fontWeight: '600', fontSize: '0.9rem' }}>{study.bible_study_groups?.group_name}</p>
-                  <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{study.study_topic}</p>
+                  <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{study.topic}</p>
                 </div>
                 <div style={{ textAlign: 'right' }}>
-                  <p style={{ fontSize: '0.75rem', fontWeight: '600' }}>{new Date(study.completion_date).toLocaleDateString()}</p>
+                  <p style={{ fontSize: '0.75rem', fontWeight: '600' }}>{new Date(study.date).toLocaleDateString()}</p>
                   <p style={{ fontSize: '0.7rem', color: '#10b981' }}>Completed</p>
                 </div>
               </div>

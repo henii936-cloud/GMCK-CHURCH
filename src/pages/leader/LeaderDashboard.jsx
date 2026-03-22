@@ -66,10 +66,10 @@ export default function LeaderDashboard() {
 
   const fetchAvailableGroups = async () => {
     try {
-      // Get all groups and filter out ones with leaders (if you want to keep it 1 leader per group)
-      // or simply show all groups
+      // Get all groups and filter out ones that already have a leader
       const data = await groupService.getGroups();
-      setAvailableGroups(data || []);
+      const unassigned = data.filter(g => g.leaders.length === 0);
+      setAvailableGroups(unassigned || []);
     } catch (err) {
       console.error("Error fetching available groups:", err);
     } finally {

@@ -22,8 +22,13 @@ export default function Study() {
   }, [user]);
 
   const fetchGroupId = async () => {
-    const { data } = await supabase.from('group_leaders').select('group_id').eq('user_id', user.id).maybeSingle();
-    if (data) setGroupId(data.group_id);
+    const { data } = await supabase
+      .from('bible_study_groups')
+      .select('id')
+      .eq('leader_id', user.id)
+      .maybeSingle();
+    
+    if (data) setGroupId(data.id);
   };
 
   const handleSubmit = async (e) => {

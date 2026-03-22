@@ -164,9 +164,7 @@ export const groupService = {
   getGroups: async () => {
     const { data, error } = await supabase.from("bible_study_groups").select(`
       *,
-      group_leaders (
-        profiles (full_name)
-      )
+      profiles!bible_study_groups_leader_id_fkey(full_name)
     `).order("group_name");
     if (error) throw error;
     return data;

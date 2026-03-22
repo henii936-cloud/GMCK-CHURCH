@@ -20,18 +20,22 @@ export default function Attendance() {
 
   const load = async () => {
     try {
-      // 1. Get leader's group
-      const { data: mapping } = await supabase.from('group_leaders').select('group_id').eq('user_id', user.id).maybeSingle();
+      // 1. Get leader's group directly from groups table
+      const { data: group } = await supabase
+        .from('bible_study_groups')
+        .select('id')
+        .eq('leader_id', user.id)
+        .maybeSingle();
       
-      if (!mapping) {
+      if (!group) {
         setLoading(false);
         return;
       }
-      setGroupId(mapping.group_id);
+      setGroupId(group.id);
 
       // 2. Get members for this group
       const data = await memberService.getMembers();
-      const filtered = data.filter(m => m.group_id === mapping.group_id);
+      const filtered = data.filter(m => m.group_id === group.id);
       setMembers(filtered);
       
       // Initialize attendance (lowercase to match DB)

@@ -128,8 +128,8 @@ $$ LANGUAGE sql SECURITY DEFINER;
 CREATE OR REPLACE FUNCTION public.is_group_leader(g_id UUID)
 RETURNS BOOLEAN AS $$
   SELECT EXISTS (
-    SELECT 1 FROM public.bible_study_groups
-    WHERE id = g_id AND leader_id = auth.uid()
+    SELECT 1 FROM public.group_leaders
+    WHERE group_id = g_id AND user_id = auth.uid()
   );
 $$ LANGUAGE sql SECURITY DEFINER;
 

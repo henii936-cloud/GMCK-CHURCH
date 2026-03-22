@@ -25,13 +25,8 @@ export default function Groups() {
 
   const loadData = async () => {
     try {
-      // Get groups and profiles for leaders
-      const [groupsData, { data: leadersData }] = await Promise.all([
-        groupService.getGroups(),
-        supabase.from("profiles").select("id, full_name, role").order("full_name")
-      ]);
+      const groupsData = await groupService.getGroups();
       setGroups(groupsData);
-      setLeaders(leadersData || []);
     } catch (err) {
       console.error("Error loading groups:", err);
     } finally {
@@ -152,18 +147,6 @@ export default function Groups() {
             <form onSubmit={handleCreateGroup} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
               <Input label="Group Name" placeholder="e.g. Young Adults Fellowship" value={newGroup.group_name} onChange={e => setNewGroup({...newGroup, group_name: e.target.value})} required />
               
-              <div className="form-group">
-                <label style={{ display: 'block', marginBottom: '6px', fontSize: '0.875rem', fontWeight: '500', color: 'var(--text-muted)' }}>Assigned Leader</label>
-                <select className="input-field" value={newGroup.leader_id} onChange={e => setNewGroup({...newGroup, leader_id: e.target.value})} required>
-                  <option value="">Select a leader</option>
-                  {leaders.map(l => (
-                    <option key={l.id} value={l.id}>
-                      {l.full_name} ({l.role === 'bible_leader' ? 'Leader' : l.role.charAt(0).toUpperCase() + l.role.slice(1)})
-                    </option>
-                  ))}
-                </select>
-              </div>
-
               <Input label="Primary Meeting Location" placeholder="e.g. Main Hall / Online" value={newGroup.location} onChange={e => setNewGroup({...newGroup, location: e.target.value})} />
               
               <div style={{ display: 'flex', gap: '12px', marginTop: '12px' }}>

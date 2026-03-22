@@ -20,8 +20,6 @@ export default function Signup() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
-  const [groupId, setGroupId] = useState("");
-  const [groups, setGroups] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
@@ -81,18 +79,7 @@ export default function Signup() {
     setError(null);
 
     try {
-      const data = await signup(email, password, name, role);
-      
-      if (role === 'bible_leader' && data.user) {
-        // Assign leader to group
-        const { error: groupError } = await supabase
-          .from('bible_study_groups')
-          .update({ leader_id: data.user.id })
-          .eq('id', groupId);
-        
-        if (groupError) throw groupError;
-      }
-      
+      await signup(email, password, name, role);
       setSuccess(true);
       setTimeout(() => navigate("/login"), 3000);
     } catch (err) {
@@ -178,28 +165,6 @@ export default function Signup() {
             <Input label="Full Display Name" placeholder="e.g. Samuel Adekunle" value={name} onChange={e => setName(e.target.value)} required icon={User} />
             <Input label="Official Email Address" type="email" placeholder="samuel@church.org" value={email} onChange={e => setEmail(e.target.value)} required icon={Mail} />
             <Input label="Secure Password" type="password" placeholder="••••••••" value={password} onChange={e => setPassword(e.target.value)} required icon={Lock} />
-
-            {role === 'bible_leader' && (
-              <div className="flex flex-col gap-2">
-                <label className="text-sm font-semibold text-muted-foreground flex items-center gap-2">
-                  <MapPin size={16} /> Select Bible Study Group
-                </label>
-                <select 
-                  value={groupId} 
-                  onChange={e => setGroupId(e.target.value)}
-                  required
-                  className="w-full px-4 py-3 rounded-xl bg-card border border-border text-foreground text-base outline-none focus:ring-2 focus:ring-primary/50 transition-all"
-                >
-                  <option value="">-- Choose a Group --</option>
-                  {groups.map(g => (
-                    <option key={g.id} value={g.id}>{g.group_name}</option>
-                  ))}
-                </select>
-                {groups.length === 0 && (
-                  <p className="text-xs text-amber-500">No available groups. Please contact Admin to create one.</p>
-                )}
-              </div>
-            )}
 
             {error && (
               <div className="p-3 rounded-xl bg-destructive/10 text-destructive text-sm font-semibold border border-destructive/20">

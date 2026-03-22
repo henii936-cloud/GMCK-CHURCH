@@ -12,8 +12,10 @@ import { Link } from 'react-router-dom';
 export default function LeaderDashboard() {
   const { user } = useAuth();
   const [group, setGroup] = useState(null);
+  const [availableGroups, setAvailableGroups] = useState([]);
   const [memberCount, setMemberCount] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [claiming, setClaiming] = useState(false);
 
   useEffect(() => {
     if (user?.id) {
@@ -23,6 +25,7 @@ export default function LeaderDashboard() {
 
   const fetchGroupData = async () => {
     try {
+      setLoading(true);
       // Get the group the leader is assigned to
       const { data: groupData, error: groupError } = await supabase
         .from('bible_study_groups')
@@ -32,9 +35,9 @@ export default function LeaderDashboard() {
 
       if (groupError) throw groupError;
       
-      // If no group is found, just return (group state remains null)
       if (!groupData) {
-        setLoading(false);
+        // If no group is found, fetch available groups
+        fetchAvailableGroups();
         return;
       }
       
@@ -56,8 +59,89 @@ export default function LeaderDashboard() {
     }
   };
 
-  if (loading) return <div>Loading Group Data...</div>;
+  const fetchAvailableGroups = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('bible_study_groups')
+        .select('*')
+        .is('leader_id', null);
+      
+      if (error) throw error;
+      setAvailableGroups(data || []);
+    } catch (err) {
+      console.error("Error fetching available groups:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  const handleClaimGroup = async (groupId) => {
+    setClaiming(true);
+    try {
+      const { error } = await supabase
+        .from('bible_study_groups')
+        .update({ leader_id: user.id })
+        .eq('id', groupId);
+      
+      if (error) throw error;
+      
+      // Refresh to show the newly claimed group
+      fetchGroupData();
+    } catch (err) {
+      console.error("Error claiming group:", err);
+      alert("Failed to claim group. It might have been taken by another leader.");
+    } finally {
+      setClaiming(false);
+    }
+  };
+
+  if (loading) return (
+    <div style={{ padding: '40px', textAlign: 'center' }}>
+      <div className="animate-spin" style={{ width: 40, height: 40, border: '4px solid var(--border)', borderTopColor: 'var(--primary)', borderRadius: '50%', margin: '0 auto 20px' }}></div>
+      <p>Synchronizing Group Data...</p>
+    </div>
+  );
+
+  // 🚪 SELECTION VIEW: If leader has no group
+  if (!group) {
+    return (
+      <div className="animate-fade-in" style={{ maxWidth: '800px', margin: '0 auto' }}>
+        <div style={{ textAlign: 'center', marginBottom: '40px' }}>
+          <h1 style={{ fontSize: '2.5rem', fontWeight: '900', marginBottom: '16px' }}>Welcome, {user?.full_name}</h1>
+          <p style={{ color: 'var(--text-muted)', fontSize: '1.1rem' }}>You haven't been assigned a group yet. Please select one of the available study groups below to begin leading.</p>
+        </div>
+
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '24px' }}>
+          {availableGroups.length > 0 ? availableGroups.map(g => (
+            <Card key={g.id} style={{ padding: '24px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '20px' }}>
+                <div style={{ width: 48, height: 48, borderRadius: 12, background: 'rgba(99, 102, 241, 0.1)', display: 'grid', placeItems: 'center' }}>
+                  <Users size={24} color="var(--primary)" />
+                </div>
+                <div>
+                  <h3 style={{ fontWeight: '800', margin: 0 }}>{g.group_name}</h3>
+                  <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', margin: 0 }}>{g.location || 'Location not set'}</p>
+                </div>
+              </div>
+              <Button 
+                onClick={() => handleClaimGroup(g.id)} 
+                style={{ width: '100%', justifyContent: 'center' }}
+                loading={claiming}
+              >
+                Lead This Group <ArrowRight size={18} style={{ marginLeft: '8px' }} />
+              </Button>
+            </Card>
+          )) : (
+            <Card style={{ gridColumn: '1/-1', padding: '40px', textAlign: 'center' }}>
+              <p style={{ color: 'var(--text-muted)' }}>No groups are currently available for selection. Please contact the administrator.</p>
+            </Card>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  // 📊 DASHBOARD VIEW: Once group is assigned
   return (
     <div className="animate-fade-in">
       <div style={{ marginBottom: '32px' }}>
@@ -65,7 +149,7 @@ export default function LeaderDashboard() {
           Welcome, {user?.full_name}
         </h1>
         <p style={{ color: 'var(--text-muted)' }}>
-          Leader of <span style={{ color: 'var(--primary)', fontWeight: '700' }}>{group?.group_name || 'Unassigned Group'}</span>
+          Leader of <span style={{ color: 'var(--primary)', fontWeight: '700' }}>{group.group_name}</span>
         </p>
       </div>
 

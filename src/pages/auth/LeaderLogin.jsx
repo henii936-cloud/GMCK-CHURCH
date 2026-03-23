@@ -32,7 +32,7 @@ export default function LeaderLogin() {
     setError("");
 
     try {
-      const data = await login(email, password, "bible_leader");
+      const data = await login(email, password);
 
       console.log("Leader login response:", data);
 
@@ -42,7 +42,16 @@ export default function LeaderLogin() {
         return;
       }
 
-      navigate("/leader");
+      const userRole = data.profile?.role || data.user?.user_metadata?.role;
+      if (userRole === "admin") {
+        navigate("/admin");
+      } else if (userRole === "bible_leader") {
+        navigate("/leader");
+      } else if (userRole === "finance") {
+        navigate("/finance");
+      } else {
+        navigate("/");
+      }
 
     } catch (err) {
       console.error("Leader Login Error:", err.message);

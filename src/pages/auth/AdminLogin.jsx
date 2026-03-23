@@ -31,14 +31,23 @@ export default function AdminLogin() {
     setError("");
 
     try {
-      const data = await login(email, password, "admin");
+      const data = await login(email, password);
 
       if (!data?.session) {
         setError("Please verify your email before signing in.");
         return;
       }
 
-      navigate("/admin");
+      const userRole = data.profile?.role || data.user?.user_metadata?.role;
+      if (userRole === "admin") {
+        navigate("/admin");
+      } else if (userRole === "bible_leader") {
+        navigate("/leader");
+      } else if (userRole === "finance") {
+        navigate("/finance");
+      } else {
+        navigate("/");
+      }
     } catch (err) {
       console.error("Admin Login Error:", err.message);
       setError(err.message || "Invalid credentials.");

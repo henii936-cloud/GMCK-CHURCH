@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { groupService, memberService } from "../../services/api";
 import { Card, Button, Input } from "../../components/common/UI";
-import { MapPin, Users, User, Plus, Search, BookOpen, Layers, MoreVertical, Settings, Activity } from "lucide-react";
+import { MapPin, Users, User, Plus, Search, BookOpen, Layers, MoreVertical, Settings, Activity, Trash2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { supabase } from "../../services/supabaseClient";
 
@@ -16,6 +16,8 @@ export default function Groups() {
   });
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState(null);
+  const [groupToDelete, setGroupToDelete] = useState(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     loadData();
@@ -51,12 +53,26 @@ export default function Groups() {
       setShowModal(false);
       loadData();
       setNewGroup({ group_name: "", location: "" });
-      alert("Group created successfully!"); // Temporary feedback
     } catch (err) {
       console.error("Error creating group:", err);
       setError(err.message || "Failed to create group. Please try again.");
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  const handleDeleteGroup = async () => {
+    if (!groupToDelete) return;
+    setIsDeleting(true);
+    try {
+      await groupService.deleteGroup(groupToDelete.id);
+      setGroups(groups.filter(g => g.id !== groupToDelete.id));
+      setGroupToDelete(null);
+    } catch (err) {
+      console.error("Error deleting group:", err);
+      alert(err.message || "Failed to delete group. Please try again.");
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -109,8 +125,14 @@ export default function Groups() {
                     <div style={{ width: 44, height: 44, borderRadius: 12, background: 'rgba(99, 102, 241, 0.1)', display: 'grid', placeItems: 'center' }}>
                       <Layers size={22} color="var(--primary)" />
                     </div>
-                    <button style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}>
-                      <MoreVertical size={20} />
+                    <button 
+                      onClick={() => setGroupToDelete(group)}
+                      style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', padding: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '8px', transition: 'background 0.2s' }}
+                      onMouseOver={e => e.currentTarget.style.background = 'rgba(239, 68, 68, 0.1)'}
+                      onMouseOut={e => e.currentTarget.style.background = 'none'}
+                      title="Delete Group"
+                    >
+                      <Trash2 size={20} />
                     </button>
                   </div>
 
@@ -140,7 +162,6 @@ export default function Groups() {
                     <Button variant="secondary" style={{ flex: 1, padding: '8px', fontSize: '0.875rem' }} icon={Activity}>Activities</Button>
                     <Button variant="secondary" style={{ flex: 1, padding: '8px', fontSize: '0.875rem' }} icon={Settings}>Settings</Button>
                   </div>
-                </div>
                 
                 <div style={{ height: '4px', width: '100%', background: 'var(--primary)', opacity: 0.1 }} />
               </Card>
@@ -148,6 +169,7 @@ export default function Groups() {
           ))}
         </AnimatePresence>
       </div>
+      )}
 
       {/* Modal for Group Creation */}
       {showModal && (
@@ -176,6 +198,30 @@ export default function Groups() {
                 <Button variant="secondary" onClick={() => setShowModal(false)} disabled={isSaving}>Cancel</Button>
               </div>
             </form>
+          </motion.div>
+        </div>
+      )}
+
+      {/* Modal for Group Deletion */}
+      {groupToDelete && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(8px)', display: 'grid', placeItems: 'center', zIndex: 1000, padding: '20px' }}>
+          <motion.div 
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            className="glass-card" 
+            style={{ width: '100%', maxWidth: '400px', padding: '32px', textAlign: 'center' }}
+          >
+            <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
+              <Trash2 size={24} />
+            </div>
+            <h2 style={{ fontSize: '1.25rem', fontWeight: '700', marginBottom: '8px' }}>Delete Group</h2>
+            <p style={{ color: 'var(--text-muted)', marginBottom: '24px', fontSize: '0.875rem' }}>
+              Are you sure you want to delete <strong>{groupToDelete.group_name}</strong>? This action cannot be undone.
+            </p>
+            <div style={{ display: 'flex', gap: '12px' }}>
+              <Button variant="secondary" onClick={() => setGroupToDelete(null)} disabled={isDeleting} style={{ flex: 1 }}>Cancel</Button>
+              <Button onClick={handleDeleteGroup} loading={isDeleting} style={{ flex: 1, background: '#ef4444', color: 'white', border: 'none' }}>Delete</Button>
+            </div>
           </motion.div>
         </div>
       )}

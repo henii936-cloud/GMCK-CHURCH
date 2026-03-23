@@ -1,34 +1,63 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { studyService } from "../../services/api";
 import { useAuth } from "../../context/AuthContext";
 import { Card, Button, Input } from "../../components/common/UI";
 import { BookOpen, Send, CheckCircle2, History, Loader2 } from "lucide-react";
+import { supabase } from "../../services/supabaseClient";
 
 export default function Study() {
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
+  const [groupId, setGroupId] = useState(null);
   const [formData, setFormData] = useState({
     study_topic: "",
     completion_date: new Date().toISOString().split('T')[0],
     notes: ""
   });
 
+  useEffect(() => {
+    const fetchGroupId = async () => {
+      if (user?.id) {
+        try {
+          const { data, error } = await supabase
+            .from('group_leaders')
+            .select('group_id')
+            .eq('user_id', user.id)
+            .maybeSingle();
+            
+          if (!error && data) {
+            setGroupId(data.group_id);
+          }
+        } catch (err) {
+          console.error("Error fetching group ID:", err);
+        }
+      }
+    };
+    fetchGroupId();
+  }, [user]);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!groupId) {
+      setMessage("Error: No group assigned to this leader.");
+      return;
+    }
     setLoading(true);
     setMessage("");
     try {
       await studyService.saveStudy({
         ...formData,
-        group_id: user.group_id
+        group_id: groupId,
+        leader_id: user.id
       });
       
       setMessage("Study progress logged for Admin review!");
       setFormData({ study_topic: "", completion_date: new Date().toISOString().split('T')[0], notes: "" });
       setTimeout(() => setMessage(""), 3000);
     } catch (err) {
-      setMessage("Error logging progress. Please try again.");
+      console.error("Save study error:", err);
+      setMessage(`Error logging progress: ${err.message || 'Please try again.'}`);
     } finally {
       setLoading(false);
     }

@@ -31,7 +31,7 @@ export default function FinanceLogin() {
     setError("");
 
     try {
-      const data = await login(email, password, "finance");
+      const data = await login(email, password);
 
       console.log("Finance login response:", data);
 
@@ -42,7 +42,16 @@ export default function FinanceLogin() {
       }
 
       // ✅ SUCCESS
-      navigate("/finance");
+      const userRole = data.profile?.role || data.user?.user_metadata?.role;
+      if (userRole === "admin") {
+        navigate("/admin");
+      } else if (userRole === "bible_leader") {
+        navigate("/leader");
+      } else if (userRole === "finance") {
+        navigate("/finance");
+      } else {
+        navigate("/");
+      }
 
     } catch (err) {
       console.error("Finance Login Error:", err.message);

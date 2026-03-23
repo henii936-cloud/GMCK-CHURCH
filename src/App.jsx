@@ -18,6 +18,7 @@ import AdminGroups from "./pages/admin/Groups";
 import AdminReports from "./pages/admin/Reports";
 import LeaderAttendance from "./pages/leader/Attendance";
 import LeaderStudy from "./pages/leader/Study";
+import LeaderMembers from "./pages/leader/Members";
 import RecordGiving from "./pages/finance/RecordGiving";
 import LeaderRoute from "./routes/LeaderRoute";
 import AdminRoute from "./routes/AdminRoute";
@@ -62,6 +63,7 @@ export default function App() {
 
           <Route path="/leader" element={<LeaderRoute><Layout allowedRoles={['bible_leader']} /></LeaderRoute>}>
             <Route index element={<LeaderDashboard />} />
+            <Route path="members" element={<LeaderMembers />} />
             <Route path="attendance" element={<LeaderAttendance />} />
             <Route path="study" element={<LeaderStudy />} />
           </Route>

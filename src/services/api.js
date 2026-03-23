@@ -166,7 +166,8 @@ export const groupService = {
       *,
       group_leaders(
         profiles(full_name, role)
-      )
+      ),
+      members(id)
     `).order("group_name");
     
     if (error) throw error;
@@ -174,7 +175,8 @@ export const groupService = {
     // Flatten data for easier consumption in frontend
     return data.map(g => ({
       ...g,
-      leaders: g.group_leaders?.map(gl => gl.profiles) || []
+      leaders: g.group_leaders?.map(gl => gl.profiles) || [],
+      members_count: g.members?.length || 0
     }));
   },
 
@@ -192,6 +194,12 @@ export const groupService = {
     const { data, error } = await supabase.from("bible_study_groups").insert([group]).select();
     if (error) throw error;
     return data;
+  },
+
+  deleteGroup: async (id) => {
+    const { error } = await supabase.from("bible_study_groups").delete().eq("id", id);
+    if (error) throw error;
+    return true;
   }
 };
 

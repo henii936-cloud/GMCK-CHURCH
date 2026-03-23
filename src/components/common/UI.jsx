@@ -6,6 +6,7 @@ export const Button = ({ children, onClick, type = "button", variant = "primary"
       case "primary": return "btn-primary";
       case "secondary": return "btn-secondary";
       case "danger": return "btn-danger";
+      case "outline": return "btn-outline";
       default: return "btn-primary";
     }
   };

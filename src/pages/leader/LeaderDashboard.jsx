@@ -5,6 +5,7 @@ import {
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { supabase } from '../../services/supabaseClient';
+import { groupService } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
 import { Card, Button } from '../../components/common/UI';
 import { Link } from 'react-router-dom';
@@ -166,9 +167,9 @@ export default function LeaderDashboard() {
               <h3 style={{ fontSize: '1.5rem', fontWeight: '800' }}>{memberCount} Members</h3>
             </div>
           </div>
-          <Link to="/leader" style={{ textDecoration: 'none' }}>
-            <Button variant="outline" style={{ width: '100%', justifyContent: 'center' }}>
-              View Members <ArrowRight size={16} style={{ marginLeft: '8px' }} />
+          <Link to="/leader/members" style={{ textDecoration: 'none' }}>
+            <Button variant="outline" className="w-full justify-center border-primary/20 hover:bg-primary/5 text-primary">
+              View Members <ArrowRight size={16} className="ml-2" />
             </Button>
           </Link>
         </Card>
@@ -184,8 +185,8 @@ export default function LeaderDashboard() {
             </div>
           </div>
           <Link to="/leader/attendance" style={{ textDecoration: 'none' }}>
-            <Button style={{ width: '100%', justifyContent: 'center', background: '#10b981' }}>
-              Record Attendance <ArrowRight size={16} style={{ marginLeft: '8px' }} />
+            <Button className="w-full justify-center bg-emerald-500 hover:bg-emerald-600 text-white border-none">
+              Record Attendance <ArrowRight size={16} className="ml-2" />
             </Button>
           </Link>
         </Card>
@@ -201,8 +202,8 @@ export default function LeaderDashboard() {
             </div>
           </div>
           <Link to="/leader/study" style={{ textDecoration: 'none' }}>
-            <Button style={{ width: '100%', justifyContent: 'center', background: '#f59e0b' }}>
-              Log Study Session <ArrowRight size={16} style={{ marginLeft: '8px' }} />
+            <Button className="w-full justify-center bg-amber-500 hover:bg-amber-600 text-white border-none">
+              Log Study Session <ArrowRight size={16} className="ml-2" />
             </Button>
           </Link>
         </Card>

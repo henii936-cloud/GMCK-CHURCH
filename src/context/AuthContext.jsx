@@ -55,7 +55,12 @@ export const AuthProvider = ({ children }) => {
       } catch (err) {
         console.error("Error fetching profile:", err.message);
         if (mounted && !cachedProfile) {
-          setUser(authUser); // Fallback to just auth user
+          // Fallback to auth user with metadata role
+          setUser({ 
+            ...authUser, 
+            role: authUser.user_metadata?.role || 'member',
+            full_name: authUser.user_metadata?.full_name || authUser.email
+          });
         }
       } finally {
         if (mounted) {
@@ -111,7 +116,7 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   // 🔐 UNIVERSAL LOGIN FUNCTION
-  const login = async (email, password, role) => {
+  const login = async (email, password) => {
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
@@ -159,13 +164,6 @@ export const AuthProvider = ({ children }) => {
         throw new Error("User profile not found. Please contact an administrator.");
       }
 
-      // 🔒 ROLE VALIDATION
-      if (role && profile.role !== role) {
-        // Sign out immediately if role doesn't match
-        await supabase.auth.signOut();
-        throw new Error(`Access denied: This account is registered as a ${profile.role}, not a ${role}.`);
-      }
-
       // Cache profile for faster reloads
       localStorage.setItem(`profile_${data.user.id}`, JSON.stringify(profile));
       
@@ -173,7 +171,7 @@ export const AuthProvider = ({ children }) => {
       setUser({ ...data.session?.user, ...profile });
       setLoading(false);
 
-      return data;
+      return { ...data, profile };
     } catch (err) {
       throw err;
     }

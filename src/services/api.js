@@ -88,6 +88,7 @@ export const financeService = {
       .from("transactions")
       .select(`
         *,
+        members(full_name),
         profiles(full_name)
       `)
       .order("transaction_date", { ascending: false });

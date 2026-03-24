@@ -62,8 +62,8 @@ export default function TransactionTable({ transactions = [] }) {
                       <Icon size={20} className="transition-transform group-hover:rotate-[360deg] duration-700" />
                     </div>
                     <div>
-                      <p className="font-black text-white group-hover:text-emerald-500 transition-colors">{t.profiles?.full_name || 'Anonymous'}</p>
-                      <p className="text-[10px] text-white/40 uppercase font-black tracking-widest">{t.id.slice(0, 8)}</p>
+                      <p className="font-black text-white group-hover:text-emerald-500 transition-colors">{t.members?.full_name || 'Anonymous'}</p>
+                      <p className="text-[10px] text-white/40 uppercase font-black tracking-widest">Recorded by: {t.profiles?.full_name || 'Staff'}</p>
                     </div>
                   </td>
 

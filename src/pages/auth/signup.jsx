@@ -162,16 +162,16 @@ export default function Signup() {
           className="w-full max-w-lg"
         >
           <div className="text-center mb-10">
-            <div className="flex justify-center gap-4 mb-8">
+            <div className="flex justify-center flex-wrap gap-3 mb-8">
               {roles.map(r => (
                 <button 
                   key={r.id}
                   onClick={() => setRole(r.id)}
-                  className={`px-6 py-3 rounded-xl border font-bold transition-all duration-300 flex flex-col items-center gap-1 w-32
+                  className={`px-4 py-3 rounded-xl border font-bold transition-all duration-300 flex flex-col items-center gap-1 w-[110px] sm:w-[120px]
                     ${role === r.id ? `${r.border} ${r.bgLight} ${r.color}` : 'border-border bg-transparent text-muted-foreground hover:border-primary/50'}`}
                 >
                   <r.icon size={20} />
-                  <span className="text-[11px] uppercase tracking-wider">{r.id.replace('_', ' ')}</span>
+                  <span className="text-[10px] sm:text-[11px] uppercase tracking-wider text-center leading-tight">{r.name.includes("Bible") ? "Study Leader" : r.name}</span>
                 </button>
               ))}
             </div>

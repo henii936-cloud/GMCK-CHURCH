@@ -25,16 +25,11 @@ import RecordGiving from "./pages/finance/RecordGiving";
 import LeaderRoute from "./routes/LeaderRoute";
 import AdminRoute from "./routes/AdminRoute";
 import FinanceRoute from "./routes/FinanceRoute";
+import FinanceDashboard from "./pages/finance/FinanceDashboard";
 
 // We'll use simple components for pages we didn't implement fully for brevity, 
 // but the core features requested are above.
 
-const FinanceDashboard = () => (
-  <div className="animate-fade-in">
-    <h1 style={{ fontSize: '2rem', fontWeight: '800', marginBottom: '16px' }}>Finance Central</h1>
-    <p style={{ color: 'var(--text-muted)' }}>Real-time overview of giving and budget utilization.</p>
-  </div>
-);
 
 export default function App() {
   console.log("App component mounted");
@@ -73,7 +68,8 @@ export default function App() {
           </Route>
 
           <Route path="/finance" element={<FinanceRoute><Layout allowedRoles={['finance']} /></FinanceRoute>}>
-            <Route index element={<RecordGiving />} />
+            <Route index element={<FinanceDashboard />} />
+            <Route path="record" element={<RecordGiving />} />
           </Route>
 
           <Route path="/" element={<Landing />} />

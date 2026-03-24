@@ -33,7 +33,14 @@ export default function Sidebar() {
       { name: "Record Study Progress", icon: BookOpen, path: "/leader/study" },
     ],
     finance: [
-      { name: "Record Giving", icon: DollarSign, path: "/finance" },
+      { name: "Dashboard", icon: Layers, path: "/finance" },
+      { name: "Approved Budgets", icon: Wallet, path: "/finance/budgets" },
+      { name: "Record Giving", icon: DollarSign, path: "/finance/record" },
+      { name: "Tithes", icon: Wallet, path: "/finance/tithes" },
+      { name: "Offerings", icon: DollarSign, path: "/finance/offerings" },
+      { name: "Donations", icon: Heart, path: "/finance/donations" },
+      { name: "Expenses", icon: ArrowDownRight, path: "/finance/expenses" },
+      { name: "Reports", icon: ClipboardList, path: "/finance/reports" },
     ]
   };
 

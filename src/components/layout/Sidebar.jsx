@@ -2,7 +2,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "../common/UI";
 import {
   Users, Layers, DollarSign, Activity, Settings,
-  MapPin, BookOpen, ClipboardList, LogOut, ChevronRight, ShieldCheck
+  MapPin, BookOpen, ClipboardList, LogOut, ChevronRight, ShieldCheck, Wallet
 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 
@@ -25,6 +25,7 @@ export default function Sidebar() {
       { name: "Study Progress", icon: BookOpen, path: "/admin/progress" },
       { name: "Events", icon: Activity, path: "/admin/events" },
       { name: "Finance", icon: DollarSign, path: "/admin/finance" },
+      { name: "Budgets", icon: Wallet, path: "/admin/budgets" },
     ],
     bible_leader: [
       { name: "My Group Members", icon: Users, path: "/leader" },

@@ -13,6 +13,7 @@ import AdminLeaders from "./pages/admin/Leaders";
 import AdminProgress from "./pages/admin/Progress";
 import AdminEvents from "./pages/admin/Events";
 import AdminFinance from "./pages/admin/Finance";
+import AdminBudgets from "./pages/admin/Budgets";
 import AdminMembers from "./pages/admin/Members";
 import AdminGroups from "./pages/admin/Groups";
 import AdminReports from "./pages/admin/Reports";
@@ -60,6 +61,7 @@ export default function App() {
             <Route path="progress" element={<AdminProgress />} />
             <Route path="events" element={<AdminEvents />} />
             <Route path="finance" element={<AdminFinance />} />
+            <Route path="budgets" element={<AdminBudgets />} />
             <Route path="programs" element={<AdminActivities />} />
           </Route>
 

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { budgetService } from "../../services/api";
+import { financeService } from "../../services/api";
 import { Card, Button, Input } from "../../components/common/UI";
 import { DollarSign, Layers, CheckCircle2, AlertCircle, Plus, Search, Filter, TrendingUp, TrendingDown, Clock, MoreVertical, Wallet } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
@@ -16,7 +16,7 @@ export default function Budgets() {
     amount_total: 0,
     amount_used: 0,
     team: "",
-    status: "approved",
+    status: "Pending", // Set to Pending so they appear in Finance page for approval
     period: "Quarterly"
   });
 
@@ -26,7 +26,7 @@ export default function Budgets() {
 
   const loadData = async () => {
     try {
-      const data = await budgetService.getBudgets();
+      const data = await financeService.getBudgets();
       setBudgets(data);
     } catch (err) {
       console.error("Error loading budgets:", err);
@@ -38,10 +38,14 @@ export default function Budgets() {
   const handleCreateBudget = async (e) => {
     e.preventDefault();
     try {
-      await budgetService.createBudget(newBudget);
+      const budgetData = {
+        name: newBudget.name,
+        amount: newBudget.amount_total,
+      };
+      await financeService.createBudget(budgetData);
       setShowModal(false);
       loadData();
-      setNewBudget({ name: "", amount_total: 0, amount_used: 0, team: "", status: "approved", period: "Quarterly" });
+      setNewBudget({ name: "", amount_total: 0, amount_used: 0, team: "", status: "Pending", period: "Quarterly" });
     } catch (err) {
       console.error("Error creating budget:", err);
     }

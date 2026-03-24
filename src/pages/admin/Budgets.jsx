@@ -75,7 +75,7 @@ export default function Budgets() {
   };
 
   // Derive all unique teams
-  const dbTeams = [...new Set(budgets.map(b => b.name.includes("::") ? b.name.split("::")[0] : "General"))];
+  const dbTeams = [...new Set(budgets.map(b => (b.name && b.name.includes("::")) ? b.name.split("::")[0] : "General"))];
   const allTeams = [...new Set(["General", ...sessionTeams, ...dbTeams])];
 
   return (
@@ -100,7 +100,7 @@ export default function Budgets() {
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '24px' }}>
             {allTeams.map((team, i) => {
-              const teamBudgets = budgets.filter(b => (b.name.includes("::") ? b.name.split("::")[0] : "General") === team);
+              const teamBudgets = budgets.filter(b => ((b.name && b.name.includes("::")) ? b.name.split("::")[0] : "General") === team);
               const totalAllocated = teamBudgets.reduce((sum, b) => sum + (b.amount || 0), 0);
               const totalApproved = teamBudgets.filter(b => b.status === "Approved").reduce((sum, b) => sum + (b.amount || 0), 0);
               
@@ -167,7 +167,7 @@ export default function Budgets() {
               <div style={{ textAlign: 'center', padding: '60px 0', color: 'var(--text-muted)' }}>
                 <Loader2 size={32} className="animate-spin" style={{ margin: '0 auto 16px' }} /> Loading...
               </div>
-            ) : budgets.filter(b => (b.name.includes("::") ? b.name.split("::")[0] : "General") === activeTeam).length === 0 ? (
+            ) : budgets.filter(b => ((b.name && b.name.includes("::")) ? b.name.split("::")[0] : "General") === activeTeam).length === 0 ? (
               <div style={{ textAlign: 'center', padding: '80px 0', color: 'var(--text-muted)', background: 'rgba(255,255,255,0.02)', borderRadius: '16px', border: '1px dashed rgba(255,255,255,0.1)' }}>
                 <Wallet size={48} style={{ margin: '0 auto 16px', opacity: 0.3 }} />
                 <h3 style={{ fontSize: '1.2rem', fontWeight: '700', marginBottom: '8px' }}>No Budgets Yet</h3>
@@ -175,8 +175,8 @@ export default function Budgets() {
               </div>
             ) : (
               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '24px' }}>
-                {budgets.filter(b => (b.name.includes("::") ? b.name.split("::")[0] : "General") === activeTeam).map((budget, i) => {
-                  const rawName = budget.name.split('::');
+              {budgets.filter(b => ((b.name && b.name.includes("::")) ? b.name.split("::")[0] : "General") === activeTeam).map((budget, i) => {
+                  const rawName = (budget.name || "").split('::');
                   const dpyName = rawName.length > 1 ? rawName[1] : budget.name;
                   const isApproved = budget.status === "Approved";
 

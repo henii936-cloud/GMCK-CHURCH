@@ -2,7 +2,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "../common/UI";
 import {
   Users, Layers, DollarSign, Activity, Settings,
-  MapPin, BookOpen, ClipboardList, LogOut, ChevronRight, ShieldCheck, Wallet
+  MapPin, BookOpen, ClipboardList, LogOut, ChevronRight, ShieldCheck, Wallet, Heart, ArrowDownRight
 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 

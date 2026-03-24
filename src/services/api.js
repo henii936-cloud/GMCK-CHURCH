@@ -90,7 +90,7 @@ export const financeService = {
         *,
         profiles(full_name)
       `)
-      .order("date", { ascending: false });
+      .order("transaction_date", { ascending: false });
     if (error) throw error;
     return data;
   },

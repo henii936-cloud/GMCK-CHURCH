@@ -46,9 +46,9 @@ export default function Finance() {
     navigate("/login/admin");
   };
 
-  const totalTithes = transactions.filter(t => t.type === 'tithe' || t.category === 'Tithes').reduce((sum, t) => sum + t.amount, 0);
-  const totalOfferings = transactions.filter(t => t.type === 'offering' || t.category === 'Offering').reduce((sum, t) => sum + t.amount, 0);
-  const totalDonations = transactions.filter(t => t.type === 'donation' || t.category === 'Donation').reduce((sum, t) => sum + t.amount, 0);
+  const totalTithes = transactions.filter(t => t.type === 'tithe' || t.category === 'Tithes').reduce((sum, t) => sum + (t.amount || 0), 0);
+  const totalOfferings = transactions.filter(t => t.type === 'offering' || t.category === 'Offering').reduce((sum, t) => sum + (t.amount || 0), 0);
+  const totalDonations = transactions.filter(t => t.type === 'donation' || t.category === 'Donation').reduce((sum, t) => sum + (t.amount || 0), 0);
   const totalIncome = totalTithes + totalOfferings + totalDonations;
 
   const approvedBudgets = budgets.filter(b => b.status === 'Approved');
@@ -113,9 +113,10 @@ export default function Finance() {
             <h4 style={{ fontSize: '1rem', fontWeight: '700', marginBottom: '16px' }}>Approved Budgets</h4>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
               {approvedBudgets.map(b => {
-                const parts = b.name.split('::');
+                const nameStr = b.name || "General::Untitled";
+                const parts = nameStr.split('::');
                 const team = parts.length > 1 ? parts[0] : 'General';
-                const name = parts.length > 1 ? parts[1] : b.name;
+                const name = parts.length > 1 ? parts[1] : nameStr;
                 return (
                   <div key={b.id} style={{ display: 'flex', justifyContent: 'space-between', padding: '12px', background: 'rgba(255,255,255,0.03)', borderRadius: '8px', border: '1px solid var(--border)', alignItems: 'center' }}>
                     <div>
@@ -135,9 +136,10 @@ export default function Finance() {
           <h3 style={{ fontSize: '1.25rem', fontWeight: '800', marginBottom: '24px' }}>Pending Budget Approvals</h3>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
             {pendingBudgets.map(b => {
-              const parts = b.name.split('::');
+              const nameStr = b.name || "General::Untitled";
+              const parts = nameStr.split('::');
               const team = parts.length > 1 ? parts[0] : 'General';
-              const name = parts.length > 1 ? parts[1] : b.name;
+              const name = parts.length > 1 ? parts[1] : nameStr;
               return (
                 <div key={b.id} style={{ padding: '16px', background: 'rgba(255,255,255,0.03)', borderRadius: '12px', border: '1px solid var(--border)' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px' }}>

@@ -1,7 +1,7 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "../common/UI";
-import { 
-  Users, Layers, DollarSign, Activity, Settings, 
+import {
+  Users, Layers, DollarSign, Activity, Settings,
   MapPin, BookOpen, ClipboardList, LogOut, ChevronRight, ShieldCheck
 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
@@ -22,10 +22,9 @@ export default function Sidebar() {
       { name: "Members", icon: Users, path: "/admin/members" },
       { name: "Bible Study Groups", icon: MapPin, path: "/admin/groups" },
       { name: "Group Leaders", icon: ShieldCheck, path: "/admin/leaders" },
-      { name: "Attendance Reports", icon: ClipboardList, path: "/admin/reports" },
       { name: "Study Progress", icon: BookOpen, path: "/admin/progress" },
       { name: "Events", icon: Activity, path: "/admin/events" },
-      { name: "Activities", icon: ClipboardList, path: "/admin/activities" },
+      { name: "Programs", icon: ClipboardList, path: "/admin/programs" },
       { name: "Finance", icon: DollarSign, path: "/admin/finance" },
     ],
     bible_leader: [
@@ -58,8 +57,8 @@ export default function Sidebar() {
             const isActive = location.pathname === item.path;
             return (
               <li key={item.path}>
-                <Link 
-                  to={item.path} 
+                <Link
+                  to={item.path}
                   className={`flex items-center gap-3 px-4 py-3 rounded-lg no-underline transition-all duration-200 relative overflow-hidden ${isActive ? 'text-foreground bg-primary/15 font-semibold' : 'text-muted-foreground hover:bg-secondary/50 font-medium'}`}
                 >
                   {isActive && (
@@ -85,9 +84,9 @@ export default function Sidebar() {
             <p className="text-xs text-muted-foreground capitalize">{user?.role?.replace('_', ' ')}</p>
           </div>
         </div>
-        <Button 
-          variant="danger" 
-          onClick={handleLogout} 
+        <Button
+          variant="danger"
+          onClick={handleLogout}
           icon={LogOut}
           className="w-full justify-center"
         >

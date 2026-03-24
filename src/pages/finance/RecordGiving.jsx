@@ -24,6 +24,8 @@ export default function RecordGiving() {
     amount: ""
   });
 
+  const [searchTerm, setSearchTerm] = useState("");
+
   useEffect(() => {
     load();
   }, []);
@@ -35,9 +37,9 @@ export default function RecordGiving() {
         financeService.getApprovedBudgets(),
         financeService.getBudgets()
       ]);
-      setMembers(membersData);
-      setBudgets(approvedBudgets);
-      setAllBudgets(allBudgetsData);
+      setMembers(membersData || []);
+      setBudgets(approvedBudgets || []);
+      setAllBudgets(allBudgetsData || []);
     } catch (err) {
       console.error(err);
     } finally {
@@ -45,7 +47,19 @@ export default function RecordGiving() {
     }
   };
 
+  const filteredMembers = members.filter(m => 
+    m.full_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    m.phone?.includes(searchTerm) ||
+    m.email?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const selectMember = (id) => {
+    setFormData({ ...formData, member_id: id });
+    // Optional: scroll to form or provide feedback
+  };
+
   const handleSave = async (e) => {
+    // ... (rest of handleSave)
     e.preventDefault();
     setSaving(true);
     setMessage("");
@@ -72,6 +86,7 @@ export default function RecordGiving() {
   };
 
   const handleCreateBudget = async (e) => {
+    // ... (rest of handleCreateBudget)
     e.preventDefault();
     try {
       await financeService.createBudget({
@@ -118,6 +133,9 @@ export default function RecordGiving() {
                   <option key={m.id} value={m.id} style={{ background: '#0f172a' }}>{m.full_name || m.name}</option>
                 ))}
               </select>
+              <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '8px' }}>
+                Tip: Search and click a member in the directory on the right to select faster.
+              </p>
             </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
@@ -170,20 +188,57 @@ export default function RecordGiving() {
         </Card>
       </div>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-        <Card style={{ padding: '32px', background: 'var(--primary)', opacity: 0.9 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '24px' }}>
-            <div style={{ padding: '12px', borderRadius: '12px', background: 'rgba(255,255,255,0.2)' }}>
-              <ShieldCheck size={32} color="white" />
-            </div>
-            <div>
-              <h3 style={{ fontSize: '1.25rem', fontWeight: '700' }}>Secure Protocol</h3>
-              <p style={{ opacity: 0.8, fontSize: '0.875rem' }}>Transaction verified by Supabase Auth</p>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', maxHeight: '100vh', overflowY: 'auto', paddingRight: '8px' }}>
+        {/* Member Directory Card */}
+        <Card style={{ padding: '24px', flex: 'none' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+            <h3 style={{ fontSize: '1.25rem', fontWeight: '700' }}>Member Directory</h3>
+            <div style={{ position: 'relative', width: '60%' }}>
+              <Search size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', opacity: 0.5 }} />
+              <input 
+                type="text" 
+                placeholder="Search name..." 
+                className="input-field"
+                style={{ paddingLeft: '36px', height: '36px', fontSize: '0.85rem' }}
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
             </div>
           </div>
-          <p style={{ fontSize: '0.95rem', lineHeight: '1.6' }}>All financial records are encrypted and audit-trailed. Please ensure you select the correct member reference to maintain accurate annual reports.</p>
+          
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', maxHeight: '400px', overflowY: 'auto', paddingRight: '4px' }}>
+            {loading ? (
+              <div style={{ textAlign: 'center', padding: '20px' }}><Loader2 className="animate-spin mx-auto" size={20} /></div>
+            ) : filteredMembers.length === 0 ? (
+              <p style={{ color: 'var(--text-muted)', textAlign: 'center', fontSize: '0.85rem', padding: '12px' }}>No members found.</p>
+            ) : (
+              filteredMembers.map(m => (
+                <div 
+                  key={m.id} 
+                  onClick={() => selectMember(m.id)}
+                  style={{ 
+                    padding: '12px', borderRadius: '8px', background: 'rgba(255,255,255,0.03)', 
+                    border: formData.member_id === m.id ? '1px solid var(--primary)' : '1px solid var(--border)',
+                    cursor: 'pointer', transition: 'all 0.2s',
+                    display: 'flex', alignItems: 'center', gap: '12px'
+                  }}
+                  className="hover:bg-white/5"
+                >
+                  <div style={{ width: 32, height: 32, borderRadius: '50%', background: 'var(--primary)', color: 'white', display: 'grid', placeItems: 'center', fontSize: '0.75rem', fontWeight: 'bold', flexShrink: 0 }}>
+                    {m.full_name?.charAt(0)}
+                  </div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <p style={{ fontWeight: '600', fontSize: '0.9rem', margin: 0, textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>{m.full_name}</p>
+                    <p style={{ fontSize: '0.7rem', color: 'var(--text-muted)', margin: 0 }}>{m.phone || 'No phone'}</p>
+                  </div>
+                  {formData.member_id === m.id && <CheckCircle size={16} color="var(--primary)" />}
+                </div>
+              ))
+            )}
+          </div>
         </Card>
 
+        {/* Budget Requests Card */}
         <Card style={{ padding: '32px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
             <h3 style={{ fontSize: '1.25rem', fontWeight: '700' }}>Budget Requests</h3>

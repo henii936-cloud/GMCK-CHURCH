@@ -37,9 +37,9 @@ export const Button = ({ children, onClick, type = "button", variant = "primary"
   );
 };
 
-export const Card = ({ children, className = "", title, subtitle, icon: Icon, style }) => {
+export const Card = ({ children, className = "", title, subtitle, icon: Icon, style, ...props }) => {
   return (
-    <div className={`glass-card ${className}`} style={style}>
+    <div className={`glass-card ${className}`} style={style} {...props}>
       {(title || Icon) && (
         <div className="flex items-center justify-between mb-5">
           <div>

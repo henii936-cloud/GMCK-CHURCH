@@ -3,7 +3,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { 
   ShieldCheck, Mail, Lock, 
   ArrowRight, ChevronLeft, Users, 
-  Zap, CheckCircle2, User, MapPin
+  Zap, CheckCircle2, User, MapPin, DollarSign
 } from 'lucide-react';
 import { motion } from 'motion/react';
 import { Button, Card, Input } from '../../components/common/UI';
@@ -51,6 +51,18 @@ export default function Signup() {
       shadow: 'shadow-emerald-500/20',
       gradient: 'from-emerald-500/20 to-transparent',
       desc: 'Manage your study group and track member engagement.' 
+    },
+    { 
+      id: 'finance', 
+      name: 'Finance Officer', 
+      icon: DollarSign, 
+      color: 'text-amber-500',
+      bg: 'bg-amber-500',
+      border: 'border-amber-500',
+      bgLight: 'bg-amber-500/10',
+      shadow: 'shadow-amber-500/20',
+      gradient: 'from-amber-500/20 to-transparent',
+      desc: 'Record offerings, manage budgets, and oversee church finances.' 
     }
   ];
 

@@ -44,7 +44,7 @@ export default function Sidebar() {
     ]
   };
 
-  const navItems = menuItems[user?.role] || [];
+  const navItems = menuItems[user?.role?.toLowerCase()] || [];
 
   return (
     <aside className="sidebar">

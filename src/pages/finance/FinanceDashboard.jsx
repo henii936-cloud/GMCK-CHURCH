@@ -22,18 +22,18 @@ export default function FinanceDashboard() {
   const loadFinanceData = async () => {
     try {
       setData(prev => ({ ...prev, loading: true }));
-      const [trans, budgets] = await Promise.all([
-        financeService.getTransactions(),
-        financeService.getBudgets()
+      const [trans, budgetResults] = await Promise.all([
+        financeService.getTransactions().catch(() => []),
+        financeService.getBudgets().catch(() => [])
       ]);
       setData({
         transactions: trans || [],
-        budgets: budgets || [],
+        budgets: budgetResults || [],
         loading: false
       });
     } catch (err) {
       console.error("Error loading finance data:", err);
-      setData(prev => ({ ...prev, loading: false }));
+      setData({ transactions: [], budgets: [], loading: false });
     }
   };
 

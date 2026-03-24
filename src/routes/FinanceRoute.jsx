@@ -19,10 +19,11 @@ export default function FinanceRoute({ children }) {
     return <Navigate to="/login/finance" />;
   }
 
-  const role = user.role || user?.user_metadata?.role;
+  const role = user?.role || user?.user_metadata?.role;
 
-  if (role !== "finance") {
-    return <Navigate to="/" />;
+  if (role?.toLowerCase() !== "finance") {
+    console.warn("FinanceRoute: Unauthorized role access attempt -", role);
+    return <Navigate to="/login/finance" replace />;
   }
 
   return children;

@@ -16,15 +16,15 @@ export default function Layout({ allowedRoles }) {
 
   if (!user) return <Navigate to="/login" />;
 
-  const userRole = user?.role || user?.user_metadata?.role;
+  const userRole = (user?.role || user?.user_metadata?.role)?.toLowerCase();
 
-  if (allowedRoles && !allowedRoles.includes(userRole)) {
+  if (allowedRoles && !allowedRoles.some(r => r.toLowerCase() === userRole)) {
     const rolePath = {
       admin: "/admin",
       bible_leader: "/leader",
       finance: "/finance"
     };
-    return <Navigate to={rolePath[userRole] || "/login"} />;
+    return <Navigate to={rolePath[userRole] || "/login"} replace />;
   }
 
   return (

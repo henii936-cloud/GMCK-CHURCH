@@ -271,3 +271,21 @@ CREATE POLICY "events_admin_manage" ON public.events FOR ALL USING (public.is_ad
 -- TRANSACTIONS POLICIES
 DROP POLICY IF EXISTS "transactions_admin_manage" ON public.transactions;
 CREATE POLICY "transactions_admin_manage" ON public.transactions FOR ALL USING (public.is_admin());
+
+-- Error Saving Attendacne ---
+/* -- Drop the old constraint and recreate it with the correct values
+ALTER TABLE public.study_attendance DROP CONSTRAINT IF EXISTS study_attendance_status_check;
+ALTER TABLE public.study_attendance ADD CONSTRAINT study_attendance_status_check 
+  CHECK (status IN ('Present', 'Absent', 'Excused'));
+*/
+
+
+-- Error Saving Study Progress --
+/*
+-- Drop the old constraint
+ALTER TABLE public.study_progress DROP CONSTRAINT IF EXISTS study_progress_status_check;
+
+-- Add the new constraint with the correct values
+ALTER TABLE public.study_progress ADD CONSTRAINT study_progress_status_check 
+  CHECK (status IN ('Completed', 'In Progress', 'Not Started'));
+*/

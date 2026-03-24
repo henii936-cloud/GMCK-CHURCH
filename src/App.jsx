@@ -16,6 +16,7 @@ import AdminFinance from "./pages/admin/Finance";
 import AdminMembers from "./pages/admin/Members";
 import AdminGroups from "./pages/admin/Groups";
 import AdminReports from "./pages/admin/Reports";
+import AdminActivities from "./pages/admin/Activities";
 import LeaderAttendance from "./pages/leader/Attendance";
 import LeaderStudy from "./pages/leader/Study";
 import LeaderMembers from "./pages/leader/Members";
@@ -59,6 +60,7 @@ export default function App() {
             <Route path="progress" element={<AdminProgress />} />
             <Route path="events" element={<AdminEvents />} />
             <Route path="finance" element={<AdminFinance />} />
+            <Route path="activities" element={<AdminActivities />} />
           </Route>
 
           <Route path="/leader" element={<LeaderRoute><Layout allowedRoles={['bible_leader']} /></LeaderRoute>}>

@@ -1,11 +1,13 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { groupService, memberService } from "../../services/api";
 import { Card, Button, Input } from "../../components/common/UI";
-import { MapPin, Users, User, Plus, Search, BookOpen, Layers, MoreVertical, Settings, Activity, Trash2 } from "lucide-react";
+import { MapPin, Users, User, Plus, Search, BookOpen, Layers, Activity, Trash2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { supabase } from "../../services/supabaseClient";
 
 export default function Groups() {
+  const navigate = useNavigate();
   const [groups, setGroups] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
@@ -159,8 +161,14 @@ export default function Groups() {
                   </div>
 
                   <div style={{ display: 'flex', gap: '12px' }}>
-                    <Button variant="secondary" style={{ flex: 1, padding: '8px', fontSize: '0.875rem' }} icon={Activity}>Activities</Button>
-                    <Button variant="secondary" style={{ flex: 1, padding: '8px', fontSize: '0.875rem' }} icon={Settings}>Settings</Button>
+                    <Button 
+                      variant="secondary" 
+                      style={{ flex: 1, padding: '8px', fontSize: '0.875rem' }} 
+                      icon={Activity}
+                      onClick={() => navigate('/admin/activities', { state: { groupId: group.id, groupName: group.group_name } })}
+                    >
+                      Activities
+                    </Button>
                   </div>
                 
                 <div style={{ height: '4px', width: '100%', background: 'var(--primary)', opacity: 0.1 }} />

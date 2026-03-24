@@ -25,6 +25,7 @@ export default function Sidebar() {
       { name: "Attendance Reports", icon: ClipboardList, path: "/admin/reports" },
       { name: "Study Progress", icon: BookOpen, path: "/admin/progress" },
       { name: "Events", icon: Activity, path: "/admin/events" },
+      { name: "Activities", icon: ClipboardList, path: "/admin/activities" },
       { name: "Finance", icon: DollarSign, path: "/admin/finance" },
     ],
     bible_leader: [

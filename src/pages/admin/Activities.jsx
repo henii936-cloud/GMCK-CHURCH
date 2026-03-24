@@ -1,14 +1,19 @@
 import { useEffect, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import { activityService } from "../../services/api";
 import { Card, Button, Input } from "../../components/common/UI";
 import { 
   Activity, MapPin, User, BookOpen, ClipboardList, Clock, 
   ChevronRight, Calendar, Plus, CalendarDays, Zap, 
-  Music, Mic2, Star, Filter, Heart 
+  Music, Mic2, Star, Filter, Heart, X 
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 
 export default function Activities() {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const groupFilter = location.state || null;
+  
   const [activities, setActivities] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("feed"); // 'feed' or 'planner'
@@ -59,11 +64,12 @@ export default function Activities() {
 
   useEffect(() => {
     load();
-  }, []);
+  }, [groupFilter?.groupId]);
 
   const load = async () => {
     try {
-      const data = await activityService.getActivities();
+      setLoading(true);
+      const data = await activityService.getActivities(groupFilter?.groupId || null);
       setActivities(data);
     } catch (err) {
       console.error(err);
@@ -101,6 +107,19 @@ export default function Activities() {
         <div>
           <h1 style={{ fontSize: '2.25rem', fontWeight: '800', letterSpacing: '-0.025em' }}>Church <span style={{ color: 'var(--primary)' }}>Activities</span></h1>
           <p style={{ color: 'var(--text-muted)', fontSize: '1rem', fontWeight: '500' }}>Real-time logs and strategic program planning</p>
+          {groupFilter?.groupName && (
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', marginTop: '12px', padding: '6px 14px', borderRadius: '20px', background: 'rgba(99, 102, 241, 0.15)', color: 'var(--primary)', fontSize: '0.875rem', fontWeight: '700' }}>
+              <Filter size={14} />
+              Viewing: {groupFilter.groupName}
+              <button 
+                onClick={() => navigate('/admin/activities', { replace: true, state: null })}
+                style={{ background: 'none', border: 'none', color: 'var(--primary)', cursor: 'pointer', display: 'flex', alignItems: 'center', padding: '2px' }}
+                title="Show all activities"
+              >
+                <X size={14} />
+              </button>
+            </div>
+          )}
         </div>
         <div style={{ display: 'flex', background: 'rgba(255,255,255,0.05)', borderRadius: '12px', padding: '6px' }}>
           <button 

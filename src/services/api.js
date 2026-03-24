@@ -215,3 +215,69 @@ export const eventService = {
     return data;
   }
 };
+
+export const activityService = {
+  getActivities: async (groupId = null) => {
+    // Fetch attendance records
+    let attendanceQuery = supabase
+      .from("study_attendance")
+      .select(`
+        id, date, created_at, group_id,
+        members(full_name),
+        bible_study_groups(group_name)
+      `)
+      .order("created_at", { ascending: false })
+      .limit(50);
+
+    if (groupId) {
+      attendanceQuery = attendanceQuery.eq("group_id", groupId);
+    }
+
+    const { data: attendanceData, error: attendanceError } = await attendanceQuery;
+    if (attendanceError) throw attendanceError;
+
+    // Fetch study progress records
+    let studyQuery = supabase
+      .from("study_progress")
+      .select(`
+        id, study_topic, completion_date, created_at, group_id,
+        bible_study_groups(group_name)
+      `)
+      .order("created_at", { ascending: false })
+      .limit(50);
+
+    if (groupId) {
+      studyQuery = studyQuery.eq("group_id", groupId);
+    }
+
+    const { data: studyData, error: studyError } = await studyQuery;
+    if (studyError) throw studyError;
+
+    // Combine and sort both feeds
+    const combined = [
+      ...(attendanceData || []).map(a => ({
+        id: a.id,
+        type: 'attendance',
+        date: a.date,
+        created_at: a.created_at,
+        group_id: a.group_id,
+        groups: { name: a.bible_study_groups?.group_name },
+        profiles: { name: a.members?.full_name },
+        detail: `Attendance recorded`
+      })),
+      ...(studyData || []).map(s => ({
+        id: s.id,
+        type: 'study',
+        date: s.completion_date,
+        created_at: s.created_at,
+        group_id: s.group_id,
+        groups: { name: s.bible_study_groups?.group_name },
+        profiles: { name: null },
+        detail: s.study_topic
+      }))
+    ];
+
+    combined.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+    return combined;
+  }
+};

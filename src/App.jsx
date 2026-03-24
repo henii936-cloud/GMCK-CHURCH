@@ -67,7 +67,7 @@ export default function App() {
             <Route path="study" element={<LeaderStudy />} />
           </Route>
 
-          <Route path="/finance" element={<FinanceRoute><Layout allowedRoles={['finance']} /></FinanceRoute>}>
+          <Route path="/finance" element={<Layout allowedRoles={['finance']} />}>
             <Route index element={<FinanceDashboard />} />
             <Route path="record" element={<RecordGiving />} />
           </Route>

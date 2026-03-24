@@ -1,189 +1,169 @@
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Noto+Serif:ital,wght@0,400;0,700;1,400;1,700&display=swap');
 @import "tailwindcss";
-@config "../tailwind.config.ts";
+
+@theme {
+  --font-heading: "Noto Serif", serif;
+  --font-body: "Manrope", sans-serif;
+  
+  --color-primary: #002c53;
+  --color-primary-container: #1a426e;
+  --color-on-primary: #ffffff;
+  
+  --color-tertiary-fixed: #ffdea9;
+  --color-tertiary-fixed-dim: #eac077;
+  --color-on-tertiary-fixed: #002c53;
+  
+  --color-surface: #f8f9fa;
+  --color-surface-container-low: #f3f4f5;
+  --color-surface-container: #edeeef;
+  --color-surface-container-highest: #e1e3e4;
+  --color-surface-container-lowest: #ffffff;
+  
+  --color-on-surface: #191c1d;
+  --color-on-surface-variant: #44474e;
+  
+  --color-outline-variant: rgba(195, 198, 208, 0.15);
+  
+  --radius-md: 0.75rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.5rem;
+  
+  --shadow-whisper: 0px 12px 32px rgba(25, 28, 29, 0.04);
+}
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
-
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
-
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
-
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
-
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
-
-    --radius: 0.5rem;
-
-    --success: 142.1 76.2% 36.3%;
-    --success-foreground: 355.7 100% 97.3%;
-
-    --warning: 38 92% 50%;
-    --warning-foreground: 48 96% 89%;
-
-    --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 240 5.9% 10%;
-    --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 240 4.8% 95.9%;
-    --sidebar-accent-foreground: 240 5.9% 10%;
-    --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --background: #f8f9fa;
+    --foreground: #191c1d;
+    
+    --primary: #002c53;
+    --primary-foreground: #ffffff;
+    
+    --card: #ffffff;
+    --card-foreground: #191c1d;
+    
+    --border: rgba(195, 198, 208, 0.15);
   }
 
-  .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
-
-    --success: 149 61% 20%;
-    --success-foreground: 143 76% 97%;
-
-    --warning: 38 92% 50%;
-    --warning-foreground: 48 96% 89%;
-
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
-  }
-}
-
-@layer base {
   * {
-    @apply border-border;
+    @apply border-outline-variant;
   }
+  
   body {
-    @apply bg-background text-foreground font-body antialiased;
+    @apply bg-surface text-on-surface font-body antialiased;
   }
+  
   h1, h2, h3, h4, h5, h6 {
-    @apply font-heading;
+    @apply font-heading tracking-[-0.02em];
   }
 }
 
-/* Keep previous utility classes for backward compatibility but map them to Tailwind */
-.glass-card {
-  @apply bg-card text-card-foreground border border-border rounded-xl shadow-sm;
+/* Editorial Typography Scales */
+.display-lg {
+  @apply font-heading text-[3.5rem] leading-tight tracking-[-0.02em];
 }
 
-.btn-primary {
-  @apply bg-primary text-primary-foreground hover:bg-primary/90 px-5 h-11 rounded-xl font-semibold inline-flex items-center justify-center gap-2 transition-all shadow-sm;
+.display-md {
+  @apply font-heading text-[2.75rem] leading-tight tracking-[-0.02em];
 }
 
-.btn-secondary {
-  @apply bg-secondary text-secondary-foreground hover:bg-secondary/80 px-5 h-11 rounded-xl font-semibold inline-flex items-center justify-center gap-2 transition-all;
+.display-sm {
+  @apply font-heading text-[2.25rem] leading-tight tracking-[-0.02em];
 }
 
-.btn-danger {
-  @apply bg-destructive text-destructive-foreground hover:bg-destructive/90 px-5 h-11 rounded-xl font-semibold inline-flex items-center justify-center gap-2 transition-all shadow-sm;
+.headline-lg {
+  @apply font-heading text-[1.75rem] font-bold tracking-[-0.02em];
 }
 
-.btn-outline {
-  @apply border border-input bg-background hover:bg-accent hover:text-accent-foreground px-5 h-11 rounded-xl font-semibold inline-flex items-center justify-center gap-2 transition-all shadow-sm;
+.headline-md {
+  @apply font-heading text-2xl font-bold tracking-[-0.02em];
 }
 
-.input-field {
-  @apply flex h-11 w-full rounded-xl border border-input bg-background px-4 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:border-primary disabled:cursor-not-allowed disabled:opacity-50 transition-all;
+.headline-sm {
+  @apply font-heading text-xl font-bold tracking-[-0.02em];
 }
 
+.label-sm {
+  @apply font-body text-[0.6875rem] font-bold uppercase tracking-wider text-on-surface-variant;
+}
+
+/* Layout Components */
 .dashboard-layout {
-  @apply flex min-h-screen bg-background;
+  @apply flex min-h-screen bg-surface;
 }
 
 .sidebar {
-  @apply w-72 bg-sidebar border-r border-sidebar-border p-6 flex flex-col gap-8 text-sidebar-foreground;
+  @apply w-72 bg-surface-container-low p-8 flex flex-col gap-10 text-on-surface border-none;
 }
 
 .main-content {
-  @apply flex-1 p-8 overflow-y-auto bg-background;
+  @apply flex-1 p-12 overflow-y-auto bg-surface pt-32; /* Increased top padding for editorial space */
 }
 
-.stat-grid {
-  @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8;
+/* Editorial Components */
+.editorial-card {
+  @apply bg-surface-container-lowest rounded-lg p-8 shadow-whisper border-none transition-all duration-300;
 }
 
-.stat-card {
-  @apply bg-card text-card-foreground border border-border rounded-xl p-6 flex flex-col gap-2 shadow-sm;
+.editorial-card:hover {
+  @apply -translate-y-1 shadow-lg;
 }
 
-.stat-label {
-  @apply text-muted-foreground text-sm font-medium;
+.glass-nav {
+  @apply bg-surface/80 backdrop-blur-[24px] sticky top-0 z-50;
 }
 
-.stat-value {
-  @apply text-3xl font-bold tracking-tight;
+.signature-gradient {
+  @apply bg-linear-to-br from-primary to-primary-container;
 }
 
-.table-glass {
-  @apply w-full text-sm text-left;
+/* Buttons */
+.btn-primary {
+  @apply bg-primary text-on-primary hover:opacity-90 px-8 h-12 rounded-xl font-bold inline-flex items-center justify-center gap-2 transition-all;
 }
 
-.table-glass th {
-  @apply px-4 py-3 font-medium text-muted-foreground border-b border-border;
+.btn-secondary {
+  @apply bg-tertiary-fixed text-on-tertiary-fixed hover:opacity-90 px-8 h-12 rounded-xl font-bold inline-flex items-center justify-center gap-2 transition-all;
 }
 
-.table-glass td {
-  @apply px-4 py-3 border-b border-border;
+/* Ministry Feed Component */
+.ministry-feed-item {
+  @apply relative pl-6 py-4;
 }
 
-.badge {
-  @apply inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2;
+.ministry-feed-item::before {
+  content: "";
+  @apply absolute left-0 top-1/2 -translate-y-1/2 w-1 h-2/3 bg-tertiary-fixed-dim rounded-full;
 }
 
-.badge-pending {
-  @apply border-transparent bg-warning text-warning-foreground hover:bg-warning/80;
+/* Input Fields */
+.editorial-input {
+  @apply w-full bg-surface-container-low rounded-md px-6 py-3 text-sm font-medium border-none outline-none transition-all focus:bg-surface-container-lowest focus:ring-2 focus:ring-primary/10;
 }
 
-.badge-approved {
-  @apply border-transparent bg-success text-success-foreground hover:bg-success/80;
+/* Status Chips */
+.status-chip {
+  @apply px-3 py-1 rounded-md text-[10px] font-black uppercase tracking-widest;
 }
 
-.animate-fade-in {
-  @apply animate-fade-in;
+.status-chip-neutral {
+  @apply bg-surface-container-highest text-on-surface-variant;
+}
+
+.status-chip-golden {
+  @apply bg-tertiary-fixed-dim text-on-tertiary-fixed;
+}
+
+/* Remove Divider Lines */
+hr, .divider {
+  @apply hidden;
+}
+
+.section-spacer {
+  @apply h-8;
+}
+
+.vertical-text {
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
 }

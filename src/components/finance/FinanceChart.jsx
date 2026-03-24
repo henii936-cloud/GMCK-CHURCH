@@ -70,7 +70,7 @@ export default function FinanceChart({ transactions = [] }) {
               axisLine={false} 
               tickLine={false} 
               tick={{ fill: 'rgba(255,255,255,0.4)', fontSize: 12, fontWeight: 700 }}
-              format={(val) => `$${val}`}
+              tickFormatter={(val) => `$${val}`}
             />
             <Tooltip 
               contentStyle={{ background: 'rgba(5, 28, 20, 0.9)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '16px', backdropFilter: 'blur(10px)' }}

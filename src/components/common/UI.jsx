@@ -5,7 +5,7 @@ export const Button = ({ children, onClick, type = "button", variant = "primary"
     switch (variant) {
       case "primary": return "btn-primary";
       case "secondary": return "btn-secondary";
-      case "danger": return "btn-danger";
+      case "danger": return "bg-red-600 text-white hover:bg-red-700";
       case "outline": return "btn-outline";
       default: return "btn-primary";
     }
@@ -15,21 +15,20 @@ export const Button = ({ children, onClick, type = "button", variant = "primary"
     <button 
       type={type} 
       onClick={onClick} 
-      className={`${getBaseClass()} ${className} hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2.5 transition-all duration-300 ease-out`} 
+      className={`${getBaseClass()} ${className} flex items-center justify-center gap-3 transition-all duration-500 ease-out rounded-xl font-bold tracking-wide`} 
       style={{
         ...style,
         cursor: (loading || disabled) ? 'not-allowed' : 'pointer',
-        opacity: (loading || disabled) ? 0.7 : 1,
-        transform: (loading || disabled) ? 'none' : undefined,
+        opacity: (loading || disabled) ? 0.5 : 1,
       }}
       disabled={loading || disabled}
       {...props}
     >
       {loading ? (
-        <Loader2 className="animate-spin" size={18} />
+        <Loader2 className="animate-spin" size={20} />
       ) : (
         <>
-          {Icon && <Icon size={18} />}
+          {Icon && <Icon size={20} />}
           {children}
         </>
       )}
@@ -39,14 +38,14 @@ export const Button = ({ children, onClick, type = "button", variant = "primary"
 
 export const Card = ({ children, className = "", title, subtitle, icon: Icon, style, ...props }) => {
   return (
-    <div className={`glass-card ${className}`} style={style} {...props}>
+    <div className={`editorial-card ${className}`} style={style} {...props}>
       {(title || Icon) && (
-        <div className="flex items-center justify-between mb-5">
+        <div className="flex items-center justify-between mb-8">
           <div>
-            {title && <h3 className="text-xl font-semibold">{title}</h3>}
-            {subtitle && <p className="text-muted-foreground text-sm">{subtitle}</p>}
+            {title && <h3 className="headline-sm text-primary">{title}</h3>}
+            {subtitle && <p className="label-sm opacity-60 mt-1">{subtitle}</p>}
           </div>
-          {Icon && <Icon size={24} className="text-primary opacity-80" />}
+          {Icon && <Icon size={28} className="text-tertiary-fixed-dim opacity-80" />}
         </div>
       )}
       {children}
@@ -56,12 +55,12 @@ export const Card = ({ children, className = "", title, subtitle, icon: Icon, st
 
 export const Input = ({ label, type = "text", placeholder, value, onChange, className = "", inputClassName = "", required, icon: Icon }) => {
   return (
-    <div className={`form-group ${className}`}>
-      {label && <label className="block mb-2 text-sm font-semibold text-foreground">{label}</label>}
-      <div className="relative">
+    <div className={`space-y-3 ${className}`}>
+      {label && <label className="label-sm font-black uppercase tracking-widest text-primary/60">{label}</label>}
+      <div className="relative group">
         {Icon && (
-          <div className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none">
-            <Icon size={18} />
+          <div className="absolute left-5 top-1/2 -translate-y-1/2 text-primary/40 group-focus-within:text-primary transition-colors pointer-events-none">
+            <Icon size={20} />
           </div>
         )}
         <input 
@@ -70,7 +69,7 @@ export const Input = ({ label, type = "text", placeholder, value, onChange, clas
           value={value} 
           onChange={onChange}
           required={required}
-          className={`flex w-full h-11 rounded-xl border border-input bg-background px-4 py-2 text-sm text-foreground ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:border-primary disabled:cursor-not-allowed disabled:opacity-50 transition-all ${Icon ? 'pl-11' : 'pl-4'} ${inputClassName}`}
+          className={`flex w-full h-14 rounded-xl bg-surface-container-low border-2 border-transparent focus:border-primary/20 focus:bg-surface px-6 py-4 text-sm text-primary placeholder:text-primary/30 outline-none transition-all duration-500 ${Icon ? 'pl-14' : 'pl-6'} ${inputClassName}`}
         />
       </div>
     </div>
@@ -81,16 +80,18 @@ export const Modal = ({ isOpen, onClose, title, children }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm grid place-items-center z-[1000] p-5">
-      <div className="glass-card w-full max-w-[500px] p-10 relative">
+    <div className="fixed inset-0 bg-primary/20 backdrop-blur-md grid place-items-center z-[1000] p-6">
+      <div className="editorial-card w-full max-w-2xl p-12 relative shadow-2xl animate-fade-in">
         <button 
           onClick={onClose}
-          className="absolute top-5 right-5 bg-transparent border-none text-muted-foreground hover:text-foreground cursor-pointer text-2xl leading-none"
+          className="absolute top-8 right-8 bg-surface-container-low w-10 h-10 rounded-full flex items-center justify-center text-primary hover:bg-primary hover:text-on-primary transition-all duration-500 cursor-pointer text-2xl"
         >
           &times;
         </button>
-        {title && <h2 className="text-2xl font-extrabold mb-6">{title}</h2>}
-        {children}
+        {title && <h2 className="display-sm text-primary mb-10">{title}</h2>}
+        <div className="mt-4">
+          {children}
+        </div>
       </div>
     </div>
   );

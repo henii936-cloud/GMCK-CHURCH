@@ -77,111 +77,101 @@ export default function AdminDashboard() {
   ];
 
   return (
-    <div className="animate-fade-in">
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
-        <div>
-          <h1 style={{ fontSize: '2rem', fontWeight: '800', letterSpacing: '-0.025em' }}>Admin Dashboard</h1>
-          <p style={{ color: 'var(--text-muted)' }}>Global overview of church operations and Bible study progress.</p>
+    <div className="animate-fade-in max-w-7xl mx-auto">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-20 gap-8">
+        <div className="max-w-2xl">
+          <p className="label-sm text-tertiary-fixed-dim mb-4 tracking-[0.3em]">Administrative Oversight</p>
+          <h1 className="display-lg text-primary mb-6">Admin <span className="text-tertiary-fixed-dim italic">Dashboard</span></h1>
+          <p className="text-on-surface-variant font-medium tracking-wide leading-relaxed">Global overview of church operations and Bible study progress. A digital sanctuary for ministry management.</p>
         </div>
-        <div style={{ display: 'flex', gap: '12px' }}>
-          <div className="glass-card" style={{ padding: '8px 16px', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.875rem' }}>
-            <Calendar size={16} color="var(--primary)" />
-            <span>{new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}</span>
+        <div className="flex items-center gap-10 bg-surface-container-low p-6 rounded-2xl border border-outline-variant/10">
+          <div className="w-14 h-14 rounded-2xl bg-primary flex items-center justify-center shadow-lg signature-gradient">
+            <Calendar size={24} className="text-on-primary" />
+          </div>
+          <div className="text-right">
+            <p className="label-sm opacity-60 mb-1">Current Period</p>
+            <p className="text-xl font-heading font-bold text-primary">{new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}</p>
           </div>
         </div>
       </div>
 
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
-        gap: '24px',
-        marginBottom: '40px'
-      }}>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 mb-16">
         {statCards.map((stat, index) => (
           <motion.div
             key={stat.label}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.1 }}
+            className="editorial-card group"
           >
-            <Card style={{ padding: '24px', position: 'relative', overflow: 'hidden' }}>
-              <div style={{
-                position: 'absolute',
-                right: '-10px',
-                top: '-10px',
-                opacity: 0.05,
-                transform: 'rotate(-15deg)'
-              }}>
-                <stat.icon size={100} color={stat.color} />
-              </div>
+            <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-6 bg-surface-container-low transition-transform group-hover:rotate-6">
+              <stat.icon size={24} style={{ color: stat.color }} />
+            </div>
 
-              <div style={{ width: 48, height: 48, borderRadius: 12, background: `${stat.color}15`, display: 'grid', placeItems: 'center', marginBottom: '16px' }}>
-                <stat.icon size={24} color={stat.color} />
-              </div>
+            <p className="label-sm opacity-60 mb-1">{stat.label}</p>
+            <h3 className="text-3xl font-heading font-bold text-primary">{loading ? '...' : stat.value}</h3>
 
-              <p style={{ fontSize: '0.875rem', fontWeight: '600', color: 'var(--text-muted)', marginBottom: '4px' }}>{stat.label}</p>
-              <h3 style={{ fontSize: '1.75rem', fontWeight: '800' }}>{loading ? '...' : stat.value}</h3>
-
-              <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginTop: '12px', fontSize: '0.75rem', color: '#10b981' }}>
-                <TrendingUp size={14} />
-                <span>+12% from last month</span>
-              </div>
-            </Card>
+            <div className="flex items-center gap-2 mt-4 text-[10px] font-black uppercase tracking-widest text-primary/40">
+              <TrendingUp size={12} />
+              <span>+12% Growth</span>
+            </div>
           </motion.div>
         ))}
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '24px' }}>
-        <Card style={{ padding: '24px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-            <h3 style={{ fontWeight: '700' }}>Recent Study Progress</h3>
-            <button style={{ fontSize: '0.875rem', color: 'var(--primary)', background: 'none', border: 'none', fontWeight: '600', cursor: 'pointer' }}>View All</button>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+        <div className="lg:col-span-2 editorial-card">
+          <div className="flex justify-between items-center mb-10">
+            <h3 className="headline-sm text-primary">Recent Study <span className="text-tertiary-fixed-dim italic">Progress</span></h3>
+            <button className="label-sm text-primary hover:text-tertiary-fixed-dim transition-colors">View All</button>
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          <div className="space-y-2">
             {recentStudy.length > 0 ? recentStudy.map(study => (
-              <div key={study.id} style={{ display: 'flex', alignItems: 'center', gap: '16px', padding: '12px', borderRadius: '12px', background: 'rgba(255,255,255,0.02)' }}>
-                <div style={{ width: 40, height: 40, borderRadius: 10, background: 'rgba(99, 102, 241, 0.1)', display: 'grid', placeItems: 'center' }}>
-                  <BookOpen size={20} color="var(--primary)" />
-                </div>
-                <div style={{ flex: 1 }}>
-                  <p style={{ fontWeight: '600', fontSize: '0.9rem' }}>{study.bible_study_groups?.group_name}</p>
-                  <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{study.topic}</p>
-                </div>
-                <div style={{ textAlign: 'right' }}>
-                  <p style={{ fontSize: '0.75rem', fontWeight: '600' }}>{new Date(study.date).toLocaleDateString()}</p>
-                  <p style={{ fontSize: '0.7rem', color: '#10b981' }}>Completed</p>
+              <div key={study.id} className="ministry-feed-item group hover:bg-surface-container-low rounded-lg transition-all px-4">
+                <div className="flex items-center gap-6">
+                  <div className="w-10 h-10 rounded-xl bg-surface-container-low flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-on-primary transition-all">
+                    <BookOpen size={18} />
+                  </div>
+                  <div className="flex-1">
+                    <p className="font-bold text-on-surface group-hover:text-primary transition-colors">{study.bible_study_groups?.group_name}</p>
+                    <p className="text-xs text-on-surface-variant">{study.topic}</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="label-sm opacity-60">{new Date(study.date).toLocaleDateString()}</p>
+                    <p className="text-[10px] font-black uppercase tracking-widest text-primary">Completed</p>
+                  </div>
                 </div>
               </div>
             )) : (
-              <p style={{ textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.875rem' }}>No recent study progress recorded.</p>
+              <p className="text-center py-12 text-on-surface-variant/40 font-medium">No recent study progress recorded.</p>
             )}
           </div>
-        </Card>
+        </div>
 
-        <Card style={{ padding: '24px' }}>
-          <h3 style={{ fontWeight: '700', marginBottom: '24px' }}>Upcoming Events</h3>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+        <div className="editorial-card">
+          <h3 className="headline-sm text-primary mb-10">Upcoming <span className="text-tertiary-fixed-dim italic">Events</span></h3>
+          <div className="space-y-8">
             {upcomingEvents.length > 0 ? upcomingEvents.map(event => {
               const date = new Date(event.date);
               return (
-                <div key={event.id} style={{ display: 'flex', gap: '16px' }}>
-                  <div style={{ textAlign: 'center', minWidth: '45px' }}>
-                    <p style={{ fontSize: '0.7rem', fontWeight: '700', textTransform: 'uppercase', color: 'var(--primary)' }}>
+                <div key={event.id} className="flex gap-6 group">
+                  <div className="text-center min-w-[48px]">
+                    <p className="label-sm text-tertiary-fixed-dim">
                       {date.toLocaleDateString('en-US', { month: 'short' })}
                     </p>
-                    <p style={{ fontSize: '1.25rem', fontWeight: '800' }}>{date.getDate()}</p>
+                    <p className="text-2xl font-heading font-bold text-primary">{date.getDate()}</p>
                   </div>
-                  <div>
-                    <p style={{ fontWeight: '600', fontSize: '0.9rem' }}>{event.title}</p>
-                    <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{event.location} • {event.event_time}</p>
+                  <div className="pt-1">
+                    <p className="font-bold text-on-surface group-hover:text-primary transition-colors">{event.title}</p>
+                    <p className="label-sm opacity-60 mt-1">{event.location} • {event.event_time}</p>
                   </div>
                 </div>
               );
             }) : (
-              <p style={{ textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.875rem' }}>No upcoming events.</p>
+              <p className="text-center py-12 text-on-surface-variant/40 font-medium">No upcoming events.</p>
             )}
           </div>
-        </Card>
+        </div>
       </div>
     </div>
   );

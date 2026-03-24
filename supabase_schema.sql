@@ -57,6 +57,7 @@ CREATE TABLE IF NOT EXISTS public.members (
   phone TEXT,
   email TEXT,
   address TEXT,
+  image_url TEXT,
   join_date DATE DEFAULT CURRENT_DATE,
   group_id UUID REFERENCES public.bible_study_groups(id) ON DELETE SET NULL,
   created_at TIMESTAMPTZ DEFAULT timezone('utc', now()) NOT NULL

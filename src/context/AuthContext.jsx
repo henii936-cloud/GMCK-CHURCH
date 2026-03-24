@@ -71,10 +71,10 @@ export const AuthProvider = ({ children }) => {
 
     const initializeAuth = async () => {
       try {
-        // 3 second timeout for getSession
+        // 10 second timeout for getSession
         const sessionPromise = supabase.auth.getSession();
         const timeoutPromise = new Promise((_, reject) => 
-          setTimeout(() => reject(new Error("Session fetch timeout")), 3000)
+          setTimeout(() => reject(new Error("Session fetch timeout")), 10000)
         );
         
         const { data: { session } } = await Promise.race([sessionPromise, timeoutPromise]);

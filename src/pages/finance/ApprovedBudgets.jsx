@@ -1,13 +1,10 @@
 import { useState, useEffect } from "react";
 import { financeService } from "../../services/api";
 import { Card, Button } from "../../components/common/UI";
-import { Wallet, CheckCircle, Clock, ShieldCheck, XCircle, LogOut } from "lucide-react";
-import { useAuth } from "../../context/AuthContext";
-import { useNavigate } from "react-router-dom";
+import { Wallet, CheckCircle, Clock, ShieldCheck, XCircle, Calendar, ArrowRight } from "lucide-react";
+import { motion, AnimatePresence } from "motion/react";
 
 export default function ApprovedBudgets() {
-  const { logout } = useAuth();
-  const navigate = useNavigate();
   const [budgets, setBudgets] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -36,105 +33,131 @@ export default function ApprovedBudgets() {
     }
   };
 
-  const handleLogout = async () => {
-    await logout();
-    navigate("/login/finance");
-  };
-
   return (
-    <div className="animate-fade-in p-8 bg-[#051C14] min-h-screen text-white">
-      <div style={{ marginBottom: '40px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-        <div>
-          <h1 style={{ fontSize: '2.5rem', fontWeight: '900', letterSpacing: '-0.05em' }}>
-            Approved <span style={{ color: '#10b981' }}>Spending Plans</span>
+    <div className="max-w-7xl mx-auto animate-fade-in">
+      {/* Header Section */}
+      <header className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-16">
+        <div className="space-y-6">
+          <h1 className="display-lg text-primary leading-[0.88] tracking-tight">
+            Approved <br />
+            <span className="text-tertiary-fixed-dim italic font-heading">Spending Plans</span>
           </h1>
-          <p style={{ color: 'rgba(255,255,255,0.5)', fontWeight: '500' }}>Manage the disbursement and usage of approved church funds.</p>
-        </div>
-        <Button variant="danger" icon={LogOut} onClick={handleLogout} style={{ borderRadius: '16px' }}>Sign Out</Button>
-      </div>
-
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))', gap: '24px' }}>
-        {budgets.map(b => {
-          const nameStr = b.name || "General::Untitled";
-          const parts = nameStr.split('::');
-          const team = parts.length > 1 ? parts[0] : 'General';
-          const name = parts.length > 1 ? parts[1] : nameStr;
-          const isUsed = b.is_used;
-
-          return (
-            <Card 
-              key={b.id} 
-              className={`p-8 border ${isUsed ? 'border-white/5 opacity-60' : 'border-emerald-500/20'} bg-white/[0.03] backdrop-blur-2xl rounded-[32px] transition-all duration-300 hover:scale-[1.02]`}
-            >
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '24px' }}>
-                <div style={{ width: 56, height: 56, borderRadius: 20, background: isUsed ? 'rgba(255,255,255,0.05)' : 'rgba(16, 185, 129, 0.1)', display: 'grid', placeItems: 'center' }}>
-                  <Wallet size={28} color={isUsed ? 'rgba(255,255,255,0.3)' : '#10b981'} />
-                </div>
-                <div style={{ textAlign: 'right' }}>
-                  <span style={{ fontSize: '0.7rem', fontWeight: '900', color: isUsed ? 'rgba(255,255,255,0.3)' : '#10b981', textTransform: 'uppercase', letterSpacing: '0.1em' }}>{team}</span>
-                  <h3 style={{ fontSize: '1.5rem', fontWeight: '900', margin: '4px 0 0 0' }}>${b.amount.toLocaleString()}</h3>
-                </div>
-              </div>
-
-              <h4 style={{ fontSize: '1.2rem', fontWeight: '700', marginBottom: '16px' }}>{name}</h4>
-              
-              <div style={{ 
-                padding: '12px 16px', 
-                borderRadius: '16px', 
-                background: isUsed ? 'rgba(255,255,255,0.05)' : 'rgba(16, 185, 129, 0.05)', 
-                border: isUsed ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(16, 185, 129, 0.2)',
-                marginBottom: '24px',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
-                fontSize: '0.8rem',
-                fontWeight: '600',
-                color: isUsed ? 'rgba(255,255,255,0.4)' : '#10b981'
-              }}>
-                {isUsed ? <XCircle size={16} /> : <CheckCircle size={16} />}
-                {isUsed ? 'Budget Fully Utilized' : 'Funds Available for Use'}
-              </div>
-
-              <Button 
-                onClick={() => handleToggleUsed(b.id, isUsed)}
-                style={{ 
-                  width: '100%', 
-                  justifyContent: 'center', 
-                  borderRadius: '16px',
-                  background: isUsed ? 'rgba(255,255,255,0.1)' : '#10b981',
-                  color: 'white',
-                  fontWeight: '800'
-                }}
-                icon={isUsed ? Clock : ShieldCheck}
-              >
-                {isUsed ? 'Mark as UNUSED' : 'Mark as USED'}
-              </Button>
-            </Card>
-          );
-        })}
-        {budgets.length === 0 && (
-          <div style={{ textAlign: 'center', padding: '100px 0', color: 'rgba(255,255,255,0.2)', gridColumn: '1/-1' }}>
-            <Wallet size={64} style={{ margin: '0 auto 24px', opacity: 0.1 }} />
-            <h3 style={{ fontSize: '1.5rem', fontWeight: '800' }}>No Approved Budgets</h3>
-            <p>Once admin approves a request, it will appear here for you to manage.</p>
+          <div className="flex items-center gap-3 text-tertiary-fixed-dim">
+            <Calendar size={20} />
+            <span className="label-sm font-black uppercase tracking-[0.2em]">Fiscal Year 2024</span>
           </div>
+          <p className="headline-sm opacity-60 max-w-xl leading-relaxed">
+            Manage the disbursement and usage of approved church funds with stewardship and transparency.
+          </p>
+        </div>
+        
+        <div className="flex items-center gap-6">
+          <div className="text-right hidden sm:block">
+            <p className="label-sm opacity-40 uppercase tracking-widest mb-1">Total Approved</p>
+            <p className="headline-sm text-primary font-black">
+              ${budgets.reduce((acc, b) => acc + (b.amount || 0), 0).toLocaleString()}
+            </p>
+          </div>
+          <div className="w-px h-12 bg-primary/10 hidden sm:block" />
+          <div className="text-right">
+            <p className="label-sm opacity-40 uppercase tracking-widest mb-1">Active Budgets</p>
+            <p className="headline-sm text-tertiary-fixed-dim font-black">
+              {budgets.filter(b => !b.is_used).length}
+            </p>
+          </div>
+        </div>
+      </header>
+
+      {/* Budgets Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <AnimatePresence mode="popLayout">
+          {budgets.map((b, index) => {
+            const nameStr = b.name || "General::Untitled";
+            const parts = nameStr.split('::');
+            const team = parts.length > 1 ? parts[0] : 'General';
+            const name = parts.length > 1 ? parts[1] : nameStr;
+            const isUsed = b.is_used;
+
+            return (
+              <motion.div
+                key={b.id}
+                layout
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                transition={{ delay: index * 0.05, duration: 0.5, ease: "easeOut" }}
+              >
+                <Card 
+                  className={`group relative overflow-hidden transition-all duration-500 hover:shadow-2xl hover:-translate-y-1 ${isUsed ? 'opacity-60 grayscale-[0.5]' : ''}`}
+                >
+                  {/* Status Indicator */}
+                  <div className={`absolute top-0 right-0 px-6 py-2 rounded-bl-2xl label-sm font-black uppercase tracking-widest text-[10px] ${isUsed ? 'bg-primary/5 text-primary/40' : 'bg-tertiary-fixed-dim text-on-tertiary-fixed'}`}>
+                    {isUsed ? 'Utilized' : 'Available'}
+                  </div>
+
+                  <div className="flex items-start justify-between mb-10">
+                    <div className={`w-16 h-16 rounded-2xl grid place-items-center transition-colors duration-500 ${isUsed ? 'bg-primary/5 text-primary/20' : 'bg-primary text-on-primary shadow-lg shadow-primary/20'}`}>
+                      <Wallet size={32} />
+                    </div>
+                    <div className="text-right pt-2">
+                      <p className="label-sm text-tertiary-fixed-dim font-black uppercase tracking-widest mb-1">{team}</p>
+                      <p className="display-sm text-primary leading-none">${b.amount.toLocaleString()}</p>
+                    </div>
+                  </div>
+
+                  <div className="space-y-6">
+                    <div>
+                      <h3 className="headline-sm text-primary mb-2 line-clamp-1">{name}</h3>
+                      <p className="label-sm opacity-60 leading-relaxed">
+                        Approved for disbursement. Ensure all receipts are logged within 48 hours of spending.
+                      </p>
+                    </div>
+
+                    <div className={`flex items-center gap-3 p-4 rounded-xl border transition-colors duration-500 ${isUsed ? 'bg-primary/5 border-primary/10 text-primary/40' : 'bg-tertiary-fixed-dim/5 border-tertiary-fixed-dim/20 text-tertiary-fixed-dim'}`}>
+                      {isUsed ? <XCircle size={18} /> : <CheckCircle size={18} />}
+                      <span className="label-sm font-black uppercase tracking-widest text-[11px]">
+                        {isUsed ? 'Budget Fully Utilized' : 'Funds Ready for Disbursement'}
+                      </span>
+                    </div>
+
+                    <Button 
+                      onClick={() => handleToggleUsed(b.id, isUsed)}
+                      className={`w-full h-14 rounded-xl font-black uppercase tracking-widest text-[11px] transition-all duration-500 ${isUsed ? 'bg-primary/5 text-primary/40 hover:bg-primary/10' : 'bg-primary text-on-primary hover:opacity-90 shadow-xl shadow-primary/10'}`}
+                      icon={isUsed ? Clock : ShieldCheck}
+                    >
+                      {isUsed ? 'Reactivate Budget' : 'Mark as Utilized'}
+                    </Button>
+                  </div>
+                </Card>
+              </motion.div>
+            );
+          })}
+        </AnimatePresence>
+
+        {budgets.length === 0 && !loading && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="col-span-full py-32 text-center"
+          >
+            <div className="w-24 h-24 rounded-[3rem] bg-primary/5 grid place-items-center mx-auto mb-8">
+              <Wallet size={48} className="text-primary/20" />
+            </div>
+            <h3 className="headline-sm text-primary mb-4">No Approved Budgets</h3>
+            <p className="label-sm opacity-40 max-w-md mx-auto leading-relaxed">
+              Once the administration approves a budget request, it will appear here for your management and disbursement.
+            </p>
+          </motion.div>
         )}
       </div>
 
-      <style>{`
-        .glass-card {
-          background: rgba(255, 255, 255, 0.03);
-          backdrop-filter: blur(20px);
-          transition: all 0.3s ease;
-        }
-        .animate-fade-in {
-          animation: fadeIn 0.5s ease-out;
-        }
-        @keyframes fadeIn {
-          from { opacity: 0; transform: translateY(10px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-      `}</style>
+      {loading && budgets.length === 0 && (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {[1, 2, 3].map(i => (
+            <div key={i} className="editorial-card h-[400px] animate-pulse bg-primary/5 rounded-[32px]" />
+          ))}
+        </div>
+      )}
     </div>
   );
 }

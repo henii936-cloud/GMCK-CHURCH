@@ -1,5 +1,6 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "../common/UI";
+import { motion } from "motion/react";
 import {
   Users, Layers, DollarSign, Activity, Settings,
   MapPin, BookOpen, ClipboardList, LogOut, ChevronRight, ShieldCheck, Wallet, Heart, ArrowDownRight
@@ -21,7 +22,6 @@ export default function Sidebar() {
       { name: "Dashboard", icon: Layers, path: "/admin" },
       { name: "Members", icon: Users, path: "/admin/members" },
       { name: "Bible Study Groups", icon: MapPin, path: "/admin/groups" },
-      { name: "Group Leaders", icon: ShieldCheck, path: "/admin/leaders" },
       { name: "Study Progress", icon: BookOpen, path: "/admin/progress" },
       { name: "Events", icon: Activity, path: "/admin/events" },
       { name: "Finance", icon: DollarSign, path: "/admin/finance" },
@@ -36,9 +36,6 @@ export default function Sidebar() {
       { name: "Dashboard", icon: Layers, path: "/finance" },
       { name: "Approved Budgets", icon: Wallet, path: "/finance/budgets" },
       { name: "Record Giving", icon: DollarSign, path: "/finance/record" },
-      { name: "Tithes", icon: Wallet, path: "/finance/tithes" },
-      { name: "Offerings", icon: DollarSign, path: "/finance/offerings" },
-      { name: "Donations", icon: Heart, path: "/finance/donations" },
       { name: "Expenses", icon: ArrowDownRight, path: "/finance/expenses" },
       { name: "Reports", icon: ClipboardList, path: "/finance/reports" },
     ]
@@ -47,18 +44,18 @@ export default function Sidebar() {
   const navItems = menuItems[user?.role?.toLowerCase()] || [];
 
   return (
-    <aside className="sidebar">
-      <div className="flex items-center gap-3 mb-5">
-        <div className="w-10 h-10 rounded-xl bg-primary grid place-items-center">
-          <Layers size={24} className="text-primary-foreground" />
+    <aside className="sidebar border-r border-outline-variant/5">
+      <div className="flex flex-col gap-2 mb-16 px-4">
+        <div className="flex items-center gap-4">
+          <div className="w-10 h-10 rounded-xl bg-primary grid place-items-center signature-gradient shadow-lg">
+            <Layers size={20} className="text-on-primary" />
+          </div>
+          <h2 className="headline-sm text-primary tracking-tight">Church<span className="text-tertiary-fixed-dim italic">ERP</span></h2>
         </div>
-        <div>
-          <h2 className="text-xl font-bold tracking-tight">ChurchERP</h2>
-          <span className="text-xs uppercase text-primary font-bold tracking-wider">{user?.role?.replace('_', ' ')} Portal</span>
-        </div>
+        <p className="label-sm opacity-40 tracking-[0.3em] pl-14">{user?.role?.replace('_', ' ')}</p>
       </div>
 
-      <nav className="flex-1 overflow-y-auto">
+      <nav className="flex-1 overflow-y-auto pr-2">
         <ul className="list-none flex flex-col gap-2">
           {navItems.map((item) => {
             const isActive = location.pathname === item.path;
@@ -66,14 +63,17 @@ export default function Sidebar() {
               <li key={item.path}>
                 <Link
                   to={item.path}
-                  className={`flex items-center gap-3 px-4 py-3 rounded-lg no-underline transition-all duration-200 relative overflow-hidden ${isActive ? 'text-foreground bg-primary/15 font-semibold' : 'text-muted-foreground hover:bg-secondary/50 font-medium'}`}
+                  className={`flex items-center gap-4 px-6 py-4 rounded-xl no-underline transition-all duration-500 group relative ${isActive ? 'text-primary bg-surface-container-highest' : 'text-on-surface-variant hover:bg-surface-container'}`}
                 >
                   {isActive && (
-                    <div className="absolute left-0 top-[20%] bottom-[20%] w-1 bg-primary rounded-r-md" />
+                    <motion.div 
+                      layoutId="sidebar-active"
+                      className="absolute left-0 top-1/2 -translate-y-1/2 w-1.5 h-1/2 bg-primary rounded-r-full" 
+                    />
                   )}
-                  <item.icon size={20} className={isActive ? 'text-primary' : 'text-inherit'} />
-                  <span>{item.name}</span>
-                  {isActive && <ChevronRight size={14} className="ml-auto opacity-50" />}
+                  <item.icon size={20} className={isActive ? 'text-primary' : 'text-on-surface-variant group-hover:text-primary transition-colors duration-500'} />
+                  <span className={`text-sm tracking-tight ${isActive ? 'font-black' : 'font-medium'}`}>{item.name}</span>
+                  {isActive && <ChevronRight size={14} className="ml-auto text-primary/40" />}
                 </Link>
               </li>
             );
@@ -81,24 +81,23 @@ export default function Sidebar() {
         </ul>
       </nav>
 
-      <div className="glass-card p-4 mt-auto bg-white/5">
-        <div className="flex items-center gap-3 mb-4">
-          <div className="w-9 h-9 rounded-full bg-primary/80 grid place-items-center font-bold text-primary-foreground">
+      <div className="mt-auto pt-10 border-t border-outline-variant/10">
+        <div className="flex items-center gap-4 mb-8 px-4">
+          <div className="w-12 h-12 rounded-2xl bg-tertiary-fixed-dim grid place-items-center font-heading font-bold text-on-tertiary-fixed shadow-whisper">
             {user?.full_name?.charAt(0) || 'U'}
           </div>
           <div className="overflow-hidden">
-            <p className="font-semibold text-sm whitespace-nowrap text-ellipsis">{user?.full_name}</p>
-            <p className="text-xs text-muted-foreground capitalize">{user?.role?.replace('_', ' ')}</p>
+            <p className="font-bold text-sm text-primary truncate">{user?.full_name}</p>
+            <p className="label-sm opacity-40 lowercase tracking-widest">{user?.role?.replace('_', ' ')}</p>
           </div>
         </div>
-        <Button
-          variant="danger"
+        <button
           onClick={handleLogout}
-          icon={LogOut}
-          className="w-full justify-center"
+          className="w-full flex items-center justify-center gap-3 py-4 rounded-xl font-black uppercase tracking-[0.2em] text-[10px] text-on-surface-variant hover:text-primary hover:bg-surface-container transition-all duration-500"
         >
-          Sign Out
-        </Button>
+          <LogOut size={16} />
+          <span>Sign Out</span>
+        </button>
       </div>
     </aside>
   );

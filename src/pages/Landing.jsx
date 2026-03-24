@@ -68,36 +68,35 @@ export default function Landing() {
   };
 
   return (
-    <div className="min-h-screen bg-[#020617] text-slate-200 selection:bg-indigo-500/30 font-sans overflow-x-hidden">
-      {/* Background Orbs */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
-        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-indigo-600/10 blur-[120px] rounded-full"></div>
-        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-purple-600/10 blur-[120px] rounded-full"></div>
+    <div className="min-h-screen bg-surface text-on-surface selection:bg-tertiary-fixed-dim/30 font-sans overflow-x-hidden">
+      {/* Subtle Texture/Background */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none z-0 opacity-20">
+        <div className="absolute top-[-10%] left-[-10%] w-[60%] h-[60%] bg-tertiary-fixed-dim/10 blur-[150px] rounded-full"></div>
       </div>
 
       {/* Navigation */}
-      <nav className={`fixed top-0 inset-x-0 z-[100] transition-all duration-500 ${scrolled ? 'py-4' : 'py-6'}`}>
+      <nav className={`fixed top-0 inset-x-0 z-[100] transition-all duration-500 ${scrolled ? 'py-4' : 'py-8'}`}>
         <div className="container mx-auto px-6 h-full">
-          <div className={`relative px-6 h-16 rounded-2xl flex items-center justify-between transition-all duration-500 ${scrolled ? 'bg-slate-900/40 backdrop-blur-xl border border-white/10 shadow-lg' : 'bg-transparent'}`}>
-            <div className="flex items-center gap-3">
+          <div className={`relative px-8 h-20 rounded-2xl flex items-center justify-between transition-all duration-500 ${scrolled ? 'bg-surface/80 backdrop-blur-xl shadow-whisper border border-primary/5' : 'bg-transparent'}`}>
+            <div className="flex items-center gap-4">
               <motion.div
-                whileHover={{ rotate: 15 }}
-                className="w-10 h-10 rounded-xl bg-indigo-600 grid place-items-center shadow-lg shadow-indigo-600/20"
+                whileHover={{ rotate: 5 }}
+                className="w-12 h-12 rounded-xl bg-primary grid place-items-center shadow-lg"
               >
-                <Layers size={22} className="text-white" />
+                <Layers size={24} className="text-on-primary" />
               </motion.div>
-              <h2 className="text-xl font-bold tracking-tight text-white">GMKC<span className="text-indigo-400">CHURCH</span></h2>
+              <h2 className="text-2xl font-heading font-bold tracking-tight text-primary">GMKC<span className="text-tertiary-fixed-dim italic">CHURCH</span></h2>
             </div>
 
-            <div className="hidden md:flex items-center gap-8">
-              <Link to="/about" className="text-sm font-medium text-slate-400 hover:text-white transition-colors">Vision</Link>
-              <Link to="/mission" className="text-sm font-medium text-slate-400 hover:text-white transition-colors">Mission</Link>
-              <Link to="/community" className="text-sm font-medium text-slate-400 hover:text-white transition-colors">Groups</Link>
-              <div className="h-4 w-[1px] bg-white/10"></div>
-              <div className="flex items-center gap-4">
-                <Link to="/login" className="text-sm font-semibold text-white/80 hover:text-white">Sign In</Link>
+            <div className="hidden md:flex items-center gap-10">
+              <Link to="/about" className="label-sm text-on-surface-variant hover:text-primary transition-colors">Vision</Link>
+              <Link to="/mission" className="label-sm text-on-surface-variant hover:text-primary transition-colors">Mission</Link>
+              <Link to="/community" className="label-sm text-on-surface-variant hover:text-primary transition-colors">Groups</Link>
+              <div className="h-4 w-[1px] bg-primary/10"></div>
+              <div className="flex items-center gap-6">
+                <Link to="/login" className="label-sm font-bold text-primary hover:text-tertiary-fixed-dim transition-colors">Sign In</Link>
                 <Link to="/signup">
-                  <Button className="bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl px-5 py-2 text-sm shadow-lg shadow-indigo-600/20 border-none h-auto">
+                  <Button className="bg-primary hover:bg-tertiary-fixed-dim text-on-primary hover:text-primary rounded-xl px-8 py-3 h-auto font-bold transition-all duration-500">
                     Get Started
                   </Button>
                 </Link>
@@ -105,10 +104,10 @@ export default function Landing() {
             </div>
 
             <button
-              className="md:hidden p-2 text-slate-400 hover:text-white"
+              className="md:hidden p-2 text-primary"
               onClick={() => setIsMenuOpen(!isMenuOpen)}
             >
-              {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
+              {isMenuOpen ? <X size={28} /> : <Menu size={28} />}
             </button>
           </div>
         </div>
@@ -121,30 +120,28 @@ export default function Landing() {
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="fixed inset-x-6 top-24 z-[90] p-6 rounded-3xl bg-slate-900/90 backdrop-blur-2xl border border-white/10 md:hidden flex flex-col gap-4"
+            className="fixed inset-x-6 top-28 z-[90] p-8 rounded-[2rem] bg-surface shadow-2xl border border-primary/5 md:hidden flex flex-col gap-6"
           >
-            <Link to="/login/admin" className="p-3 font-medium hover:bg-white/5 rounded-xl">Admin Portal</Link>
-            <Link to="/login/leader" className="p-3 font-medium hover:bg-white/5 rounded-xl">Leader Portal</Link>
-            <Link to="/login/finance" className="p-3 font-medium hover:bg-white/5 rounded-xl">Finance Portal</Link>
-            <div className="h-[1px] bg-white/10"></div>
+            <Link to="/login/admin" className="headline-sm text-primary p-4 hover:bg-surface-container-low rounded-2xl transition-all">Admin Portal</Link>
+            <Link to="/login/leader" className="headline-sm text-primary p-4 hover:bg-surface-container-low rounded-2xl transition-all">Leader Portal</Link>
+            <Link to="/login/finance" className="headline-sm text-primary p-4 hover:bg-surface-container-low rounded-2xl transition-all">Finance Portal</Link>
+            <div className="h-[1px] bg-primary/10"></div>
             <Link to="/signup">
-              <Button className="w-full bg-indigo-600 py-4 h-auto">Join Our Community</Button>
+              <Button className="w-full bg-primary py-6 rounded-2xl h-auto font-bold text-on-primary">Join Our Community</Button>
             </Link>
           </motion.div>
         )}
       </AnimatePresence>
 
       {/* Hero Section */}
-      <section className="relative min-h-screen pt-32 pb-20 px-6 flex flex-col items-center justify-center overflow-hidden">
-        {/* Hero Background Image */}
+      <section className="relative min-h-screen pt-40 pb-20 px-6 flex flex-col items-center justify-center overflow-hidden">
         <div className="absolute inset-0 z-0">
           <img
             src="https://images.unsplash.com/photo-1544427928-c49cddee6eac?q=80&w=2000&auto=format&fit=crop"
-            alt="Church Community Praying"
-            className="w-full h-full object-cover opacity-20 filter grayscale-[20%]"
+            alt="Church Community"
+            className="w-full h-full object-cover opacity-10 grayscale"
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-[#020617] via-transparent to-[#020617]"></div>
-          <div className="absolute inset-0 bg-radial-[at_center_center] from-transparent via-[#020617]/40 to-[#020617]"></div>
+          <div className="absolute inset-0 bg-gradient-to-b from-surface via-transparent to-surface"></div>
         </div>
 
         <motion.div
@@ -152,69 +149,49 @@ export default function Landing() {
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true }}
-          className="relative z-10 max-w-5xl mx-auto text-center"
+          className="relative z-10 max-w-6xl mx-auto text-center"
         >
-          <motion.div variants={itemVariants} className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 font-semibold text-xs mb-8 uppercase tracking-widest">
-            <Sparkles size={14} className="animate-pulse" /> Unified Spiritual Management
+          <motion.div variants={itemVariants} className="inline-flex items-center gap-3 px-6 py-2 rounded-full bg-tertiary-fixed-dim/10 border border-tertiary-fixed-dim/20 text-primary font-black text-[10px] mb-12 uppercase tracking-[0.3em]">
+            <Sparkles size={14} className="text-tertiary-fixed-dim" /> Unified Spiritual Management
           </motion.div>
 
-          <motion.h1 variants={itemVariants} className="text-6xl md:text-8xl font-black tracking-tight leading-[0.95] mb-8 text-white">
+          <motion.h1 variants={itemVariants} className="display-lg text-primary mb-12 leading-[0.9] max-w-4xl mx-auto">
             Lead Your <br />
-            <span className="inline-block text-indigo-500 italic">Faith</span> Community.
+            <span className="text-tertiary-fixed-dim italic">Faith</span> Community.
           </motion.h1>
 
-          <motion.p variants={itemVariants} className="text-xl md:text-2xl text-slate-400 mb-12 leading-relaxed max-w-2xl mx-auto font-light">
+          <motion.p variants={itemVariants} className="text-xl md:text-2xl text-on-surface-variant mb-16 leading-relaxed max-w-2xl mx-auto font-medium tracking-wide">
             A minimalist, powerful ecosystem for modern church administration. Transform how you lead, study, and grow together.
           </motion.p>
 
-          <motion.div variants={itemVariants} className="flex flex-col sm:flex-row gap-4 justify-center">
+          <motion.div variants={itemVariants} className="flex flex-col sm:flex-row gap-6 justify-center">
             <Link to="/signup">
-              <Button className="px-10 py-7 text-lg h-auto rounded-2xl bg-indigo-600 hover:bg-indigo-500 group shadow-2xl shadow-indigo-600/20">
-                Launch Platform <ArrowRight size={20} className="ml-2 transition-transform group-hover:translate-x-1" />
+              <Button className="px-12 py-8 text-xl h-auto rounded-2xl bg-primary text-on-primary hover:bg-tertiary-fixed-dim hover:text-primary group shadow-whisper transition-all duration-500 font-bold">
+                Launch Platform <ArrowRight size={24} className="ml-3 transition-transform group-hover:translate-x-2" />
               </Button>
             </Link>
             <Link to="/login">
-              <Button variant="outline" className="px-10 py-7 text-lg h-auto rounded-2xl border-white/10 bg-white/5 hover:bg-white/10 backdrop-blur-md">
+              <Button variant="outline" className="px-12 py-8 text-xl h-auto rounded-2xl border-primary/10 bg-surface-container-low text-primary hover:bg-surface-container transition-all duration-500 font-bold">
                 Admin Console
               </Button>
             </Link>
           </motion.div>
         </motion.div>
-
-        {/* Floating Icons for dynamism */}
-        <motion.div
-          animate={{ y: [0, -20, 0] }}
-          transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute top-1/3 left-[15%] hidden lg:block opacity-20 pointer-events-none"
-        >
-          <div className="p-4 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-500">
-            <Heart size={32} />
-          </div>
-        </motion.div>
-        <motion.div
-          animate={{ y: [0, 20, 0] }}
-          transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-          className="absolute bottom-1/4 right-[15%] hidden lg:block opacity-20 pointer-events-none"
-        >
-          <div className="p-4 rounded-2xl bg-purple-500/10 border border-purple-500/20 text-purple-500">
-            <Globe size={32} />
-          </div>
-        </motion.div>
       </section>
 
-      {/* Access Grid - Redesigned */}
-      <section className="py-24 px-6 relative">
-        <div className="container mx-auto max-w-6xl">
-          <div className="text-center mb-20">
-            <h2 className="text-3xl md:text-5xl font-bold mb-4">Select Your Portal</h2>
-            <p className="text-slate-400 max-w-xl mx-auto">Tailored interfaces for every aspect of church governance and community life.</p>
+      {/* Access Grid */}
+      <section className="py-32 px-6 relative bg-surface-container-low">
+        <div className="container mx-auto max-w-7xl">
+          <div className="text-center mb-24">
+            <h2 className="display-md text-primary mb-6">Select Your <span className="text-tertiary-fixed-dim italic">Portal</span></h2>
+            <p className="text-on-surface-variant max-w-2xl mx-auto font-medium tracking-wide">Tailored interfaces for every aspect of church governance and community life.</p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
             {[
-              { id: 'admin', name: 'Master Admin', icon: Shield, color: 'text-indigo-400', bg: 'bg-indigo-500/10', glow: 'shadow-indigo-500/10', border: 'border-indigo-500/20', path: '/login/admin', desc: 'Manage users, roles, and global church settings.' },
-              { id: 'bible_leader', name: 'Bible Leader', icon: Users, color: 'text-emerald-400', bg: 'bg-emerald-500/10', glow: 'shadow-emerald-500/10', border: 'border-emerald-500/20', path: '/login/leader', desc: 'Lead groups, track studies, and nurture members.' },
-              { id: 'finance', name: 'Financial Office', icon: DollarSign, color: 'text-amber-400', bg: 'bg-amber-500/10', glow: 'shadow-amber-500/10', border: 'border-amber-500/20', path: '/login/finance', desc: 'Secure budget tracking and financial oversight.' }
+              { id: 'admin', name: 'Master Admin', icon: Shield, color: 'text-primary', bg: 'bg-surface-container', path: '/login/admin', desc: 'Manage users, roles, and global church settings.' },
+              { id: 'bible_leader', name: 'Bible Leader', icon: Users, color: 'text-emerald-700', bg: 'bg-emerald-50', path: '/login/leader', desc: 'Lead groups, track studies, and nurture members.' },
+              { id: 'finance', name: 'Financial Office', icon: DollarSign, color: 'text-amber-700', bg: 'bg-amber-50', path: '/login/finance', desc: 'Secure budget tracking and financial oversight.' }
             ].map((r, i) => (
               <motion.div
                 key={r.id}
@@ -222,26 +199,23 @@ export default function Landing() {
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.1 }}
                 viewport={{ once: true }}
-                whileHover={{ y: -8 }}
-                className={`relative p-8 rounded-[2.5rem] bg-slate-900/40 backdrop-blur-md border ${r.border} overflow-hidden group`}
+                className="editorial-card group hover:scale-[1.02] transition-all duration-500"
               >
-                <div className={`absolute -right-12 -top-12 w-32 h-32 rounded-full ${r.color === 'text-indigo-400' ? 'bg-indigo-500/5' : r.color === 'text-emerald-400' ? 'bg-emerald-500/5' : 'bg-amber-500/5'} blur-2xl transition-all group-hover:scale-150`}></div>
-
-                <div className={`w-14 h-14 rounded-2xl ${r.bg} ${r.color} flex items-center justify-center mb-8 relative z-10`}>
-                  <r.icon size={28} />
+                <div className={`w-16 h-16 rounded-2xl ${r.bg} ${r.color} flex items-center justify-center mb-10 transition-all duration-500 group-hover:rotate-6 shadow-sm`}>
+                  <r.icon size={32} />
                 </div>
 
-                <h3 className="text-2xl font-bold mb-3 relative z-10">{r.name}</h3>
-                <p className="text-slate-400 mb-8 relative z-10 text-sm leading-relaxed">{r.desc}</p>
+                <h3 className="headline-sm text-primary mb-4">{r.name}</h3>
+                <p className="text-on-surface-variant mb-10 text-sm leading-relaxed font-medium">{r.desc}</p>
 
-                <div className="flex flex-col gap-3 relative z-10">
+                <div className="flex flex-col gap-4">
                   <Link to={r.path} className="w-full">
-                    <Button className={`w-full py-6 h-auto rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white border-none shadow-lg ${r.glow}`}>
+                    <Button className="w-full py-6 h-auto rounded-xl bg-primary text-on-primary hover:bg-tertiary-fixed-dim hover:text-primary transition-all duration-500 font-bold">
                       Enter Portal
                     </Button>
                   </Link>
                   <Link to="/signup" state={{ role: r.id }} className="w-full">
-                    <Button variant="outline" className="w-full py-6 h-auto rounded-2xl border-white/10 bg-white/5 hover:bg-white/10 text-white">
+                    <Button variant="outline" className="w-full py-6 h-auto rounded-xl border-primary/10 bg-surface-container-low text-primary hover:bg-surface-container transition-all duration-500 font-bold">
                       Create Role
                     </Button>
                   </Link>
@@ -252,13 +226,13 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* Feature Section - Clean & Modern */}
-      <section className="py-24 px-6 bg-slate-900/20">
-        <div className="container mx-auto max-w-6xl">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center text-left">
+      {/* Feature Section */}
+      <section className="py-32 px-6">
+        <div className="container mx-auto max-w-7xl">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-24 items-center">
             <div>
-              <h2 className="text-4xl md:text-5xl font-black mb-8 leading-tight">Advanced Tools for a <br />Dynamic Community.</h2>
-              <div className="space-y-8">
+              <h2 className="display-md text-primary mb-12 leading-tight">Advanced Tools for a <br /><span className="text-tertiary-fixed-dim italic">Dynamic</span> Community.</h2>
+              <div className="space-y-12">
                 {[
                   { icon: Zap, title: "Real-time Sync", desc: "Instant updates across all leader devices during bible study sessions." },
                   { icon: Shield, title: "Vault-grade Security", desc: "Your congregation's data and finances are protected with top-tier encryption." },
@@ -269,30 +243,29 @@ export default function Landing() {
                     whileInView={{ opacity: 1, x: 0 }}
                     transition={{ delay: i * 0.1 }}
                     key={i}
-                    className="flex gap-6 items-start"
+                    className="flex gap-8 items-start group"
                   >
-                    <div className="w-12 h-12 rounded-xl bg-indigo-600/10 flex items-center justify-center shrink-0">
-                      <f.icon className="text-indigo-400" size={24} />
+                    <div className="w-14 h-14 rounded-2xl bg-surface-container-low flex items-center justify-center shrink-0 text-primary group-hover:bg-primary group-hover:text-on-primary transition-all duration-500">
+                      <f.icon size={28} />
                     </div>
                     <div>
-                      <h4 className="font-bold text-lg mb-1">{f.title}</h4>
-                      <p className="text-slate-400 text-sm">{f.desc}</p>
+                      <h4 className="headline-sm text-primary mb-2">{f.title}</h4>
+                      <p className="text-on-surface-variant text-sm font-medium leading-relaxed">{f.desc}</p>
                     </div>
                   </motion.div>
                 ))}
               </div>
             </div>
             <div className="relative">
-              <div className="aspect-square rounded-[3rem] bg-indigo-600/10 border border-indigo-500/20 flex items-center justify-center p-12 overflow-hidden shadow-2xl shadow-indigo-600/5">
-                <div className="grid grid-cols-2 gap-4 w-full h-full opacity-60">
-                  <div className="bg-indigo-500/20 rounded-3xl animate-pulse"></div>
-                  <div className="bg-purple-500/20 rounded-3xl animate-pulse delay-75"></div>
-                  <div className="bg-blue-500/20 rounded-3xl animate-pulse delay-150"></div>
-                  <div className="bg-pink-500/20 rounded-3xl animate-pulse delay-300"></div>
+              <div className="aspect-square rounded-[4rem] bg-surface-container-low border border-primary/5 flex items-center justify-center p-16 overflow-hidden shadow-whisper">
+                <div className="grid grid-cols-2 gap-6 w-full h-full opacity-40">
+                  <div className="bg-primary/5 rounded-3xl animate-pulse"></div>
+                  <div className="bg-tertiary-fixed-dim/10 rounded-3xl animate-pulse delay-75"></div>
+                  <div className="bg-primary/10 rounded-3xl animate-pulse delay-150"></div>
+                  <div className="bg-tertiary-fixed-dim/5 rounded-3xl animate-pulse delay-300"></div>
                 </div>
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="w-48 h-48 rounded-full bg-indigo-600 blur-[80px] opacity-20"></div>
-                  <Layers size={120} className="text-indigo-500/50 drop-shadow-2xl animate-bounce-slow" />
+                  <Layers size={160} className="text-primary/10 drop-shadow-2xl animate-bounce-slow" />
                 </div>
               </div>
             </div>
@@ -301,18 +274,18 @@ export default function Landing() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-32 px-6">
+      <section className="py-40 px-6">
         <motion.div
-          className="container mx-auto max-w-4xl p-12 md:p-20 rounded-[3rem] bg-gradient-to-br from-indigo-600 to-indigo-800 text-center relative overflow-hidden shadow-2xl shadow-indigo-600/20"
+          className="container mx-auto max-w-5xl p-16 md:p-24 rounded-[4rem] bg-primary text-center relative overflow-hidden shadow-2xl"
         >
-          <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 blur-3xl rounded-full -mr-32 -mt-32"></div>
-          <div className="absolute bottom-0 left-0 w-64 h-64 bg-indigo-900/40 blur-3xl rounded-full -ml-32 -mb-32"></div>
+          <div className="absolute top-0 right-0 w-96 h-96 bg-tertiary-fixed-dim/10 blur-[100px] rounded-full -mr-48 -mt-48"></div>
+          <div className="absolute bottom-0 left-0 w-96 h-96 bg-surface/5 blur-[100px] rounded-full -ml-48 -mb-48"></div>
 
           <div className="relative z-10">
-            <h2 className="text-4xl md:text-6xl font-black text-white mb-8 tracking-tight">Ready to Transform Your Church?</h2>
-            <p className="text-indigo-100/80 mb-12 text-xl font-light">Join hundreds of leaders managing their community with precision and heart.</p>
+            <h2 className="display-md text-on-primary mb-10 tracking-tight">Ready to Transform Your <span className="text-tertiary-fixed-dim italic">Church?</span></h2>
+            <p className="text-on-primary/70 mb-16 text-xl font-medium tracking-wide max-w-2xl mx-auto">Join hundreds of leaders managing their community with precision and heart.</p>
             <Link to="/signup">
-              <Button className="bg-white text-indigo-600 hover:bg-slate-100 rounded-2xl px-12 py-8 text-xl h-auto font-bold border-none shadow-xl">
+              <Button className="bg-tertiary-fixed-dim text-primary hover:bg-surface rounded-2xl px-16 py-8 text-2xl h-auto font-bold border-none shadow-xl transition-all duration-500">
                 Get Started Now
               </Button>
             </Link>
@@ -321,30 +294,35 @@ export default function Landing() {
       </section>
 
       {/* Footer */}
-      <footer className="py-20 px-6 border-t border-white/5 bg-slate-900/20">
-        <div className="container mx-auto max-w-6xl">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-10">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-lg bg-indigo-600 grid place-items-center">
-                <Layers size={18} className="text-white" />
+      <footer className="py-32 px-6 border-t border-primary/5 bg-surface-container-low">
+        <div className="container mx-auto max-w-7xl">
+          <div className="flex flex-col md:flex-row justify-between items-start gap-16">
+            <div className="flex flex-col gap-6">
+              <div className="flex items-center gap-4">
+                <div className="w-10 h-10 rounded-xl bg-primary grid place-items-center">
+                  <Layers size={20} className="text-on-primary" />
+                </div>
+                <h2 className="text-xl font-heading font-bold tracking-tight text-primary">GMKC<span className="text-tertiary-fixed-dim italic">CHURCH</span></h2>
               </div>
-              <h2 className="text-lg font-bold tracking-tight text-white">GMKC<span className="text-indigo-400">CHURCH</span></h2>
+              <p className="text-on-surface-variant text-sm max-w-xs leading-relaxed font-medium">
+                Empowering faith communities through elegant, intentional management solutions.
+              </p>
             </div>
 
-            <div className="flex gap-12">
-              <div className="flex flex-col gap-4">
-                <h4 className="text-white font-bold text-sm">Product</h4>
-                <Link to="#" className="text-slate-400 hover:text-indigo-400 text-sm">Features</Link>
-                <Link to="#" className="text-slate-400 hover:text-indigo-400 text-sm">Security</Link>
+            <div className="flex gap-24">
+              <div className="flex flex-col gap-6">
+                <h4 className="text-primary font-black text-[10px] uppercase tracking-widest">Product</h4>
+                <Link to="#" className="text-on-surface-variant hover:text-primary text-sm font-medium transition-colors">Features</Link>
+                <Link to="#" className="text-on-surface-variant hover:text-primary text-sm font-medium transition-colors">Security</Link>
               </div>
-              <div className="flex flex-col gap-4">
-                <h4 className="text-white font-bold text-sm">Community</h4>
-                <Link to="#" className="text-slate-400 hover:text-indigo-400 text-sm">Events</Link>
-                <Link to="#" className="text-slate-400 hover:text-indigo-400 text-sm">Training</Link>
+              <div className="flex flex-col gap-6">
+                <h4 className="text-primary font-black text-[10px] uppercase tracking-widest">Community</h4>
+                <Link to="#" className="text-on-surface-variant hover:text-primary text-sm font-medium transition-colors">Events</Link>
+                <Link to="#" className="text-on-surface-variant hover:text-primary text-sm font-medium transition-colors">Training</Link>
               </div>
             </div>
 
-            <div className="text-slate-500 text-sm">
+            <div className="text-on-surface-variant/40 text-[10px] font-black uppercase tracking-widest">
               &copy; 2026 GMKC Church. All Rights Reserved.
             </div>
           </div>
@@ -354,10 +332,10 @@ export default function Landing() {
       <style jsx>{`
         @keyframes bounce-slow {
           0%, 100% { transform: translateY(0); }
-          50% { transform: translateY(-20px); }
+          50% { transform: translateY(-30px); }
         }
         .animate-bounce-slow {
-          animation: bounce-slow 6s ease-in-out infinite;
+          animation: bounce-slow 8s ease-in-out infinite;
         }
       `}</style>
     </div>

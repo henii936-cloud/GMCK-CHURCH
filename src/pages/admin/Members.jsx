@@ -5,7 +5,8 @@ import {
   Users, UserPlus, Search, Filter, Mail, Phone, 
   MoreVertical, Edit2, Trash2, CheckCircle2, 
   XCircle, FilterX, UserCheck, MapPin, 
-  Calendar, CreditCard, ChevronDown, BookOpen
+  Calendar, CreditCard, ChevronDown, BookOpen,
+  Camera, Upload
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 
@@ -29,6 +30,10 @@ export default function Members() {
     gender: "Male",
     group_id: "",
     address: "",
+    status: "Active",
+    marital_status: "Unmarried",
+    leave_status: "Active",
+    image_url: "",
     join_date: new Date().toISOString().split('T')[0]
   });
 
@@ -63,6 +68,10 @@ export default function Members() {
         gender: member.gender || "Male",
         group_id: member.group_id || "",
         address: member.address || "",
+        status: member.status || "Active",
+        marital_status: member.marital_status || "Unmarried",
+        leave_status: member.leave_status || "Active",
+        image_url: member.image_url || "",
         join_date: member.join_date || new Date().toISOString().split('T')[0]
       });
     } else {
@@ -74,10 +83,29 @@ export default function Members() {
         gender: "Male",
         group_id: "",
         address: "",
+        status: "Active",
+        marital_status: "Unmarried",
+        leave_status: "Active",
+        image_url: "",
         join_date: new Date().toISOString().split('T')[0]
       });
     }
     setShowModal(true);
+  };
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      if (file.size > 2 * 1024 * 1024) {
+        setError("Image size must be less than 2MB");
+        return;
+      }
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setFormData({ ...formData, image_url: reader.result });
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   const handleSaveMember = async (e) => {
@@ -120,6 +148,19 @@ export default function Members() {
       setTimeout(() => setSuccess(null), 3000);
     } catch (err) {
       setError("Failed to delete. Restricted row.");
+    }
+  };
+
+  const handleToggleStatus = async (member) => {
+    try {
+      const newStatus = member.status === "Active" ? "Inactive" : "Active";
+      await memberService.updateMember(member.id, { status: newStatus });
+      setSuccess(`Member marked as ${newStatus}`);
+      loadData();
+      setTimeout(() => setSuccess(null), 3000);
+    } catch (err) {
+      console.error("Toggle status error:", err);
+      setError("Failed to update status.");
     }
   };
 
@@ -209,7 +250,9 @@ export default function Members() {
               <tr style={{ background: 'rgba(255,255,255,0.02)', borderBottom: '1px solid var(--border)' }}>
                 <th style={{ padding: '20px 24px', textAlign: 'left', color: 'var(--text-muted)', fontSize: '0.75rem', fontWeight: '800', textTransform: 'uppercase' }}>Participant Profile</th>
                 <th style={{ padding: '20px 24px', textAlign: 'left', color: 'var(--text-muted)', fontSize: '0.75rem', fontWeight: '800', textTransform: 'uppercase' }}>Contact Info</th>
-                <th style={{ padding: '20px 24px', textAlign: 'left', color: 'var(--text-muted)', fontSize: '0.75rem', fontWeight: '800', textTransform: 'uppercase' }}>Gender</th>
+                <th style={{ padding: '20px 24px', textAlign: 'left', color: 'var(--text-muted)', fontSize: '0.75rem', fontWeight: '800', textTransform: 'uppercase' }}>Status</th>
+                <th style={{ padding: '20px 24px', textAlign: 'left', color: 'var(--text-muted)', fontSize: '0.75rem', fontWeight: '800', textTransform: 'uppercase' }}>Leave</th>
+                <th style={{ padding: '20px 24px', textAlign: 'left', color: 'var(--text-muted)', fontSize: '0.75rem', fontWeight: '800', textTransform: 'uppercase' }}>Marital</th>
                 <th style={{ padding: '20px 24px', textAlign: 'left', color: 'var(--text-muted)', fontSize: '0.75rem', fontWeight: '800', textTransform: 'uppercase' }}>Study Unit</th>
                 <th style={{ padding: '20px 24px', textAlign: 'left', color: 'var(--text-muted)', fontSize: '0.75rem', fontWeight: '800', textTransform: 'uppercase' }}>Join Date</th>
                 <th style={{ padding: '20px 24px', textAlign: 'right' }}>Actions</th>
@@ -220,9 +263,18 @@ export default function Members() {
                 <tr key={m.id} className="table-row-hover" style={{ borderBottom: '1px solid var(--border)' }}>
                   <td style={{ padding: '20px 24px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                      <div style={{ width: 44, height: 44, borderRadius: 14, background: 'var(--primary)', color: 'white', display: 'grid', placeItems: 'center', fontWeight: 'bold' }}>
-                        {m.full_name.charAt(0)}
-                      </div>
+                      {m.image_url ? (
+                        <img 
+                          src={m.image_url} 
+                          alt={m.full_name} 
+                          referrerPolicy="no-referrer"
+                          style={{ width: 44, height: 44, borderRadius: '50%', objectFit: 'cover', border: '2px solid var(--primary)22' }} 
+                        />
+                      ) : (
+                        <div style={{ width: 44, height: 44, borderRadius: 14, background: 'var(--primary)', color: 'white', display: 'grid', placeItems: 'center', fontWeight: 'bold' }}>
+                          {m.full_name.charAt(0)}
+                        </div>
+                      )}
                       <div>
                         <p style={{ fontWeight: '700', margin: 0 }}>{m.full_name}</p>
                         <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', margin: 0 }}>{m.address}</p>
@@ -236,13 +288,38 @@ export default function Members() {
                     </div>
                   </td>
                   <td style={{ padding: '20px 24px' }}>
+                    <button 
+                      onClick={() => handleToggleStatus(m)}
+                      style={{ 
+                        padding: '4px 12px', borderRadius: '100px', fontSize: '0.7rem', fontWeight: '800',
+                        background: m.status === 'Active' ? 'rgba(16,185,129,0.1)' : 'rgba(239,68,68,0.1)',
+                        color: m.status === 'Active' ? '#10b981' : '#ef4444',
+                        border: `1px solid ${m.status === 'Active' ? '#10b981' : '#ef4444'}22`,
+                        cursor: 'pointer',
+                        transition: 'all 0.2s'
+                      }}
+                    >
+                      {m.status?.toUpperCase() || 'ACTIVE'}
+                    </button>
+                  </td>
+                  <td style={{ padding: '20px 24px' }}>
+                    <span style={{ 
+                      padding: '4px 12px', borderRadius: '100px', fontSize: '0.7rem', fontWeight: '800',
+                      background: m.leave_status === 'Active' ? 'rgba(16,185,129,0.1)' : 'rgba(245,158,11,0.1)',
+                      color: m.leave_status === 'Active' ? '#10b981' : '#f59e0b',
+                      border: `1px solid ${m.leave_status === 'Active' ? '#10b981' : '#f59e0b'}22`
+                    }}>
+                      {m.leave_status?.toUpperCase() || 'ACTIVE'}
+                    </span>
+                  </td>
+                  <td style={{ padding: '20px 24px' }}>
                     <span style={{ 
                       padding: '4px 12px', borderRadius: '100px', fontSize: '0.7rem', fontWeight: '800',
                       background: 'rgba(99,102,241,0.1)',
                       color: 'var(--primary)',
                       border: '1px solid var(--primary)22'
                     }}>
-                      {m.gender.toUpperCase()}
+                      {m.marital_status?.toUpperCase() || 'UNMARRIED'}
                     </span>
                   </td>
                   <td style={{ padding: '20px 24px' }}>
@@ -296,6 +373,38 @@ export default function Members() {
               <div className="p-8 overflow-y-auto custom-scrollbar">
                 <form id="member-form" onSubmit={handleSaveMember} className="space-y-8">
                   
+                  {/* Photo Upload Section */}
+                  <div className="flex flex-col items-center justify-center py-4">
+                    <div className="relative group">
+                      <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-primary/20 bg-muted flex items-center justify-center transition-all group-hover:border-primary/40">
+                        {formData.image_url ? (
+                          <img 
+                            src={formData.image_url} 
+                            alt="Preview" 
+                            className="w-full h-full object-cover"
+                            referrerPolicy="no-referrer"
+                          />
+                        ) : (
+                          <Users size={48} className="text-muted-foreground" />
+                        )}
+                      </div>
+                      <label 
+                        htmlFor="image-upload" 
+                        className="absolute bottom-0 right-0 p-2.5 bg-primary text-white rounded-full cursor-pointer shadow-lg hover:scale-110 transition-transform"
+                      >
+                        <Camera size={18} />
+                        <input 
+                          id="image-upload" 
+                          type="file" 
+                          className="hidden" 
+                          accept="image/*" 
+                          onChange={handleImageChange}
+                        />
+                      </label>
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-3 font-medium">Click camera icon to upload photo</p>
+                  </div>
+
                   {/* Personal Information Section */}
                   <div>
                     <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
@@ -337,6 +446,48 @@ export default function Members() {
                             onChange={e => setFormData({...formData, gender: e.target.value})}
                           >
                             {['Male', 'Female', 'Other'].map(s => <option key={s} value={s}>{s}</option>)}
+                          </select>
+                          <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" size={18} />
+                        </div>
+                      </div>
+
+                      <div className="space-y-2">
+                        <label className="text-sm font-semibold text-foreground">Marital Status</label>
+                        <div className="relative">
+                          <select 
+                            className="w-full h-11 px-4 rounded-xl border border-input bg-background text-foreground focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all appearance-none" 
+                            value={formData.marital_status} 
+                            onChange={e => setFormData({...formData, marital_status: e.target.value})}
+                          >
+                            {['Unmarried', 'Married'].map(s => <option key={s} value={s}>{s}</option>)}
+                          </select>
+                          <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" size={18} />
+                        </div>
+                      </div>
+
+                      <div className="space-y-2">
+                        <label className="text-sm font-semibold text-foreground">Account Status</label>
+                        <div className="relative">
+                          <select 
+                            className="w-full h-11 px-4 rounded-xl border border-input bg-background text-foreground focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all appearance-none" 
+                            value={formData.status} 
+                            onChange={e => setFormData({...formData, status: e.target.value})}
+                          >
+                            {['Active', 'Inactive'].map(s => <option key={s} value={s}>{s}</option>)}
+                          </select>
+                          <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" size={18} />
+                        </div>
+                      </div>
+
+                      <div className="space-y-2">
+                        <label className="text-sm font-semibold text-foreground">Leave Status</label>
+                        <div className="relative">
+                          <select 
+                            className="w-full h-11 px-4 rounded-xl border border-input bg-background text-foreground focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all appearance-none" 
+                            value={formData.leave_status} 
+                            onChange={e => setFormData({...formData, leave_status: e.target.value})}
+                          >
+                            {['Active', 'On Leave', 'Sick', 'Travelled', 'Suspended'].map(s => <option key={s} value={s}>{s}</option>)}
                           </select>
                           <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" size={18} />
                         </div>

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useAuth } from "../../context/AuthContext";
 import { useNavigate, Link } from "react-router-dom";
-import { motion } from "framer-motion";
+import { motion } from "motion/react";
 import { ShieldCheck, Mail, Lock, Loader2, ChevronLeft, ArrowRight } from "lucide-react";
 import { Button, Input, Card } from "../../components/common/UI";
 
@@ -16,10 +16,10 @@ export default function AdminLogin() {
 
   const theme = {
     name: "Administrator",
-    color: "text-indigo-500",
-    bg: "bg-indigo-500",
-    shadow: "shadow-indigo-500/30",
-    gradient: "from-indigo-500/20 to-transparent",
+    color: "text-primary",
+    bg: "bg-primary",
+    shadow: "shadow-primary/10",
+    gradient: "from-primary/10 to-transparent",
     icon: ShieldCheck
   };
 
@@ -57,34 +57,40 @@ export default function AdminLogin() {
   };
 
   return (
-    <div className={`grid place-items-center min-h-screen p-5 bg-[radial-gradient(at_0%_0%,rgba(99,102,241,0.2)_0,transparent_40%)] bg-background text-foreground`}>
-      <div className="fixed top-10 left-10">
-        <Link to="/" className="flex items-center gap-2 text-muted-foreground font-semibold hover:text-foreground transition-colors">
-          <ChevronLeft size={20} /> Back to Home
+    <div className={`grid place-items-center min-h-screen p-6 bg-surface text-primary relative overflow-hidden`}>
+      <div className="absolute top-0 left-0 w-full h-full opacity-5 pointer-events-none">
+        <div className="absolute top-[-10%] right-[-10%] w-96 h-96 rounded-full bg-primary blur-[100px]" />
+        <div className="absolute bottom-[-10%] left-[-10%] w-96 h-96 rounded-full bg-tertiary-fixed-dim blur-[100px]" />
+      </div>
+
+      <div className="fixed top-12 left-12 z-10">
+        <Link to="/" className="flex items-center gap-3 text-primary/40 font-black uppercase tracking-[0.2em] text-[11px] hover:text-primary transition-colors">
+          <ChevronLeft size={16} /> Home Sanctuary
         </Link>
       </div>
 
       <motion.div 
-        initial={{ opacity: 0, y: 20 }}
+        initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
-        className="w-full max-w-[460px]"
+        transition={{ duration: 0.8, ease: "easeOut" }}
+        className="w-full max-w-lg relative z-10"
       >
-        <div className="text-center mb-10">
-          <div className={`w-20 h-20 rounded-3xl ${theme.bg} grid place-items-center mx-auto mb-6 shadow-xl ${theme.shadow}`}>
-            <theme.icon size={36} className="text-white" />
+        <div className="text-center mb-16">
+          <div className={`w-24 h-24 rounded-[3rem] ${theme.bg} grid place-items-center mx-auto mb-8 shadow-xl ${theme.shadow}`}>
+            <theme.icon size={48} className="text-on-primary" />
           </div>
 
-          <h1 className="text-4xl font-extrabold mb-2">
-            Admin<span className={theme.color}> Portal</span>
+          <h1 className="display-sm text-primary mb-4">
+            Admin<span className="text-tertiary-fixed-dim italic"> Portal</span>
           </h1>
 
-          <p className="text-muted-foreground">
-            Church Management System Control Center
+          <p className="label-sm opacity-60 uppercase tracking-widest">
+            Church Management Control Center
           </p>
         </div>
 
-        <Card className="p-10 md:p-12">
-          <form onSubmit={handleSubmit} className="flex flex-col gap-6">
+        <Card className="p-12 md:p-16 shadow-whisper border-none bg-surface-container">
+          <form onSubmit={handleSubmit} className="flex flex-col gap-8">
             
             <Input 
               label="Admin Email" 
@@ -108,23 +114,23 @@ export default function AdminLogin() {
 
             {error && (
               <motion.div 
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: 'auto' }}
-                className="text-destructive text-sm bg-destructive/10 p-3 rounded-xl border border-destructive/20 font-semibold"
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="p-4 rounded-xl bg-red-50 text-red-600 text-xs font-bold border border-red-100 text-center"
               >
                 {error}
               </motion.div>
             )}
 
-            <Button type="submit" loading={loading} className={`h-14 ${theme.bg} hover:opacity-90 text-white border-none shadow-lg ${theme.shadow}`}>
-              Sign In to Dashboard <ArrowRight size={18} className="ml-2" />
+            <Button type="submit" loading={loading} className={`h-16 ${theme.bg} hover:opacity-90 text-on-primary border-none shadow-xl ${theme.shadow}`}>
+              Sign In to Dashboard <ArrowRight size={20} className="ml-3" />
             </Button>
           </form>
         </Card>
 
-        <div className="mt-8 text-center">
-          <p className="text-muted-foreground text-sm">
-            Not an Admin? <Link to="/login/leader" className={`${theme.color} font-semibold hover:underline`}>Leader Login</Link> or <Link to="/login/finance" className={`${theme.color} font-semibold hover:underline`}>Finance Login</Link>
+        <div className="mt-12 text-center">
+          <p className="text-primary/40 text-xs font-medium">
+            Not an Admin? <Link to="/login/leader" className="text-primary font-black uppercase tracking-widest hover:underline ml-2">Leader Login</Link> or <Link to="/login/finance" className="text-primary font-black uppercase tracking-widest hover:underline ml-2">Finance Login</Link>
           </p>
         </div>
       </motion.div>

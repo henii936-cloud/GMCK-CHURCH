@@ -30,8 +30,21 @@ export default function Layout({ allowedRoles }) {
   return (
     <div className="dashboard-layout">
       <Sidebar />
-      <main className="main-content">
-        <Outlet />
+      <main className="flex-1 min-h-screen bg-surface relative overflow-hidden">
+        {/* Decorative Background Elements */}
+        <div className="absolute top-0 right-0 w-[40vw] h-[40vw] rounded-full bg-primary/5 blur-[120px] pointer-events-none" />
+        <div className="absolute bottom-0 left-0 w-[30vw] h-[30vw] rounded-full bg-tertiary-fixed-dim/5 blur-[100px] pointer-events-none" />
+        
+        {/* Vertical Rail Text (Editorial Touch) */}
+        <div className="fixed right-8 top-1/2 -translate-y-1/2 vertical-text opacity-10 pointer-events-none select-none">
+          <span className="text-[10px] font-black uppercase tracking-[0.5em] text-primary">
+            The Digital Sanctuary • GMKC Church ERP • Est. 2026
+          </span>
+        </div>
+
+        <div className="main-content relative z-10">
+          <Outlet />
+        </div>
       </main>
     </div>
   );

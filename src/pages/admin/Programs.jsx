@@ -9,7 +9,7 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 
-export default function Activities() {
+export default function Programs() {
   const location = useLocation();
   const navigate = useNavigate();
   const groupFilter = location.state || null;
@@ -105,14 +105,14 @@ export default function Activities() {
     <div className="animate-fade-in">
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '32px' }}>
         <div>
-          <h1 style={{ fontSize: '2.25rem', fontWeight: '800', letterSpacing: '-0.025em' }}>Church <span style={{ color: 'var(--primary)' }}>Activities</span></h1>
+          <h1 style={{ fontSize: '2.25rem', fontWeight: '800', letterSpacing: '-0.025em' }}>Church <span style={{ color: 'var(--primary)' }}>Programs</span></h1>
           <p style={{ color: 'var(--text-muted)', fontSize: '1rem', fontWeight: '500' }}>Real-time logs and strategic program planning</p>
           {groupFilter?.groupName && (
             <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', marginTop: '12px', padding: '6px 14px', borderRadius: '20px', background: 'rgba(99, 102, 241, 0.15)', color: 'var(--primary)', fontSize: '0.875rem', fontWeight: '700' }}>
               <Filter size={14} />
               Viewing: {groupFilter.groupName}
               <button 
-                onClick={() => navigate('/admin/activities', { replace: true, state: null })}
+                onClick={() => navigate('/admin/programs', { replace: true, state: null })}
                 style={{ background: 'none', border: 'none', color: 'var(--primary)', cursor: 'pointer', display: 'flex', alignItems: 'center', padding: '2px' }}
                 title="Show all activities"
               >

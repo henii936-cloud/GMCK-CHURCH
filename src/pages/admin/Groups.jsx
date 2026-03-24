@@ -165,9 +165,9 @@ export default function Groups() {
                       variant="secondary" 
                       style={{ flex: 1, padding: '8px', fontSize: '0.875rem' }} 
                       icon={Activity}
-                      onClick={() => navigate('/admin/activities', { state: { groupId: group.id, groupName: group.group_name } })}
+                      onClick={() => navigate('/admin/programs', { state: { groupId: group.id, groupName: group.group_name } })}
                     >
-                      Activities
+                      Programs
                     </Button>
                   </div>
                 

@@ -132,6 +132,16 @@ export const financeService = {
       .select();
     if (error) throw error;
     return data;
+  },
+
+  updateBudgetUsage: async (id, is_used) => {
+    const { data, error } = await supabase
+      .from("budgets")
+      .update({ is_used })
+      .eq("id", id)
+      .select();
+    if (error) throw error;
+    return data;
   }
 };
 

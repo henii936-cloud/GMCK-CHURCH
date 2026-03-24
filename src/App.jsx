@@ -22,6 +22,7 @@ import LeaderAttendance from "./pages/leader/Attendance";
 import LeaderStudy from "./pages/leader/Study";
 import LeaderMembers from "./pages/leader/Members";
 import RecordGiving from "./pages/finance/RecordGiving";
+import ApprovedBudgets from "./pages/finance/ApprovedBudgets";
 import LeaderRoute from "./routes/LeaderRoute";
 import AdminRoute from "./routes/AdminRoute";
 import FinanceRoute from "./routes/FinanceRoute";
@@ -70,6 +71,7 @@ export default function App() {
           <Route path="/finance" element={<Layout allowedRoles={['finance']} />}>
             <Route index element={<FinanceDashboard />} />
             <Route path="record" element={<RecordGiving />} />
+            <Route path="budgets" element={<ApprovedBudgets />} />
           </Route>
 
           <Route path="/" element={<Landing />} />

@@ -117,7 +117,8 @@ CREATE TABLE IF NOT EXISTS public.budgets (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   name TEXT NOT NULL,
   amount DECIMAL(12,2) NOT NULL DEFAULT 0,
-  status TEXT DEFAULT 'Pending' CHECK (status IN ('Pending', 'Approved', 'Rejected')),
+  status TEXT DEFAULT 'Pending' CHECK (status IN ('Pending', 'Approved', 'Rejected', 'Used')),
+  is_used BOOLEAN DEFAULT FALSE, -- Track if funds were spent
   created_at TIMESTAMPTZ DEFAULT timezone('utc', now()) NOT NULL
 );
 

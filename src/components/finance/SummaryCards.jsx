@@ -5,13 +5,18 @@ export default function SummaryCards({ transactions = [] }) {
   const sumByType = (type) => 
     transactions.filter(t => t.type === type).reduce((sum, t) => sum + (t.amount || 0), 0);
 
+  const totalIncome = sumByType('tithe') + sumByType('offering') + sumByType('donation');
+  const totalExpense = sumByType('expense');
+  const netBalance = totalIncome - totalExpense;
+
   const stats = [
-    { label: "Total Tithes", val: sumByType('tithe'), icon: Wallet, color: '#002c53', trend: '+12.5%', isUp: true },
-    { label: "Total Expense", val: sumByType('expense'), icon: ArrowDownRight, color: '#eac077', trend: '+8.4%', isUp: false },
+    { label: "Total Income", val: totalIncome, icon: Wallet, color: '#002c53', trend: '+12.5%', isUp: true },
+    { label: "Total Expense", val: totalExpense, icon: ArrowDownRight, color: '#eac077', trend: '+8.4%', isUp: false },
+    { label: "Net Balance", val: netBalance, icon: DollarSign, color: netBalance >= 0 ? '#10b981' : '#ef4444', trend: 'Stable', isUp: netBalance >= 0 },
   ];
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
       {stats.map((stat, i) => (
         <motion.div 
           key={stat.label}

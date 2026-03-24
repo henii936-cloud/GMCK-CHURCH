@@ -51,6 +51,8 @@ export default function Finance() {
   const totalOfferings = transactions.filter(t => t.type === 'offering' || t.category === 'Offering').reduce((sum, t) => sum + (t.amount || 0), 0);
   const totalDonations = transactions.filter(t => t.type === 'donation' || t.category === 'Donation').reduce((sum, t) => sum + (t.amount || 0), 0);
   const totalIncome = totalTithes + totalOfferings + totalDonations;
+  const totalExpenses = transactions.filter(t => t.type === 'expense' || t.category === 'Expense').reduce((sum, t) => sum + (t.amount || 0), 0);
+  const netBalance = totalIncome - totalExpenses;
 
   const approvedBudgets = budgets.filter(b => b.status === 'Approved');
   const pendingBudgets = budgets.filter(b => b.status === 'Pending');
@@ -68,34 +70,27 @@ export default function Finance() {
         <Button variant="danger" icon={LogOut} onClick={handleLogout}>Sign Out</Button>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '24px', marginBottom: '32px' }}>
-        <Card style={{ padding: '24px', borderLeft: '4px solid #10b981' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', color: '#10b981', marginBottom: '12px' }}>
-            <TrendingUp size={20} />
-            <span style={{ fontSize: '0.875rem', fontWeight: '700', textTransform: 'uppercase' }}>Total Tithes</span>
-          </div>
-          <h2 style={{ fontSize: '2rem', fontWeight: '900', margin: 0 }}>${totalTithes.toLocaleString()}</h2>
-        </Card>
-        <Card style={{ padding: '24px', borderLeft: '4px solid #3b82f6' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', color: '#3b82f6', marginBottom: '12px' }}>
-            <TrendingUp size={20} />
-            <span style={{ fontSize: '0.875rem', fontWeight: '700', textTransform: 'uppercase' }}>Total Offerings</span>
-          </div>
-          <h2 style={{ fontSize: '2rem', fontWeight: '900', margin: 0 }}>${totalOfferings.toLocaleString()}</h2>
-        </Card>
-        <Card style={{ padding: '24px', borderLeft: '4px solid #8b5cf6' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', color: '#8b5cf6', marginBottom: '12px' }}>
-            <TrendingUp size={20} />
-            <span style={{ fontSize: '0.875rem', fontWeight: '700', textTransform: 'uppercase' }}>Total Donations</span>
-          </div>
-          <h2 style={{ fontSize: '2rem', fontWeight: '900', margin: 0 }}>${totalDonations.toLocaleString()}</h2>
-        </Card>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '24px', marginBottom: '32px' }}>
         <Card style={{ padding: '24px', borderLeft: '4px solid var(--primary)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px', color: 'var(--primary)', marginBottom: '12px' }}>
             <DollarSign size={20} />
             <span style={{ fontSize: '0.875rem', fontWeight: '700', textTransform: 'uppercase' }}>Total Income</span>
           </div>
           <h2 style={{ fontSize: '2rem', fontWeight: '900', margin: 0 }}>${totalIncome.toLocaleString()}</h2>
+        </Card>
+        <Card style={{ padding: '24px', borderLeft: '4px solid #f59e0b' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', color: '#f59e0b', marginBottom: '12px' }}>
+            <TrendingUp size={20} style={{ transform: 'rotate(90deg)' }} />
+            <span style={{ fontSize: '0.875rem', fontWeight: '700', textTransform: 'uppercase' }}>Total Expenses</span>
+          </div>
+          <h2 style={{ fontSize: '2rem', fontWeight: '900', margin: 0 }}>${totalExpenses.toLocaleString()}</h2>
+        </Card>
+        <Card style={{ padding: '24px', borderLeft: `4px solid ${netBalance >= 0 ? '#10b981' : '#ef4444'}` }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', color: netBalance >= 0 ? '#10b981' : '#ef4444', marginBottom: '12px' }}>
+            <TrendingUp size={20} />
+            <span style={{ fontSize: '0.875rem', fontWeight: '700', textTransform: 'uppercase' }}>Net Balance</span>
+          </div>
+          <h2 style={{ fontSize: '2rem', fontWeight: '900', margin: 0 }}>${netBalance.toLocaleString()}</h2>
         </Card>
       </div>
 

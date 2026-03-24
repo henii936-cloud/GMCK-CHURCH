@@ -24,7 +24,6 @@ export default function Sidebar() {
       { name: "Group Leaders", icon: ShieldCheck, path: "/admin/leaders" },
       { name: "Study Progress", icon: BookOpen, path: "/admin/progress" },
       { name: "Events", icon: Activity, path: "/admin/events" },
-      { name: "Programs", icon: ClipboardList, path: "/admin/programs" },
       { name: "Finance", icon: DollarSign, path: "/admin/finance" },
     ],
     bible_leader: [

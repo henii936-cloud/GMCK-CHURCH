@@ -60,7 +60,7 @@ export default function App() {
             <Route path="progress" element={<AdminProgress />} />
             <Route path="events" element={<AdminEvents />} />
             <Route path="finance" element={<AdminFinance />} />
-            <Route path="activities" element={<AdminActivities />} />
+            <Route path="programs" element={<AdminActivities />} />
           </Route>
 
           <Route path="/leader" element={<LeaderRoute><Layout allowedRoles={['bible_leader']} /></LeaderRoute>}>

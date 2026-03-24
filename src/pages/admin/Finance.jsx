@@ -4,6 +4,7 @@ import { Card, Button } from "../../components/common/UI";
 import { DollarSign, TrendingUp, CheckCircle, Clock, LogOut } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
+import TransactionTable from "../../components/finance/TransactionTable";
 
 export default function Finance() {
   const { logout } = useAuth();
@@ -172,6 +173,10 @@ export default function Finance() {
             )}
           </div>
         </Card>
+      </div>
+
+      <div style={{ marginTop: '40px' }}>
+        <TransactionTable transactions={transactions} />
       </div>
     </div>
   );

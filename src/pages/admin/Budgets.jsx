@@ -202,6 +202,23 @@ export default function Budgets() {
                               </span>
                             </div>
                             
+                            {isApproved && (
+                              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '12px', paddingTop: '12px', borderTop: '1px solid var(--border)' }}>
+                                <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: '600' }}>UTILITY STATUS</span>
+                                <span style={{ 
+                                  fontSize: '0.65rem', 
+                                  fontWeight: '900', 
+                                  padding: '2px 8px', 
+                                  borderRadius: '4px', 
+                                  background: budget.is_used ? 'rgba(255,255,255,0.05)' : 'rgba(16, 185, 129, 0.1)',
+                                  color: budget.is_used ? 'var(--text-muted)' : '#10b981',
+                                  border: `1px solid ${budget.is_used ? 'var(--border)' : 'rgba(16, 185, 129, 0.2)'}`
+                                }}>
+                                  {budget.is_used ? 'FUNDS USED' : 'FUNDS AVAILABLE'}
+                                </span>
+                              </div>
+                            )}
+                            
                             {!isApproved && (
                               <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '4px', marginTop: '12px' }}>
                                 <AlertCircle size={12} color="#f59e0b" /> Pending admin review in Finance

@@ -124,7 +124,20 @@ export default function Finance() {
                       <div style={{ fontSize: '0.65rem', color: 'var(--primary)', fontWeight: '800', textTransform: 'uppercase', marginBottom: '2px' }}>{team}</div>
                       <span style={{ fontWeight: '600' }}>{name}</span>
                     </div>
-                    <span style={{ fontWeight: '800', color: 'var(--primary)' }}>${b.amount.toLocaleString()}</span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                      <span style={{ 
+                        fontSize: '0.65rem', 
+                        fontWeight: '900', 
+                        padding: '2px 8px', 
+                        borderRadius: '4px', 
+                        background: b.is_used ? 'rgba(255,255,255,0.05)' : 'rgba(16, 185, 129, 0.1)',
+                        color: b.is_used ? 'var(--text-muted)' : '#10b981',
+                        border: `1px solid ${b.is_used ? 'var(--border)' : 'rgba(16, 185, 129, 0.2)'}`
+                      }}>
+                        {b.is_used ? 'USED' : 'AVAILABLE'}
+                      </span>
+                      <span style={{ fontWeight: '800', color: 'var(--primary)' }}>${b.amount.toLocaleString()}</span>
+                    </div>
                   </div>
                 );
               })}

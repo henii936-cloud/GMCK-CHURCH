@@ -16,7 +16,7 @@ import AdminFinance from "./pages/admin/Finance";
 import AdminMembers from "./pages/admin/Members";
 import AdminGroups from "./pages/admin/Groups";
 import AdminReports from "./pages/admin/Reports";
-import AdminActivities from "./pages/admin/Activities";
+import AdminActivities from "./pages/admin/Programs";
 import LeaderAttendance from "./pages/leader/Attendance";
 import LeaderStudy from "./pages/leader/Study";
 import LeaderMembers from "./pages/leader/Members";
@@ -40,7 +40,7 @@ export default function App() {
   useEffect(() => {
     document.title = "ChurchERP - Dashboard";
   }, []);
-  
+
   return (
     <Router>
       <AuthProvider>
@@ -50,7 +50,7 @@ export default function App() {
           <Route path="/login/finance" element={<FinanceLogin />} />
           <Route path="/login" element={<Navigate to="/login/admin" />} />
           <Route path="/signup" element={<Signup />} />
-          
+
           <Route path="/admin" element={<AdminRoute><Layout allowedRoles={['admin']} /></AdminRoute>}>
             <Route index element={<AdminDashboard />} />
             <Route path="members" element={<AdminMembers />} />

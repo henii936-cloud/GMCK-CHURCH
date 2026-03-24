@@ -178,8 +178,10 @@ export default function Activities() {
                     </div>
                     <div style={{ width: '1px', height: '40px', background: 'var(--border)' }} />
                     <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                      <div style={{ width: 32, height: 32, borderRadius: '50%', background: 'var(--primary)', opacity: 0.8, display: 'grid', placeItems: 'center', fontSize: '0.75rem', fontWeight: 'bold' }}>{a.profiles?.name?.charAt(0)}</div>
-                      <span style={{ fontWeight: '600', fontSize: '0.9rem' }}>{a.profiles?.name}</span>
+                      <div style={{ width: 32, height: 32, borderRadius: '50%', background: 'var(--primary)', opacity: 0.8, display: 'grid', placeItems: 'center', fontSize: '0.75rem', fontWeight: 'bold' }}>
+                        {(a.profiles?.name || 'A').charAt(0).toUpperCase()}
+                      </div>
+                      <span style={{ fontWeight: '600', fontSize: '0.9rem' }}>{a.profiles?.name || 'Admin'}</span>
                     </div>
                     <div style={{ textAlign: 'right' }}>
                       <p style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.875rem', color: 'var(--text-muted)', fontWeight: '600' }}><Clock size={14} /> {new Date(a.created_at).toLocaleDateString()}</p>

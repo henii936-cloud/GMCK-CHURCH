@@ -64,12 +64,16 @@ export default function RecordGiving() {
     setSaving(true);
     setMessage("");
     try {
-      await financeService.createTransaction({
+      const transactionData = {
         ...formData,
+        member_id: formData.member_id || null,
+        budget_id: formData.budget_id || null,
         amount: parseFloat(formData.amount),
-        recorded_by: user.id,
+        recorded_by: user.id || null,
         transaction_date: new Date().toISOString().split('T')[0]
-      });
+      };
+      
+      await financeService.createTransaction(transactionData);
       setMessage("Transaction recorded successfully!");
       setFormData({
         member_id: "",
@@ -79,7 +83,8 @@ export default function RecordGiving() {
       });
       setTimeout(() => setMessage(""), 3000);
     } catch (err) {
-      setMessage("Error recording transaction. Please try again.");
+      console.error("Critical: Error recording transaction:", err);
+      setMessage(`Error recording transaction: ${err.message || 'Please try again.'}`);
     } finally {
       setSaving(false);
     }

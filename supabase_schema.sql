@@ -102,12 +102,22 @@ CREATE TABLE IF NOT EXISTS public.events (
 CREATE TABLE IF NOT EXISTS public.transactions (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   member_id UUID REFERENCES public.members(id) ON DELETE SET NULL,
+  budget_id UUID, -- Added for budget allocation
   type TEXT CHECK (type IN ('tithe', 'offering', 'donation', 'other', 'Income', 'Expense')),
   category TEXT,
   description TEXT,
   amount DECIMAL(12,2) NOT NULL CHECK (amount > 0),
   transaction_date DATE DEFAULT CURRENT_DATE,
   recorded_by UUID REFERENCES public.profiles(id),
+  created_at TIMESTAMPTZ DEFAULT timezone('utc', now()) NOT NULL
+);
+
+-- BUDGETS TABLE (Added as it was missing from schema but referenced in app)
+CREATE TABLE IF NOT EXISTS public.budgets (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  name TEXT NOT NULL,
+  amount DECIMAL(12,2) NOT NULL DEFAULT 0,
+  status TEXT DEFAULT 'Pending' CHECK (status IN ('Pending', 'Approved', 'Rejected')),
   created_at TIMESTAMPTZ DEFAULT timezone('utc', now()) NOT NULL
 );
 
@@ -271,6 +281,33 @@ CREATE POLICY "events_admin_manage" ON public.events FOR ALL USING (public.is_ad
 -- TRANSACTIONS POLICIES
 DROP POLICY IF EXISTS "transactions_admin_manage" ON public.transactions;
 CREATE POLICY "transactions_admin_manage" ON public.transactions FOR ALL USING (public.is_admin());
+
+DROP POLICY IF EXISTS "transactions_finance_manage" ON public.transactions;
+CREATE POLICY "transactions_finance_manage" ON public.transactions FOR ALL 
+USING (
+  EXISTS (
+    SELECT 1 FROM public.profiles 
+    WHERE id = auth.uid() AND role = 'finance'
+  )
+);
+
+-- BUDGETS POLICIES
+ALTER TABLE public.budgets ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "budgets_admin_manage" ON public.budgets;
+CREATE POLICY "budgets_admin_manage" ON public.budgets FOR ALL USING (public.is_admin());
+
+DROP POLICY IF EXISTS "budgets_view_all" ON public.budgets;
+CREATE POLICY "budgets_view_all" ON public.budgets FOR SELECT USING (true);
+
+DROP POLICY IF EXISTS "budgets_finance_manage" ON public.budgets;
+CREATE POLICY "budgets_finance_manage" ON public.budgets FOR ALL 
+USING (
+  EXISTS (
+    SELECT 1 FROM public.profiles 
+    WHERE id = auth.uid() AND role = 'finance'
+  )
+);
 
 -- Error Saving Attendacne ---
 /* -- Drop the old constraint and recreate it with the correct values

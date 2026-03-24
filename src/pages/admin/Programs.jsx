@@ -157,35 +157,61 @@ export default function Programs() {
         {activeTab === 'feed' && (
           <motion.div 
             key="feed"
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: 20 }}
-            style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            style={{ 
+              display: 'grid', 
+              gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', 
+              gap: '24px' 
+            }}
           >
-            {activities.map((a) => (
-              <Card key={a.id} style={{ padding: '0', overflow: 'hidden' }}>
-                <div style={{ display: 'flex', minHeight: '120px' }}>
-                  <div style={{ width: '6px', background: a.type === 'study' ? 'var(--tertiary)' : 'var(--primary)', opacity: 0.8 }} />
-                  <div style={{ flex: 1, padding: '24px', display: 'grid', gridTemplateColumns: '1fr auto 1fr auto', alignItems: 'center', gap: '32px' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                      <div style={{ width: 48, height: 48, borderRadius: 16, background: 'rgba(255, 255, 255, 0.05)', display: 'grid', placeItems: 'center', border: '1px solid var(--border)' }}>
-                        {a.type === 'study' ? <BookOpen size={24} color="var(--tertiary)" /> : <ClipboardList size={24} color="var(--primary)" />}
-                      </div>
-                      <div>
-                        <h4 style={{ fontWeight: '700', fontSize: '1.1rem', marginBottom: '4px' }}>{a.type === 'study' ? 'Bible Study Session' : 'Attendance Taken'}</h4>
-                        <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem', display: 'flex', alignItems: 'center', gap: '4px' }}><MapPin size={14} /> {a.groups?.name}</p>
-                      </div>
+            {activities.length === 0 ? (
+              <div style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '100px 0', color: 'var(--text-muted)' }}>
+                No activities recorded yet.
+              </div>
+            ) : activities.map((a) => (
+              <Card key={a.id} style={{ padding: '0', overflow: 'hidden', height: '100%', display: 'flex', flexDirection: 'column' }}>
+                <div style={{ height: '6px', background: a.type === 'study' ? 'var(--tertiary)' : 'var(--primary)', opacity: 0.8 }} />
+                
+                <div style={{ padding: '24px', flex: 1, display: 'flex', flexDirection: 'column' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '20px' }}>
+                    <div style={{ width: 44, height: 44, borderRadius: 14, background: a.type === 'study' ? 'rgba(16, 185, 129, 0.1)' : 'rgba(99, 102, 241, 0.1)', display: 'grid', placeItems: 'center', border: '1px solid var(--border)' }}>
+                      {a.type === 'study' ? <BookOpen size={22} color="var(--tertiary)" /> : <ClipboardList size={22} color="var(--primary)" />}
                     </div>
-                    <div style={{ width: '1px', height: '40px', background: 'var(--border)' }} />
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                      <div style={{ width: 32, height: 32, borderRadius: '50%', background: 'var(--primary)', opacity: 0.8, display: 'grid', placeItems: 'center', fontSize: '0.75rem', fontWeight: 'bold' }}>
-                        {(a.profiles?.name || 'A').charAt(0).toUpperCase()}
+                    <span style={{ fontSize: '0.75rem', fontWeight: '700', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                      <Clock size={12} /> {new Date(a.created_at).toLocaleDateString()}
+                    </span>
+                  </div>
+
+                  <div style={{ marginBottom: '16px' }}>
+                    <h4 style={{ fontWeight: '800', fontSize: '1.1rem', marginBottom: '6px', color: 'var(--text)' }}>
+                      {a.type === 'study' ? 'Bible Study Session' : 'Attendance Taken'}
+                    </h4>
+                    <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem', display: 'flex', alignItems: 'center', gap: '6px', fontWeight: '500' }}>
+                      <MapPin size={14} style={{ opacity: 0.7 }} /> {a.groups?.name || 'Unknown Group'}
+                    </p>
+                  </div>
+
+                  <div style={{ marginBottom: '24px', flex: 1 }}>
+                    {a.type === 'study' ? (
+                      <div className="glass-card" style={{ padding: '12px', background: 'rgba(255,255,255,0.03)', borderRadius: '10px', fontSize: '0.875rem', fontStyle: 'italic', color: 'var(--text-muted)' }}>
+                        "{a.detail}"
                       </div>
-                      <span style={{ fontWeight: '600', fontSize: '0.9rem' }}>{a.profiles?.name || 'Admin'}</span>
+                    ) : (
+                      <div style={{ fontSize: '0.875rem', color: 'var(--primary)', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <Users size={14} /> Full group attendance recorded
+                      </div>
+                    )}
+                  </div>
+
+                  <div style={{ paddingTop: '16px', borderTop: '1px solid var(--border)', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <div style={{ width: 28, height: 28, borderRadius: '50%', background: 'var(--primary)', opacity: 0.6, display: 'grid', placeItems: 'center', fontSize: '0.7rem', fontWeight: 'bold' }}>
+                      {(a.profiles?.name || 'A').charAt(0).toUpperCase()}
                     </div>
-                    <div style={{ textAlign: 'right' }}>
-                      <p style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.875rem', color: 'var(--text-muted)', fontWeight: '600' }}><Clock size={14} /> {new Date(a.created_at).toLocaleDateString()}</p>
-                    </div>
+                    <span style={{ fontWeight: '600', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                      By {a.profiles?.name || 'System Admin'}
+                    </span>
                   </div>
                 </div>
               </Card>

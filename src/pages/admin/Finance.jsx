@@ -112,12 +112,20 @@ export default function Finance() {
           <div style={{ marginTop: '32px' }}>
             <h4 style={{ fontSize: '1rem', fontWeight: '700', marginBottom: '16px' }}>Approved Budgets</h4>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-              {approvedBudgets.map(b => (
-                <div key={b.id} style={{ display: 'flex', justifyContent: 'space-between', padding: '12px', background: 'rgba(255,255,255,0.03)', borderRadius: '8px', border: '1px solid var(--border)' }}>
-                  <span style={{ fontWeight: '600' }}>{b.name}</span>
-                  <span style={{ fontWeight: '700', color: 'var(--primary)' }}>${b.amount.toLocaleString()}</span>
-                </div>
-              ))}
+              {approvedBudgets.map(b => {
+                const parts = b.name.split('::');
+                const team = parts.length > 1 ? parts[0] : 'General';
+                const name = parts.length > 1 ? parts[1] : b.name;
+                return (
+                  <div key={b.id} style={{ display: 'flex', justifyContent: 'space-between', padding: '12px', background: 'rgba(255,255,255,0.03)', borderRadius: '8px', border: '1px solid var(--border)', alignItems: 'center' }}>
+                    <div>
+                      <div style={{ fontSize: '0.65rem', color: 'var(--primary)', fontWeight: '800', textTransform: 'uppercase', marginBottom: '2px' }}>{team}</div>
+                      <span style={{ fontWeight: '600' }}>{name}</span>
+                    </div>
+                    <span style={{ fontWeight: '800', color: 'var(--primary)' }}>${b.amount.toLocaleString()}</span>
+                  </div>
+                );
+              })}
               {approvedBudgets.length === 0 && <p style={{ color: 'var(--text-muted)' }}>No approved budgets.</p>}
             </div>
           </div>
@@ -126,26 +134,34 @@ export default function Finance() {
         <Card style={{ padding: '32px' }}>
           <h3 style={{ fontSize: '1.25rem', fontWeight: '800', marginBottom: '24px' }}>Pending Budget Approvals</h3>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            {pendingBudgets.map(b => (
-              <div key={b.id} style={{ padding: '16px', background: 'rgba(255,255,255,0.03)', borderRadius: '12px', border: '1px solid var(--border)' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px' }}>
-                  <div>
-                    <h4 style={{ fontSize: '1.1rem', fontWeight: '700', margin: '0 0 4px 0' }}>{b.name}</h4>
-                    <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                      <Clock size={14} className="text-yellow-500" /> Requested
-                    </span>
+            {pendingBudgets.map(b => {
+              const parts = b.name.split('::');
+              const team = parts.length > 1 ? parts[0] : 'General';
+              const name = parts.length > 1 ? parts[1] : b.name;
+              return (
+                <div key={b.id} style={{ padding: '16px', background: 'rgba(255,255,255,0.03)', borderRadius: '12px', border: '1px solid var(--border)' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px' }}>
+                    <div>
+                      <div style={{ display: 'inline-block', padding: '3px 8px', borderRadius: '4px', background: 'rgba(245, 158, 11, 0.1)', color: '#f59e0b', fontSize: '0.65rem', fontWeight: '800', textTransform: 'uppercase', marginBottom: '6px' }}>
+                        {team}
+                      </div>
+                      <h4 style={{ fontSize: '1.1rem', fontWeight: '700', margin: '0 0 4px 0' }}>{name}</h4>
+                      <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                        <Clock size={14} className="text-yellow-500" /> Requested
+                      </span>
+                    </div>
+                    <span style={{ fontSize: '1.25rem', fontWeight: '900' }}>${b.amount.toLocaleString()}</span>
                   </div>
-                  <span style={{ fontSize: '1.25rem', fontWeight: '900' }}>${b.amount.toLocaleString()}</span>
+                  <Button 
+                    onClick={() => handleApproveBudget(b.id)} 
+                    style={{ width: '100%', justifyContent: 'center', background: '#10b981', color: 'white' }}
+                    icon={CheckCircle}
+                  >
+                    Approve Budget
+                  </Button>
                 </div>
-                <Button 
-                  onClick={() => handleApproveBudget(b.id)} 
-                  style={{ width: '100%', justifyContent: 'center', background: '#10b981', color: 'white' }}
-                  icon={CheckCircle}
-                >
-                  Approve Budget
-                </Button>
-              </div>
-            ))}
+              );
+            })}
             {pendingBudgets.length === 0 && (
               <div style={{ textAlign: 'center', padding: '40px', color: 'var(--text-muted)', background: 'rgba(255,255,255,0.02)', borderRadius: '12px' }}>
                 <CheckCircle size={32} style={{ margin: '0 auto 12px', opacity: 0.5 }} />

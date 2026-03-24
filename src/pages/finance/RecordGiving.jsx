@@ -66,12 +66,14 @@ export default function RecordGiving() {
     try {
       const transactionData = {
         ...formData,
-        member_id: formData.member_id || null,
-        budget_id: formData.budget_id || null,
         amount: parseFloat(formData.amount),
         recorded_by: user.id || null,
         transaction_date: new Date().toISOString().split('T')[0]
       };
+      
+      // Remove empty optional IDs to prevent Supabase schema errors
+      if (!transactionData.member_id) delete transactionData.member_id;
+      if (!transactionData.budget_id) delete transactionData.budget_id;
       
       await financeService.createTransaction(transactionData);
       setMessage("Transaction recorded successfully!");

@@ -34,7 +34,8 @@ export default function Members() {
     marital_status: "Unmarried",
     leave_status: "Active",
     image_url: "",
-    join_date: new Date().toISOString().split('T')[0]
+    join_date: new Date().toISOString().split('T')[0],
+    age_group: "Adult"
   });
 
   useEffect(() => {
@@ -72,7 +73,8 @@ export default function Members() {
         marital_status: member.marital_status || "Unmarried",
         leave_status: member.leave_status || "Active",
         image_url: member.image_url || "",
-        join_date: member.join_date || new Date().toISOString().split('T')[0]
+        join_date: member.join_date || new Date().toISOString().split('T')[0],
+        age_group: member.age_group || "Adult"
       });
     } else {
       setEditingMember(null);
@@ -87,7 +89,8 @@ export default function Members() {
         marital_status: "Unmarried",
         leave_status: "Active",
         image_url: "",
-        join_date: new Date().toISOString().split('T')[0]
+        join_date: new Date().toISOString().split('T')[0],
+        age_group: "Adult"
       });
     }
     setShowModal(true);
@@ -182,62 +185,114 @@ export default function Members() {
   return (
     <div className="animate-fade-in" style={{ paddingBottom: '60px' }}>
       {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '32px' }}>
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
         <div>
-          <h1 style={{ fontSize: '2.5rem', fontWeight: '900', letterSpacing: '-0.04em' }}>
-            Church <span style={{ color: 'var(--primary)' }}>Membership</span>
+          <h1 className="text-4xl font-black tracking-tight text-on-surface">
+            Church <span className="text-primary">Membership</span>
           </h1>
-          <p style={{ color: 'var(--text-muted)', fontWeight: '500' }}>Directory management and engagement oversight</p>
+          <p className="text-on-surface-variant font-medium mt-1">Directory management and engagement oversight</p>
         </div>
-        <Button onClick={() => handleOpenModal()} icon={UserPlus} className="pulse-animation">
+        <Button onClick={() => handleOpenModal()} icon={UserPlus} className="rounded-full px-6 shadow-lg shadow-primary/20 pulse-animation">
           Register Member
         </Button>
       </div>
 
       {/* Modern Summary Row */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '24px', marginBottom: '40px' }}>
-          {[
-            { label: "Total Congregation", val: stats.total, icon: Users, color: 'var(--primary)', bg: 'rgba(99,102,241,0.1)' },
-            { label: "Male Members", val: stats.male, icon: UserCheck, color: 'var(--secondary)', bg: 'rgba(16,185,129,0.1)' },
-            { label: "Female Members", val: stats.female, icon: Filter, color: 'var(--tertiary)', bg: 'rgba(245,158,11,0.1)' }
-          ].map((s, i) => (
-          <Card key={i} style={{ border: `1px solid ${s.color}22`, background: `linear-gradient(135deg, ${s.bg} 0%, transparent 100%)` }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-              <div style={{ width: 60, height: 60, borderRadius: 16, background: s.color, display: 'grid', placeItems: 'center', boxShadow: `0 8px 20px ${s.color}33` }}>
-                <s.icon color="white" size={30} />
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+        {/* Total Card - Featured */}
+        <motion.div 
+          whileHover={{ y: -4 }}
+          className="relative overflow-hidden rounded-3xl bg-primary p-8 text-on-primary shadow-xl shadow-primary/20"
+        >
+          <div className="absolute -right-10 -top-10 w-40 h-40 bg-white/10 rounded-full blur-2xl"></div>
+          <div className="absolute -bottom-10 -left-10 w-32 h-32 bg-black/10 rounded-full blur-xl"></div>
+          <div className="relative z-10 flex flex-col h-full justify-between gap-6">
+            <div className="flex justify-between items-start">
+              <div className="p-3 bg-white/20 rounded-2xl backdrop-blur-sm">
+                <Users size={28} className="text-white" />
               </div>
-              <div>
-                <p style={{ fontSize: '0.8rem', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--text-muted)' }}>{s.label}</p>
-                <h2 style={{ fontSize: '2rem', fontWeight: '900', margin: 0 }}>{s.val}</h2>
-              </div>
+              <span className="px-3 py-1 bg-white/20 rounded-full text-xs font-semibold backdrop-blur-sm">Total</span>
             </div>
-          </Card>
-        ))}
+            <div>
+              <p className="text-[#e9ecef] text-sm font-bold uppercase tracking-wider mb-1">Total Congregation</p>
+              <h2 className="text-5xl font-black tracking-tight">{stats.total}</h2>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Male Members */}
+        <motion.div 
+          whileHover={{ y: -4 }}
+          className="rounded-3xl bg-surface border border-outline-variant/20 p-8 shadow-sm flex flex-col justify-between gap-6"
+        >
+          <div className="flex justify-between items-start">
+            <div className="p-3 bg-blue-500/10 rounded-2xl text-blue-600">
+              <UserCheck size={28} />
+            </div>
+          </div>
+          <div>
+            <p className="text-on-surface-variant text-sm font-bold uppercase tracking-wider mb-1">Male Members</p>
+            <div className="flex items-end gap-3">
+              <h2 className="text-4xl font-black text-on-surface tracking-tight">{stats.male}</h2>
+              <span className="text-sm font-medium text-on-surface-variant mb-1">
+                {stats.total > 0 ? Math.round((stats.male / stats.total) * 100) : 0}%
+              </span>
+            </div>
+            <div className="w-full h-1.5 bg-surface-container-high rounded-full mt-4 overflow-hidden">
+              <div className="h-full bg-blue-500 rounded-full" style={{ width: `${stats.total > 0 ? (stats.male / stats.total) * 100 : 0}%` }}></div>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Female Members */}
+        <motion.div 
+          whileHover={{ y: -4 }}
+          className="rounded-3xl bg-surface border border-outline-variant/20 p-8 shadow-sm flex flex-col justify-between gap-6"
+        >
+          <div className="flex justify-between items-start">
+            <div className="p-3 bg-pink-500/10 rounded-2xl text-pink-600">
+              <Filter size={28} />
+            </div>
+          </div>
+          <div>
+            <p className="text-on-surface-variant text-sm font-bold uppercase tracking-wider mb-1">Female Members</p>
+            <div className="flex items-end gap-3">
+              <h2 className="text-4xl font-black text-on-surface tracking-tight">{stats.female}</h2>
+              <span className="text-sm font-medium text-on-surface-variant mb-1">
+                {stats.total > 0 ? Math.round((stats.female / stats.total) * 100) : 0}%
+              </span>
+            </div>
+            <div className="w-full h-1.5 bg-surface-container-high rounded-full mt-4 overflow-hidden">
+              <div className="h-full bg-pink-500 rounded-full" style={{ width: `${stats.total > 0 ? (stats.female / stats.total) * 100 : 0}%` }}></div>
+            </div>
+          </div>
+        </motion.div>
       </div>
 
       {/* Control Bar */}
-      <div style={{ display: 'flex', gap: '16px', marginBottom: '24px' }}>
-        <div style={{ flex: 1, position: 'relative' }}>
-          <Search size={22} style={{ position: 'absolute', left: '20px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
+      <div className="flex flex-col md:flex-row gap-4 mb-8">
+        <div className="flex-1 relative">
+          <Search size={20} className="absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant" />
           <input 
             type="text" 
             placeholder="Filter by name, identifier or contact info..." 
-            className="input-field" 
-            style={{ paddingLeft: '56px', height: '56px', fontSize: '1rem' }}
+            className="w-full pl-12 pr-4 h-14 rounded-2xl border border-[#181717] bg-surface text-on-surface focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
-        <select 
-          className="input-field" 
-          style={{ width: '250px', height: '56px', cursor: 'pointer' }}
-          value={selectedGroup}
-          onChange={(e) => setSelectedGroup(e.target.value)}
-        >
-          <option value="All">All Congregational Groups</option>
-          {groups.map(g => <option key={g.id} value={g.id}>{g.group_name}</option>)}
-        </select>
-        <Button variant="secondary" onClick={() => { setSearchTerm(""); setSelectedGroup("All"); }} icon={FilterX} style={{ height: '56px' }}>
+        <div className="relative md:w-64">
+          <select 
+            className="w-full h-14 pl-4 pr-10 rounded-2xl border border-[#0e0d0d] bg-surface text-on-surface focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all appearance-none cursor-pointer"
+            value={selectedGroup}
+            onChange={(e) => setSelectedGroup(e.target.value)}
+          >
+            <option value="All">All Congregational Groups</option>
+            {groups.map(g => <option key={g.id} value={g.id}>{g.group_name}</option>)}
+          </select>
+          <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none" size={18} />
+        </div>
+        <Button variant="secondary" onClick={() => { setSearchTerm(""); setSelectedGroup("All"); }} icon={FilterX} className="h-14 rounded-2xl px-6">
           Reset Filters
         </Button>
       </div>
@@ -351,220 +406,250 @@ export default function Members() {
               initial={{ scale: 0.95, opacity: 0, y: 20 }} 
               animate={{ scale: 1, opacity: 1, y: 0 }} 
               exit={{ scale: 0.95, opacity: 0, y: 20 }}
-              className="w-full max-w-2xl bg-card border border-border rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]"
+              className="w-full max-w-4xl bg-surface border border-outline-variant/20 rounded-[2rem] shadow-2xl overflow-hidden flex flex-col md:flex-row max-h-[90vh]"
             >
-              <div className="px-8 py-6 border-b border-border bg-muted/30 flex justify-between items-center sticky top-0 z-10">
-                <div>
-                  <h2 className="text-2xl font-bold text-foreground">
+              {/* Left Side: Photo & Summary */}
+              <div className="md:w-1/3 bg-surface-container-low p-8 flex flex-col items-center border-r border-outline-variant/10">
+                <div className="w-full flex justify-between items-start mb-8 md:hidden">
+                  <h2 className="text-xl font-bold text-primary">
                     {editingMember ? 'Update Profile' : 'New Registration'}
                   </h2>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    Maintain accurate records for church planning and outreach.
-                  </p>
+                  <button onClick={() => setShowModal(false)} className="p-2 rounded-full hover:bg-surface-container text-on-surface-variant">
+                    <XCircle size={24} />
+                  </button>
                 </div>
-                <button 
-                  onClick={() => setShowModal(false)}
-                  className="p-2 rounded-full hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  <XCircle size={24} />
-                </button>
+                
+                <div className="relative group mb-6">
+                  <div className="w-40 h-40 rounded-full overflow-hidden border-4 border-surface bg-surface-container flex items-center justify-center shadow-xl transition-all group-hover:border-primary/20">
+                    {formData.image_url ? (
+                      <img 
+                        src={formData.image_url} 
+                        alt="Preview" 
+                        className="w-full h-full object-cover"
+                        referrerPolicy="no-referrer"
+                      />
+                    ) : (
+                      <Users size={64} className="text-on-surface-variant/50" />
+                    )}
+                  </div>
+                  <label 
+                    htmlFor="image-upload" 
+                    className="absolute bottom-2 right-2 p-3 bg-primary text-on-primary rounded-full cursor-pointer shadow-lg hover:scale-110 transition-transform"
+                  >
+                    <Camera size={20} />
+                    <input 
+                      id="image-upload" 
+                      type="file" 
+                      className="hidden" 
+                      accept="image/*" 
+                      onChange={handleImageChange}
+                    />
+                  </label>
+                </div>
+                <h3 className="text-lg font-bold text-on-surface text-center mb-2">
+                  {formData.full_name || "New Member"}
+                </h3>
+                <p className="text-sm text-on-surface-variant text-center mb-8">
+                  {formData.email || "No email provided"}
+                </p>
+                
+                <div className="w-full space-y-4 mt-auto hidden md:block">
+                  <div className="p-4 rounded-2xl bg-surface border border-outline-variant/10">
+                    <p className="text-xs font-bold text-primary uppercase tracking-wider mb-1">Age Group</p>
+                    <p className="text-sm font-medium text-on-surface">{formData.age_group}</p>
+                  </div>
+                  <div className="p-4 rounded-2xl bg-surface border border-outline-variant/10">
+                    <p className="text-xs font-bold text-primary uppercase tracking-wider mb-1">Group</p>
+                    <p className="text-sm font-medium text-on-surface">
+                      {groups.find(g => g.id === formData.group_id)?.group_name || "Unassigned"}
+                    </p>
+                  </div>
+                </div>
               </div>
-              
-              <div className="p-8 overflow-y-auto custom-scrollbar">
-                <form id="member-form" onSubmit={handleSaveMember} className="space-y-8">
-                  
-                  {/* Photo Upload Section */}
-                  <div className="flex flex-col items-center justify-center py-4">
-                    <div className="relative group">
-                      <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-primary/20 bg-muted flex items-center justify-center transition-all group-hover:border-primary/40">
-                        {formData.image_url ? (
-                          <img 
-                            src={formData.image_url} 
-                            alt="Preview" 
-                            className="w-full h-full object-cover"
-                            referrerPolicy="no-referrer"
+
+              {/* Right Side: Form */}
+              <div className="md:w-2/3 flex flex-col bg-surface">
+                <div className="px-8 py-6 border-b border-outline-variant/10 hidden md:flex justify-between items-center sticky top-0 z-10 bg-surface/80 backdrop-blur-md">
+                  <div>
+                    <h2 className="text-2xl font-bold text-primary">
+                      {editingMember ? 'Update Profile' : 'New Registration'}
+                    </h2>
+                    <p className="text-sm text-on-surface-variant mt-1">
+                      Maintain accurate records for church planning and outreach.
+                    </p>
+                  </div>
+                  <button 
+                    onClick={() => setShowModal(false)}
+                    className="p-2 rounded-full hover:bg-surface-container text-on-surface-variant hover:text-primary transition-colors"
+                  >
+                    <XCircle size={24} />
+                  </button>
+                </div>
+                
+                <div className="p-8 overflow-y-auto custom-scrollbar flex-1">
+                  <form id="member-form" onSubmit={handleSaveMember} className="space-y-8">
+                    
+                    {/* Personal Information Section */}
+                    <div>
+                      <h3 className="text-sm font-bold text-primary uppercase tracking-widest mb-6 flex items-center gap-2">
+                        <UserCheck size={16} />
+                        Personal Information
+                      </h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="md:col-span-2">
+                          <Input 
+                            label="Full Legal Name" 
+                            placeholder="e.g. Johnathan Doe" 
+                            value={formData.full_name} 
+                            onChange={e => setFormData({...formData, full_name: e.target.value})} 
+                            required 
                           />
-                        ) : (
-                          <Users size={48} className="text-muted-foreground" />
-                        )}
-                      </div>
-                      <label 
-                        htmlFor="image-upload" 
-                        className="absolute bottom-0 right-0 p-2.5 bg-primary text-white rounded-full cursor-pointer shadow-lg hover:scale-110 transition-transform"
-                      >
-                        <Camera size={18} />
-                        <input 
-                          id="image-upload" 
-                          type="file" 
-                          className="hidden" 
-                          accept="image/*" 
-                          onChange={handleImageChange}
-                        />
-                      </label>
-                    </div>
-                    <p className="text-xs text-muted-foreground mt-3 font-medium">Click camera icon to upload photo</p>
-                  </div>
-
-                  {/* Personal Information Section */}
-                  <div>
-                    <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
-                      <UserCheck size={20} className="text-primary" />
-                      Personal Information
-                    </h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <div className="md:col-span-2">
+                        </div>
+                        
                         <Input 
-                          label="Full Legal Name" 
-                          placeholder="e.g. Johnathan Doe" 
-                          value={formData.full_name} 
-                          onChange={e => setFormData({...formData, full_name: e.target.value})} 
-                          required 
+                          label="Email Address" 
+                          placeholder="member@domain.com" 
+                          value={formData.email} 
+                          onChange={e => setFormData({...formData, email: e.target.value})} 
+                          icon={Mail} 
                         />
-                      </div>
-                      
-                      <Input 
-                        label="Email Address" 
-                        placeholder="member@domain.com" 
-                        value={formData.email} 
-                        onChange={e => setFormData({...formData, email: e.target.value})} 
-                        icon={Mail} 
-                      />
-                      <Input 
-                        label="Phone Number" 
-                        placeholder="+1 (555) 000-0000" 
-                        value={formData.phone} 
-                        onChange={e => setFormData({...formData, phone: e.target.value})} 
-                        icon={Phone} 
-                      />
-                      
-                      <div className="space-y-2">
-                        <label className="text-sm font-semibold text-foreground">Gender</label>
-                        <div className="relative">
-                          <select 
-                            className="w-full h-11 px-4 rounded-xl border border-input bg-background text-foreground focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all appearance-none" 
-                            value={formData.gender} 
-                            onChange={e => setFormData({...formData, gender: e.target.value})}
-                          >
-                            {['Male', 'Female', 'Other'].map(s => <option key={s} value={s}>{s}</option>)}
-                          </select>
-                          <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" size={18} />
-                        </div>
-                      </div>
-
-                      <div className="space-y-2">
-                        <label className="text-sm font-semibold text-foreground">Marital Status</label>
-                        <div className="relative">
-                          <select 
-                            className="w-full h-11 px-4 rounded-xl border border-input bg-background text-foreground focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all appearance-none" 
-                            value={formData.marital_status} 
-                            onChange={e => setFormData({...formData, marital_status: e.target.value})}
-                          >
-                            {['Unmarried', 'Married'].map(s => <option key={s} value={s}>{s}</option>)}
-                          </select>
-                          <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" size={18} />
-                        </div>
-                      </div>
-
-                      <div className="space-y-2">
-                        <label className="text-sm font-semibold text-foreground">Account Status</label>
-                        <div className="relative">
-                          <select 
-                            className="w-full h-11 px-4 rounded-xl border border-input bg-background text-foreground focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all appearance-none" 
-                            value={formData.status} 
-                            onChange={e => setFormData({...formData, status: e.target.value})}
-                          >
-                            {['Active', 'Inactive'].map(s => <option key={s} value={s}>{s}</option>)}
-                          </select>
-                          <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" size={18} />
-                        </div>
-                      </div>
-
-                      <div className="space-y-2">
-                        <label className="text-sm font-semibold text-foreground">Leave Status</label>
-                        <div className="relative">
-                          <select 
-                            className="w-full h-11 px-4 rounded-xl border border-input bg-background text-foreground focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all appearance-none" 
-                            value={formData.leave_status} 
-                            onChange={e => setFormData({...formData, leave_status: e.target.value})}
-                          >
-                            {['Active', 'On Leave', 'Sick', 'Travelled', 'Suspended'].map(s => <option key={s} value={s}>{s}</option>)}
-                          </select>
-                          <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" size={18} />
-                        </div>
-                      </div>
-
-                      <div className="md:col-span-2">
                         <Input 
-                          label="Residential Address" 
-                          placeholder="Home address details" 
-                          value={formData.address} 
-                          onChange={e => setFormData({...formData, address: e.target.value})} 
-                          icon={MapPin} 
+                          label="Phone Number" 
+                          placeholder="+1 (555) 000-0000" 
+                          value={formData.phone} 
+                          onChange={e => setFormData({...formData, phone: e.target.value})} 
+                          icon={Phone} 
+                        />
+                        
+                        <div className="space-y-2">
+                          <label className="text-sm font-semibold text-on-surface">Gender</label>
+                          <div className="relative">
+                            <select 
+                              className="w-full h-12 px-4 rounded-xl border border-outline-variant/20 bg-surface text-on-surface focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all appearance-none" 
+                              value={formData.gender} 
+                              onChange={e => setFormData({...formData, gender: e.target.value})}
+                            >
+                              {['Male', 'Female', 'Other'].map(s => <option key={s} value={s}>{s}</option>)}
+                            </select>
+                            <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none" size={18} />
+                          </div>
+                        </div>
+
+                        <div className="space-y-2">
+                          <label className="text-sm font-semibold text-on-surface">Marital Status</label>
+                          <div className="relative">
+                            <select 
+                              className="w-full h-12 px-4 rounded-xl border border-outline-variant/20 bg-surface text-on-surface focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all appearance-none" 
+                              value={formData.marital_status} 
+                              onChange={e => setFormData({...formData, marital_status: e.target.value})}
+                            >
+                              {['Unmarried', 'Married'].map(s => <option key={s} value={s}>{s}</option>)}
+                            </select>
+                            <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none" size={18} />
+                          </div>
+                        </div>
+
+                        <div className="space-y-2">
+                          <label className="text-sm font-semibold text-on-surface">Age Group</label>
+                          <div className="relative">
+                            <select 
+                              className="w-full h-12 px-4 rounded-xl border border-outline-variant/20 bg-surface text-on-surface focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all appearance-none" 
+                              value={formData.age_group} 
+                              onChange={e => setFormData({...formData, age_group: e.target.value})}
+                            >
+                              {['Kids', 'Teenage', 'Youth', 'Adult', 'Senior'].map(s => <option key={s} value={s}>{s}</option>)}
+                            </select>
+                            <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none" size={18} />
+                          </div>
+                        </div>
+
+                        <div className="space-y-2">
+                          <label className="text-sm font-semibold text-on-surface">Leave Status</label>
+                          <div className="relative">
+                            <select 
+                              className="w-full h-12 px-4 rounded-xl border border-outline-variant/20 bg-surface text-on-surface focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all appearance-none" 
+                              value={formData.leave_status} 
+                              onChange={e => setFormData({...formData, leave_status: e.target.value})}
+                            >
+                              {['Active', 'On Leave', 'Sick', 'Travelled', 'Suspended'].map(s => <option key={s} value={s}>{s}</option>)}
+                            </select>
+                            <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none" size={18} />
+                          </div>
+                        </div>
+
+                        <div className="md:col-span-2">
+                          <Input 
+                            label="Residential Address" 
+                            placeholder="Home address details" 
+                            value={formData.address} 
+                            onChange={e => setFormData({...formData, address: e.target.value})} 
+                            icon={MapPin} 
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    <hr className="border-outline-variant/10" />
+
+                    {/* Church Details Section */}
+                    <div>
+                      <h3 className="text-sm font-bold text-primary uppercase tracking-widest mb-6 flex items-center gap-2">
+                        <BookOpen size={16} />
+                        Church Details
+                      </h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="space-y-2">
+                          <label className="text-sm font-semibold text-on-surface">Bible Study Unit</label>
+                          <div className="relative">
+                            <select 
+                              className="w-full h-12 px-4 rounded-xl border border-outline-variant/20 bg-surface text-on-surface focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all appearance-none" 
+                              value={formData.group_id} 
+                              onChange={e => setFormData({...formData, group_id: e.target.value})}
+                            >
+                              <option value="">Unassigned (General Pool)</option>
+                              {groups.map(g => <option key={g.id} value={g.id}>{g.group_name}</option>)}
+                            </select>
+                            <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none" size={18} />
+                          </div>
+                        </div>
+
+                        <Input 
+                          label="Join Date" 
+                          type="date" 
+                          value={formData.join_date} 
+                          onChange={e => setFormData({...formData, join_date: e.target.value})} 
+                          icon={Calendar} 
                         />
                       </div>
                     </div>
-                  </div>
+                  </form>
 
-                  <hr className="border-border" />
-
-                  {/* Church Details Section */}
-                  <div>
-                    <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
-                      <BookOpen size={20} className="text-primary" />
-                      Church Details
-                    </h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <div className="space-y-2">
-                        <label className="text-sm font-semibold text-foreground">Bible Study Unit</label>
-                        <div className="relative">
-                          <select 
-                            className="w-full h-11 px-4 rounded-xl border border-input bg-background text-foreground focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all appearance-none" 
-                            value={formData.group_id} 
-                            onChange={e => setFormData({...formData, group_id: e.target.value})}
-                          >
-                            <option value="">Unassigned (General Pool)</option>
-                            {groups.map(g => <option key={g.id} value={g.id}>{g.group_name}</option>)}
-                          </select>
-                          <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" size={18} />
-                        </div>
-                      </div>
-
-                      <Input 
-                        label="Join Date" 
-                        type="date" 
-                        value={formData.join_date} 
-                        onChange={e => setFormData({...formData, join_date: e.target.value})} 
-                        icon={Calendar} 
-                      />
+                  {error && (
+                    <div className="mt-6 p-4 rounded-xl bg-error/10 text-error flex items-center gap-3 border border-error/20">
+                      <XCircle size={20} /> 
+                      <span className="text-sm font-medium">{error}</span>
                     </div>
-                  </div>
-                </form>
+                  )}
+                </div>
 
-                {error && (
-                  <div className="mt-6 p-4 rounded-xl bg-destructive/10 text-destructive flex items-center gap-3 border border-destructive/20">
-                    <XCircle size={20} /> 
-                    <span className="text-sm font-medium">{error}</span>
-                  </div>
-                )}
-              </div>
-
-              <div className="px-8 py-6 border-t border-border bg-muted/10 flex gap-4 justify-end sticky bottom-0 z-10">
-                <Button 
-                  variant="secondary" 
-                  onClick={() => setShowModal(false)} 
-                  className="px-8"
-                  disabled={isSaving}
-                >
-                  Cancel
-                </Button>
-                <Button 
-                  type="submit" 
-                  form="member-form"
-                  className="px-8"
-                  loading={isSaving}
-                >
-                  {editingMember ? 'Save Changes' : 'Register Member'}
-                </Button>
+                <div className="px-8 py-6 border-t border-outline-variant/10 bg-surface-container-lowest flex gap-4 justify-end sticky bottom-0 z-10">
+                  <Button 
+                    variant="secondary" 
+                    onClick={() => setShowModal(false)} 
+                    className="px-8"
+                    disabled={isSaving}
+                  >
+                    Cancel
+                  </Button>
+                  <Button 
+                    type="submit" 
+                    form="member-form"
+                    className="px-8"
+                    loading={isSaving}
+                  >
+                    {editingMember ? 'Save Changes' : 'Register Member'}
+                  </Button>
+                </div>
               </div>
             </motion.div>
           </div>

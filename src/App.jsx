@@ -28,6 +28,7 @@ import AdminRoute from "./routes/AdminRoute";
 import FinanceRoute from "./routes/FinanceRoute";
 import FinanceDashboard from "./pages/finance/FinanceDashboard";
 import Expenses from "./pages/finance/Expenses";
+import Reports from "./pages/finance/Reports";
 
 // We'll use simple components for pages we didn't implement fully for brevity, 
 // but the core features requested are above.
@@ -74,6 +75,7 @@ export default function App() {
             <Route path="record" element={<RecordGiving />} />
             <Route path="budgets" element={<ApprovedBudgets />} />
             <Route path="expenses" element={<Expenses />} />
+            <Route path="reports" element={<Reports />} />
           </Route>
 
           <Route path="/" element={<Landing />} />

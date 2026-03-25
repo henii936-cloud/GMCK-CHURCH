@@ -45,17 +45,17 @@ export default function Sidebar() {
 
   return (
     <aside className="sidebar border-r border-outline-variant/5">
-      <div className="flex flex-col gap-2 mb-16 px-4">
-        <div className="flex items-center gap-4">
+      <div className="flex flex-col gap-2 mb-16">
+        <div className="flex items-center gap-1.5">
           <div className="w-10 h-10 rounded-xl bg-primary grid place-items-center signature-gradient shadow-lg">
             <Layers size={20} className="text-on-primary" />
           </div>
           <h2 className="headline-sm text-primary tracking-tight">Church<span className="text-tertiary-fixed-dim italic">ERP</span></h2>
         </div>
-        <p className="label-sm opacity-40 tracking-[0.3em] pl-14">{user?.role?.replace('_', ' ')}</p>
+        <p className="label-sm opacity-40 tracking-[0.3em] pl-[46px] -mt-[5px]">{user?.role?.replace('_', ' ')}</p>
       </div>
 
-      <nav className="flex-1 overflow-y-auto pr-2">
+      <nav className="flex-1 overflow-y-auto pr-2 -mt-[87px]">
         <ul className="list-none flex flex-col gap-2">
           {navItems.map((item) => {
             const isActive = location.pathname === item.path;
@@ -63,7 +63,7 @@ export default function Sidebar() {
               <li key={item.path}>
                 <Link
                   to={item.path}
-                  className={`flex items-center gap-4 px-6 py-4 rounded-xl no-underline transition-all duration-500 group relative ${isActive ? 'text-primary bg-surface-container-highest' : 'text-on-surface-variant hover:bg-surface-container'}`}
+                  className={`flex items-center gap-4 px-4 py-4 rounded-xl no-underline transition-all duration-500 group relative ${isActive ? 'text-primary bg-surface-container-highest' : 'text-on-surface-variant hover:bg-surface-container'}`}
                 >
                   {isActive && (
                     <motion.div 
@@ -82,7 +82,7 @@ export default function Sidebar() {
       </nav>
 
       <div className="mt-auto pt-10 border-t border-outline-variant/10">
-        <div className="flex items-center gap-4 mb-8 px-4">
+        <div className="flex items-center gap-4 mb-8">
           <div className="w-12 h-12 rounded-2xl bg-tertiary-fixed-dim grid place-items-center font-heading font-bold text-on-tertiary-fixed shadow-whisper">
             {user?.full_name?.charAt(0) || 'U'}
           </div>

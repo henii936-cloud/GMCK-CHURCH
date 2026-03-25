@@ -93,11 +93,11 @@
 }
 
 .sidebar {
-  @apply w-72 bg-surface-container-low p-8 flex flex-col gap-10 text-on-surface border-none;
+  @apply w-[260px] bg-surface-container-low p-6 flex flex-col gap-10 text-on-surface border-none;
 }
 
 .main-content {
-  @apply flex-1 p-12 overflow-y-auto bg-surface pt-32; /* Increased top padding for editorial space */
+  @apply flex-1 p-12 overflow-y-auto bg-surface pt-12; /* Adjusted top padding for editorial space */
 }
 
 /* Editorial Components */

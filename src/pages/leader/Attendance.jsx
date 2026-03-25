@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { attendanceService, memberService } from "../../services/api";
 import { useAuth } from "../../context/AuthContext";
 import { Card, Button } from "../../components/common/UI";
-import { ClipboardList, Users, Check, X, Search, Loader2, Calendar } from "lucide-react";
+import { ClipboardList, Users, Check, X, Search, Loader2, Calendar, ChevronDown, ChevronUp } from "lucide-react";
 import { supabase } from "../../services/supabaseClient";
 
 export default function Attendance() {
@@ -16,6 +16,14 @@ export default function Attendance() {
   const [message, setMessage] = useState("");
   const [activeTab, setActiveTab] = useState("take"); // 'take' or 'history'
   const [groupId, setGroupId] = useState(null);
+  const [expandedDates, setExpandedDates] = useState({});
+
+  const toggleDate = (dateKey) => {
+    setExpandedDates(prev => ({
+      ...prev,
+      [dateKey]: !prev[dateKey]
+    }));
+  };
 
   useEffect(() => {
     if (user?.id) {
@@ -119,6 +127,9 @@ export default function Attendance() {
   }, {});
 
   const sortedDates = Object.keys(groupedHistory).sort((a, b) => new Date(b) - new Date(a));
+  
+  const today = new Date().toISOString().split('T')[0];
+  const isAttendanceTakenToday = history.some(record => record.date === today);
 
   return (
     <div className="animate-fade-in">
@@ -173,6 +184,18 @@ export default function Attendance() {
 
       <Card style={{ padding: '0', overflow: 'hidden', border: '1px solid var(--border)' }}>
         {activeTab === 'take' ? (
+          isAttendanceTakenToday ? (
+            <div className="p-16 text-center flex flex-col items-center justify-center bg-surface">
+              <div className="w-20 h-20 rounded-full bg-emerald-500/10 text-emerald-500 flex items-center justify-center mb-6">
+                <Check size={40} />
+              </div>
+              <h2 className="text-2xl font-bold text-on-surface mb-3">Attendance Complete</h2>
+              <p className="text-on-surface-variant mb-8 max-w-md">You have already recorded attendance for today's session. Thank you for keeping the records up to date.</p>
+              <Button onClick={() => setActiveTab('history')} style={{ padding: '12px 24px' }}>
+                View Attendance History
+              </Button>
+            </div>
+          ) : (
           <>
             <div style={{ padding: '24px', background: 'rgba(255,255,255,0.03)', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', gap: '16px' }}>
               <div style={{ flex: 1, position: 'relative' }}>
@@ -314,6 +337,7 @@ export default function Attendance() {
               </Button>
             </div>
           </>
+          )
         ) : (
           <div className="p-6 space-y-8 bg-surface">
             {sortedDates.length === 0 ? (
@@ -336,10 +360,15 @@ export default function Attendance() {
                   day: 'numeric' 
                 });
 
+                const isExpanded = expandedDates[dateKey];
+
                 return (
                   <div key={dateKey} className="bg-surface-container-lowest rounded-2xl overflow-hidden border border-outline-variant/20 shadow-sm">
                     {/* Date Header */}
-                    <div className="bg-surface-container-low p-5 border-b border-outline-variant/20 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div 
+                      className="bg-surface-container-low p-5 border-b border-outline-variant/20 flex flex-col sm:flex-row sm:items-center justify-between gap-4 cursor-pointer hover:bg-surface-container-low/80 transition-colors"
+                      onClick={() => toggleDate(dateKey)}
+                    >
                       <div className="flex items-center gap-4">
                         <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
                           <Calendar size={24} />
@@ -350,40 +379,47 @@ export default function Attendance() {
                         </div>
                       </div>
                       
-                      {/* Summary Badges */}
-                      <div className="flex flex-wrap gap-2">
-                        <span className="px-3 py-1.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-xs font-bold tracking-wide uppercase">
-                          {presentCount} Present
-                        </span>
-                        <span className="px-3 py-1.5 rounded-full bg-red-500/10 text-red-600 dark:text-red-400 text-xs font-bold tracking-wide uppercase">
-                          {absentCount} Absent
-                        </span>
-                        <span className="px-3 py-1.5 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 text-xs font-bold tracking-wide uppercase">
-                          {excusedCount} Excused
-                        </span>
+                      <div className="flex items-center gap-4">
+                        {/* Summary Badges */}
+                        <div className="flex flex-wrap gap-2">
+                          <span className="px-3 py-1.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-xs font-bold tracking-wide uppercase">
+                            {presentCount} Present
+                          </span>
+                          <span className="px-3 py-1.5 rounded-full bg-red-500/10 text-red-600 dark:text-red-400 text-xs font-bold tracking-wide uppercase">
+                            {absentCount} Absent
+                          </span>
+                          <span className="px-3 py-1.5 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 text-xs font-bold tracking-wide uppercase">
+                            {excusedCount} Excused
+                          </span>
+                        </div>
+                        <div className="text-on-surface-variant flex items-center justify-center w-8 h-8 rounded-full bg-surface-container">
+                          {isExpanded ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+                        </div>
                       </div>
                     </div>
 
                     {/* Records List */}
-                    <div className="divide-y divide-outline-variant/10">
-                      {records.map(record => (
-                        <div key={record.id} className="p-4 flex items-center justify-between hover:bg-surface-container-low transition-colors">
-                          <div className="flex items-center gap-4">
-                            <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-sm">
-                              {record.members?.full_name?.charAt(0) || '?'}
+                    {isExpanded && (
+                      <div className="divide-y divide-outline-variant/10 animate-in slide-in-from-top-2 duration-200">
+                        {records.map(record => (
+                          <div key={record.id} className="p-4 flex items-center justify-between hover:bg-surface-container-low transition-colors">
+                            <div className="flex items-center gap-4">
+                              <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-sm">
+                                {record.members?.full_name?.charAt(0) || '?'}
+                              </div>
+                              <span className="font-semibold text-on-surface">{record.members?.full_name || 'Unknown'}</span>
                             </div>
-                            <span className="font-semibold text-on-surface">{record.members?.full_name || 'Unknown'}</span>
+                            <span className={`px-4 py-1.5 rounded-full text-xs font-bold tracking-wide uppercase ${
+                              record.status === 'Present' ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400' : 
+                              record.status === 'Absent' ? 'bg-red-500/10 text-red-600 dark:text-red-400' : 
+                              'bg-amber-500/10 text-amber-600 dark:text-amber-400'
+                            }`}>
+                              {record.status}
+                            </span>
                           </div>
-                          <span className={`px-4 py-1.5 rounded-full text-xs font-bold tracking-wide uppercase ${
-                            record.status === 'Present' ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400' : 
-                            record.status === 'Absent' ? 'bg-red-500/10 text-red-600 dark:text-red-400' : 
-                            'bg-amber-500/10 text-amber-600 dark:text-amber-400'
-                          }`}>
-                            {record.status}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 );
               })

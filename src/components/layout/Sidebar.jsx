@@ -3,14 +3,41 @@ import { Button } from "../common/UI";
 import { motion } from "motion/react";
 import {
   Users, Layers, DollarSign, Activity, Settings,
-  MapPin, BookOpen, ClipboardList, LogOut, ChevronRight, ShieldCheck, Wallet, Heart, ArrowDownRight
+  MapPin, BookOpen, ClipboardList, LogOut, ChevronRight, ShieldCheck, Wallet, Heart, ArrowDownRight,
+  Menu, X
 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
+import { useState, useEffect } from "react";
 
 export default function Sidebar() {
   const { user, logout } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
+  const [mobileOpen, setMobileOpen] = useState(false);
+
+  // Close sidebar on route change (mobile)
+  useEffect(() => {
+    setMobileOpen(false);
+  }, [location.pathname]);
+
+  // Close sidebar on resize to desktop
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 1024) setMobileOpen(false);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  // Prevent body scroll when mobile sidebar is open
+  useEffect(() => {
+    if (mobileOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => { document.body.style.overflow = ''; };
+  }, [mobileOpen]);
 
   const handleLogout = async () => {
     await logout();
@@ -43,8 +70,8 @@ export default function Sidebar() {
 
   const navItems = menuItems[user?.role?.toLowerCase()] || [];
 
-  return (
-    <aside className="sidebar border-r border-outline-variant/5">
+  const sidebarContent = (
+    <>
       <div className="flex flex-col gap-2 mb-16">
         <div className="flex items-center gap-1.5">
           <div className="w-10 h-10 rounded-xl bg-primary grid place-items-center signature-gradient shadow-lg">
@@ -99,6 +126,46 @@ export default function Sidebar() {
           <span>Sign Out</span>
         </button>
       </div>
-    </aside>
+    </>
+  );
+
+  return (
+    <>
+      {/* Mobile hamburger button */}
+      <button
+        onClick={() => setMobileOpen(true)}
+        className="lg:hidden fixed top-4 left-4 z-[60] w-11 h-11 rounded-xl bg-surface-container-lowest shadow-lg flex items-center justify-center text-primary hover:bg-primary hover:text-on-primary transition-all duration-300 cursor-pointer border border-outline-variant/10"
+        aria-label="Open sidebar"
+      >
+        <Menu size={22} />
+      </button>
+
+      {/* Desktop sidebar */}
+      <aside className="sidebar border-r border-outline-variant/5 hidden lg:flex">
+        {sidebarContent}
+      </aside>
+
+      {/* Mobile overlay */}
+      {mobileOpen && (
+        <div 
+          className="lg:hidden fixed inset-0 bg-primary/20 backdrop-blur-sm z-[70]"
+          onClick={() => setMobileOpen(false)}
+        />
+      )}
+
+      {/* Mobile sidebar drawer */}
+      <aside 
+        className={`lg:hidden fixed inset-y-0 left-0 z-[80] w-[280px] bg-surface-container-low p-6 flex flex-col gap-10 text-on-surface border-none shadow-2xl transition-transform duration-300 ease-out ${mobileOpen ? 'translate-x-0' : '-translate-x-full'}`}
+      >
+        <button
+          onClick={() => setMobileOpen(false)}
+          className="absolute top-4 right-4 w-9 h-9 rounded-xl bg-surface-container flex items-center justify-center text-on-surface-variant hover:text-primary transition-colors cursor-pointer"
+          aria-label="Close sidebar"
+        >
+          <X size={18} />
+        </button>
+        {sidebarContent}
+      </aside>
+    </>
   );
 }

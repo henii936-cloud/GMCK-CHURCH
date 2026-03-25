@@ -100,11 +100,24 @@
 }
 
 .sidebar {
-  @apply w-[260px] bg-surface-container-low p-6 flex flex-col gap-10 text-on-surface border-none;
+  @apply w-[260px] bg-surface-container-low p-6 flex-col gap-10 text-on-surface border-none hidden lg:flex;
 }
 
 .main-content {
-  @apply flex-1 p-12 overflow-y-auto bg-surface pt-12; /* Adjusted top padding for editorial space */
+  @apply flex-1 overflow-y-auto bg-surface;
+  padding: 1.5rem 1rem; /* Mobile: compact padding */
+}
+
+@media (min-width: 768px) {
+  .main-content {
+    padding: 2rem 2rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .main-content {
+    padding: 3rem 3rem;
+  }
 }
 
 /* Editorial Components */
@@ -173,4 +186,51 @@ hr, .divider {
 .vertical-text {
   writing-mode: vertical-rl;
   transform: rotate(180deg);
+}
+
+/* Custom Scrollbar */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 4px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(0,0,0,0.08);
+  border-radius: 99px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(0,0,0,0.15);
+}
+
+/* Fade-in animation */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-in {
+  animation: fadeIn 0.5s ease-out;
+}
+
+/* Mobile-first typography overrides */
+@media (max-width: 767px) {
+  .display-lg {
+    font-size: 1.75rem !important;
+    line-height: 1.2;
+  }
+  .display-md {
+    font-size: 1.5rem !important;
+  }
+  .display-sm {
+    font-size: 1.25rem !important;
+  }
+  .headline-lg {
+    font-size: 1.25rem !important;
+  }
+  .headline-md {
+    font-size: 1.125rem !important;
+  }
+  .headline-sm {
+    font-size: 1rem !important;
+  }
 }

@@ -3,6 +3,7 @@ import { Card, Button } from "../../components/common/UI";
 import { BarChart3, PieChart, FileText, Download, TrendingUp, Calendar, Filter, Share2, Users, BookOpen, DollarSign } from "lucide-react";
 import { motion } from "framer-motion";
 import { attendanceService, studyService, financeService, memberService } from "../../services/api";
+import AttendanceHistory from "../../components/common/AttendanceHistory";
 
 export default function Reports() {
   const [loading, setLoading] = useState(true);
@@ -77,40 +78,10 @@ export default function Reports() {
         ))}
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '24px' }}>
         <Card title="Recent Attendance" subtitle="Latest group attendance records">
-          <div style={{ overflowX: 'auto', maxHeight: '300px' }}>
-            <table className="table-glass">
-              <thead>
-                <tr>
-                  <th>Date</th>
-                  <th>Member</th>
-                  <th>Group</th>
-                  <th>Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                {attendance.slice(0, 10).map(a => (
-                  <tr key={a.id}>
-                    <td>{new Date(a.date).toLocaleDateString()}</td>
-                    <td style={{ fontWeight: '600' }}>{a.members?.full_name || 'Unknown'}</td>
-                    <td>{a.bible_study_groups?.group_name || 'Unknown'}</td>
-                    <td>
-                      <span style={{ 
-                        padding: '4px 8px', borderRadius: '4px', fontSize: '0.75rem', fontWeight: '700',
-                        background: a.status === 'Present' ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)',
-                        color: a.status === 'Present' ? '#10b981' : '#ef4444'
-                      }}>
-                        {a.status}
-                      </span>
-                    </td>
-                  </tr>
-                ))}
-                {attendance.length === 0 && (
-                  <tr><td colSpan="4" style={{ textAlign: 'center', padding: '20px', color: 'var(--text-muted)' }}>No attendance records found.</td></tr>
-                )}
-              </tbody>
-            </table>
+          <div style={{ maxHeight: '600px', overflowY: 'auto', paddingRight: '8px' }}>
+            <AttendanceHistory history={attendance} />
           </div>
         </Card>
         

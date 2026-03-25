@@ -31,21 +31,29 @@ export default function AdminDashboard() {
         { count: membersCount },
         { count: groupsCount },
         { count: leadersCount },
-        { data: financeData }
+        { data: financeData },
+        { data: attendanceData }
       ] = await Promise.all([
         supabase.from('members').select('*', { count: 'exact', head: true }),
         supabase.from('bible_study_groups').select('*', { count: 'exact', head: true }),
         supabase.from('profiles').select('*', { count: 'exact', head: true }).eq('role', 'bible_leader'),
-        supabase.from('transactions').select('amount')
+        supabase.from('transactions').select('amount'),
+        supabase.from('attendance').select('status')
       ]);
 
       const totalFinance = financeData?.reduce((sum, t) => sum + Number(t.amount), 0) || 0;
+      
+      let attendanceRate = 0;
+      if (attendanceData && attendanceData.length > 0) {
+        const presentCount = attendanceData.filter(a => a.status === 'Present').length;
+        attendanceRate = Math.round((presentCount / attendanceData.length) * 100);
+      }
 
       setStats({
         members: membersCount || 0,
         groups: groupsCount || 0,
         leaders: leadersCount || 0,
-        attendance: 85, // Mock for now
+        attendance: attendanceRate,
         finance: totalFinance
       });
     } catch (err) {

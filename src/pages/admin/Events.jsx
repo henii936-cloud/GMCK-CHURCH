@@ -4,7 +4,8 @@ import { Card, Button, Input } from "../../components/common/UI";
 import {
   Calendar, MapPin, Clock, Plus, Search, Trash2, Edit2,
   XCircle, CheckCircle2, Users, ChevronDown, AlertCircle,
-  CalendarDays, CalendarCheck, Tag, FileText, Eye
+  CalendarDays, CalendarCheck, Tag, FileText, Eye,
+  Mic, Music, UserCheck, StickyNote
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 
@@ -45,6 +46,10 @@ export default function Events() {
     location: "",
     category: "General",
     status: "Upcoming",
+    preacher: "",
+    worship_leader: "",
+    mc: "",
+    notes: "",
   });
 
   useEffect(() => {
@@ -80,6 +85,10 @@ export default function Events() {
         location: event.location || "",
         category: event.category || "General",
         status: event.status || "Upcoming",
+        preacher: event.preacher || "",
+        worship_leader: event.worship_leader || "",
+        mc: event.mc || "",
+        notes: event.notes || "",
       });
     } else {
       setEditingId(null);
@@ -87,6 +96,7 @@ export default function Events() {
         title: "", description: "", date: "", end_date: "",
         event_time: "", end_time: "", location: "",
         category: "General", status: "Upcoming",
+        preacher: "", worship_leader: "", mc: "", notes: "",
       });
     }
     setShowModal(true);
@@ -400,6 +410,24 @@ export default function Events() {
                       )}
                     </div>
 
+                    {/* People */}
+                    {(event.preacher || event.worship_leader || event.mc) && (
+                      <div className="flex flex-wrap gap-x-4 gap-y-1.5 mt-1">
+                        {event.preacher && (
+                          <div className="flex items-center gap-1.5 text-xs text-on-surface-variant">
+                            <Mic size={12} className="opacity-50" />
+                            <span className="font-medium">{event.preacher}</span>
+                          </div>
+                        )}
+                        {event.worship_leader && (
+                          <div className="flex items-center gap-1.5 text-xs text-on-surface-variant">
+                            <Music size={12} className="opacity-50" />
+                            <span className="font-medium">{event.worship_leader}</span>
+                          </div>
+                        )}
+                      </div>
+                    )}
+
                     {/* Status badge */}
                     <div className="mt-3">
                       <span className={`inline-block px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider ${
@@ -564,6 +592,67 @@ export default function Events() {
                     </div>
                   </div>
 
+                  {/* Service Team Section */}
+                  <div className="pt-2">
+                    <p className="text-xs font-bold text-on-surface-variant uppercase tracking-widest mb-4 flex items-center gap-2">
+                      <Users size={14} className="text-primary" />
+                      Service Team
+                    </p>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div className="space-y-2">
+                        <label className="text-sm font-semibold text-on-surface">Preacher</label>
+                        <div className="relative">
+                          <Mic size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant/50" />
+                          <input
+                            type="text"
+                            placeholder="e.g. Pastor John"
+                            value={formData.preacher}
+                            onChange={e => setFormData({ ...formData, preacher: e.target.value })}
+                            className="w-full h-12 pl-12 pr-4 rounded-xl border border-outline-variant/20 bg-surface text-on-surface focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+                          />
+                        </div>
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-sm font-semibold text-on-surface">Worship Leader</label>
+                        <div className="relative">
+                          <Music size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant/50" />
+                          <input
+                            type="text"
+                            placeholder="e.g. Sister Mary"
+                            value={formData.worship_leader}
+                            onChange={e => setFormData({ ...formData, worship_leader: e.target.value })}
+                            className="w-full h-12 pl-12 pr-4 rounded-xl border border-outline-variant/20 bg-surface text-on-surface focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+                          />
+                        </div>
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-sm font-semibold text-on-surface">MC / Host</label>
+                        <div className="relative">
+                          <UserCheck size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant/50" />
+                          <input
+                            type="text"
+                            placeholder="e.g. Brother James"
+                            value={formData.mc}
+                            onChange={e => setFormData({ ...formData, mc: e.target.value })}
+                            className="w-full h-12 pl-12 pr-4 rounded-xl border border-outline-variant/20 bg-surface text-on-surface focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Notes */}
+                  <div className="space-y-2">
+                    <label className="text-sm font-semibold text-on-surface">Additional Notes</label>
+                    <textarea
+                      placeholder="Any extra details, reminders, or instructions..."
+                      value={formData.notes}
+                      onChange={e => setFormData({ ...formData, notes: e.target.value })}
+                      rows={2}
+                      className="w-full px-4 py-3 rounded-xl border border-outline-variant/20 bg-surface text-on-surface focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all resize-none"
+                    />
+                  </div>
+
                   {error && (
                     <div className="p-4 rounded-xl bg-error/10 text-error flex items-center gap-3 border border-error/20">
                       <AlertCircle size={20} />
@@ -658,6 +747,52 @@ export default function Events() {
                         <div className="flex gap-3 items-center">
                           <MapPin size={18} className="text-on-surface-variant/50 shrink-0" />
                           <span className="text-sm font-semibold text-on-surface">{viewEvent.location}</span>
+                        </div>
+                      )}
+
+                      {/* Service Team */}
+                      {(viewEvent.preacher || viewEvent.worship_leader || viewEvent.mc) && (
+                        <div className="pt-3 border-t border-outline-variant/10">
+                          <p className="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest mb-3">Service Team</p>
+                          <div className="space-y-2.5">
+                            {viewEvent.preacher && (
+                              <div className="flex gap-3 items-center">
+                                <Mic size={16} className="text-primary/60 shrink-0" />
+                                <div>
+                                  <p className="text-[10px] text-on-surface-variant uppercase font-bold tracking-wider">Preacher</p>
+                                  <p className="text-sm font-semibold text-on-surface">{viewEvent.preacher}</p>
+                                </div>
+                              </div>
+                            )}
+                            {viewEvent.worship_leader && (
+                              <div className="flex gap-3 items-center">
+                                <Music size={16} className="text-primary/60 shrink-0" />
+                                <div>
+                                  <p className="text-[10px] text-on-surface-variant uppercase font-bold tracking-wider">Worship Leader</p>
+                                  <p className="text-sm font-semibold text-on-surface">{viewEvent.worship_leader}</p>
+                                </div>
+                              </div>
+                            )}
+                            {viewEvent.mc && (
+                              <div className="flex gap-3 items-center">
+                                <UserCheck size={16} className="text-primary/60 shrink-0" />
+                                <div>
+                                  <p className="text-[10px] text-on-surface-variant uppercase font-bold tracking-wider">MC / Host</p>
+                                  <p className="text-sm font-semibold text-on-surface">{viewEvent.mc}</p>
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      )}
+
+                      {viewEvent.notes && (
+                        <div className="flex gap-3 pt-3 border-t border-outline-variant/10">
+                          <StickyNote size={16} className="text-on-surface-variant/50 shrink-0 mt-0.5" />
+                          <div>
+                            <p className="text-[10px] text-on-surface-variant uppercase font-bold tracking-wider mb-1">Notes</p>
+                            <p className="text-sm text-on-surface-variant leading-relaxed">{viewEvent.notes}</p>
+                          </div>
                         </div>
                       )}
 

@@ -136,11 +136,21 @@ export default function Members() {
       const payload = { ...formData };
       if (!payload.group_id) payload.group_id = null;
 
-      // If there's a new image file selected, upload it to Storage first
+      // If there's a new image file selected, try to upload it to Storage
       if (imageFile) {
-        const uploadedUrl = await uploadImage(imageFile);
-        payload.image_url = uploadedUrl;
+        try {
+          const uploadedUrl = await uploadImage(imageFile);
+          payload.image_url = uploadedUrl;
+        } catch (uploadErr) {
+          console.warn("Image upload failed, saving member without photo:", uploadErr);
+          payload.image_url = null;
+        }
         setImageFile(null);
+      }
+
+      // Never send blob: URLs to the database
+      if (payload.image_url && payload.image_url.startsWith('blob:')) {
+        payload.image_url = null;
       }
 
       if (editingMember) {

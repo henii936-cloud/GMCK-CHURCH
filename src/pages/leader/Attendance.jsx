@@ -109,6 +109,17 @@ export default function Attendance() {
     m.full_name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  const groupedHistory = history.reduce((acc, record) => {
+    const dateKey = record.date;
+    if (!acc[dateKey]) {
+      acc[dateKey] = [];
+    }
+    acc[dateKey].push(record);
+    return acc;
+  }, {});
+
+  const sortedDates = Object.keys(groupedHistory).sort((a, b) => new Date(b) - new Date(a));
+
   return (
     <div className="animate-fade-in">
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '32px' }}>
@@ -181,64 +192,77 @@ export default function Attendance() {
               </div>
             </div>
 
-            <div style={{ padding: '12px' }}>
-              <table className="table-glass">
-                <thead>
-                  <tr>
-                    <th>Member Name</th>
-                    <th>Status</th>
-                    <th style={{ textAlign: 'right' }}>Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredMembers.map((m) => (
-                    <tr key={m.id} style={{ transition: '0.2s' }}>
-                      <td>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                          <div style={{ width: 36, height: 36, borderRadius: '50%', background: 'rgba(99, 102, 241, 0.1)', display: 'grid', placeItems: 'center', fontWeight: '800', color: 'var(--primary)' }}>
-                            {m.full_name.charAt(0)}
-                          </div>
-                          <span style={{ fontWeight: '600' }}>{m.full_name}</span>
+            <div className="p-6 bg-surface">
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+                {filteredMembers.map((m) => (
+                  <div 
+                    key={m.id} 
+                    className={`p-5 rounded-2xl border transition-all duration-200 flex flex-col gap-4 ${
+                      attendance[m.id] === 'Present' ? 'bg-emerald-500/5 border-emerald-500/20 shadow-sm shadow-emerald-500/5' : 
+                      attendance[m.id] === 'Absent' ? 'bg-red-500/5 border-red-500/20 shadow-sm shadow-red-500/5' : 
+                      'bg-amber-500/5 border-amber-500/20 shadow-sm shadow-amber-500/5'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className={`w-12 h-12 rounded-full flex items-center justify-center font-bold text-lg ${
+                          attendance[m.id] === 'Present' ? 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-400' : 
+                          attendance[m.id] === 'Absent' ? 'bg-red-500/20 text-red-600 dark:text-red-400' : 
+                          'bg-amber-500/20 text-amber-600 dark:text-amber-400'
+                        }`}>
+                          {m.full_name.charAt(0)}
                         </div>
-                      </td>
-                      <td>
-                        <span className="badge" style={{ 
-                          opacity: 0.8,
-                          color: attendance[m.id] === 'Present' ? '#10b981' : attendance[m.id] === 'Absent' ? '#ef4444' : '#f59e0b',
-                          background: attendance[m.id] === 'Present' ? 'rgba(16, 185, 129, 0.1)' : attendance[m.id] === 'Absent' ? 'rgba(239, 68, 68, 0.1)' : 'rgba(245, 158, 11, 0.1)'
-                        }}>
-                          {attendance[m.id]}
-                        </span>
-                      </td>
-                      <td style={{ textAlign: 'right' }}>
-                        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px' }}>
-                          <button 
-                            onClick={() => setStatus(m.id, 'Present')}
-                            style={{ padding: '6px 12px', borderRadius: 8, background: attendance[m.id] === 'Present' ? 'var(--primary)' : 'rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', gap: '6px', transition: '0.2s', border: 'none', cursor: 'pointer', color: attendance[m.id] === 'Present' ? 'white' : 'var(--text-muted)' }}
-                            title="Present"
-                          >
-                            <Check size={16} /> <span style={{ fontWeight: '600', fontSize: '0.875rem' }}>Present</span>
-                          </button>
-                          <button 
-                            onClick={() => setStatus(m.id, 'Absent')}
-                            style={{ padding: '6px 12px', borderRadius: 8, background: attendance[m.id] === 'Absent' ? '#ef4444' : 'rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', gap: '6px', transition: '0.2s', border: 'none', cursor: 'pointer', color: attendance[m.id] === 'Absent' ? 'white' : 'var(--text-muted)' }}
-                            title="Absent"
-                          >
-                            <X size={16} /> <span style={{ fontWeight: '600', fontSize: '0.875rem' }}>Absent</span>
-                          </button>
-                          <button 
-                            onClick={() => setStatus(m.id, 'Excused')}
-                            style={{ padding: '6px 12px', borderRadius: 8, background: attendance[m.id] === 'Excused' ? '#f59e0b' : 'rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', gap: '6px', transition: '0.2s', border: 'none', cursor: 'pointer', color: attendance[m.id] === 'Excused' ? 'white' : 'var(--text-muted)' }}
-                            title="Excused"
-                          >
-                            <span style={{ fontSize: '0.75rem', fontWeight: '800' }}>E</span> <span style={{ fontWeight: '600', fontSize: '0.875rem' }}>Excused</span>
-                          </button>
+                        <div>
+                          <h3 className="font-bold text-on-surface text-lg">{m.full_name}</h3>
+                          <span className={`text-xs font-bold uppercase tracking-wider ${
+                            attendance[m.id] === 'Present' ? 'text-emerald-600 dark:text-emerald-400' : 
+                            attendance[m.id] === 'Absent' ? 'text-red-600 dark:text-red-400' : 
+                            'text-amber-600 dark:text-amber-400'
+                          }`}>
+                            {attendance[m.id]}
+                          </span>
                         </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+                      </div>
+                    </div>
+                    
+                    <div className="grid grid-cols-3 gap-2 mt-2">
+                      <button 
+                        onClick={() => setStatus(m.id, 'Present')}
+                        className={`py-2 rounded-xl flex flex-col items-center justify-center gap-1 transition-all ${
+                          attendance[m.id] === 'Present' 
+                            ? 'bg-emerald-500 text-white shadow-md shadow-emerald-500/20' 
+                            : 'bg-surface-container hover:bg-emerald-500/10 text-on-surface-variant hover:text-emerald-500'
+                        }`}
+                      >
+                        <Check size={18} />
+                        <span className="text-[10px] font-bold uppercase tracking-wider">Present</span>
+                      </button>
+                      <button 
+                        onClick={() => setStatus(m.id, 'Absent')}
+                        className={`py-2 rounded-xl flex flex-col items-center justify-center gap-1 transition-all ${
+                          attendance[m.id] === 'Absent' 
+                            ? 'bg-red-500 text-white shadow-md shadow-red-500/20' 
+                            : 'bg-surface-container hover:bg-red-500/10 text-on-surface-variant hover:text-red-500'
+                        }`}
+                      >
+                        <X size={18} />
+                        <span className="text-[10px] font-bold uppercase tracking-wider">Absent</span>
+                      </button>
+                      <button 
+                        onClick={() => setStatus(m.id, 'Excused')}
+                        className={`py-2 rounded-xl flex flex-col items-center justify-center gap-1 transition-all ${
+                          attendance[m.id] === 'Excused' 
+                            ? 'bg-amber-500 text-white shadow-md shadow-amber-500/20' 
+                            : 'bg-surface-container hover:bg-amber-500/10 text-on-surface-variant hover:text-amber-500'
+                        }`}
+                      >
+                        <span className="font-black text-sm leading-none h-[18px] flex items-center">E</span>
+                        <span className="text-[10px] font-bold uppercase tracking-wider">Excused</span>
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
 
             <div style={{ padding: '24px', background: 'rgba(0,0,0,0.1)', borderTop: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -291,41 +315,78 @@ export default function Attendance() {
             </div>
           </>
         ) : (
-          <div style={{ padding: '12px' }}>
-            {history.length === 0 ? (
-              <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text-muted)' }}>
+          <div className="p-6 space-y-8 bg-surface">
+            {sortedDates.length === 0 ? (
+              <div className="p-10 text-center text-on-surface-variant font-medium">
                 No attendance history found.
               </div>
             ) : (
-              <table className="table-glass">
-                <thead>
-                  <tr>
-                    <th>Date</th>
-                    <th>Member Name</th>
-                    <th>Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {history.map((record) => (
-                    <tr key={record.id}>
-                      <td>{new Date(record.date).toLocaleDateString()}</td>
-                      <td>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                          <span style={{ fontWeight: '600' }}>{record.members?.full_name || 'Unknown'}</span>
+              sortedDates.map(dateKey => {
+                const records = groupedHistory[dateKey];
+                const presentCount = records.filter(r => r.status === 'Present').length;
+                const absentCount = records.filter(r => r.status === 'Absent').length;
+                const excusedCount = records.filter(r => r.status === 'Excused').length;
+                
+                // Parse date safely (assuming YYYY-MM-DD format from DB)
+                const [year, month, day] = dateKey.split('-');
+                const displayDate = new Date(year, month - 1, day).toLocaleDateString(undefined, { 
+                  weekday: 'long', 
+                  year: 'numeric', 
+                  month: 'long', 
+                  day: 'numeric' 
+                });
+
+                return (
+                  <div key={dateKey} className="bg-surface-container-lowest rounded-2xl overflow-hidden border border-outline-variant/20 shadow-sm">
+                    {/* Date Header */}
+                    <div className="bg-surface-container-low p-5 border-b border-outline-variant/20 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                      <div className="flex items-center gap-4">
+                        <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
+                          <Calendar size={24} />
                         </div>
-                      </td>
-                      <td>
-                        <span className="badge" style={{
-                          color: record.status === 'Present' ? '#10b981' : record.status === 'Absent' ? '#ef4444' : '#f59e0b',
-                          background: record.status === 'Present' ? 'rgba(16, 185, 129, 0.1)' : record.status === 'Absent' ? 'rgba(239, 68, 68, 0.1)' : 'rgba(245, 158, 11, 0.1)'
-                        }}>
-                          {record.status}
+                        <div>
+                          <h3 className="text-xl font-bold text-on-surface">{displayDate}</h3>
+                          <p className="text-sm text-on-surface-variant font-medium mt-0.5">{records.length} Total Members Recorded</p>
+                        </div>
+                      </div>
+                      
+                      {/* Summary Badges */}
+                      <div className="flex flex-wrap gap-2">
+                        <span className="px-3 py-1.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-xs font-bold tracking-wide uppercase">
+                          {presentCount} Present
                         </span>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+                        <span className="px-3 py-1.5 rounded-full bg-red-500/10 text-red-600 dark:text-red-400 text-xs font-bold tracking-wide uppercase">
+                          {absentCount} Absent
+                        </span>
+                        <span className="px-3 py-1.5 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 text-xs font-bold tracking-wide uppercase">
+                          {excusedCount} Excused
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Records List */}
+                    <div className="divide-y divide-outline-variant/10">
+                      {records.map(record => (
+                        <div key={record.id} className="p-4 flex items-center justify-between hover:bg-surface-container-low transition-colors">
+                          <div className="flex items-center gap-4">
+                            <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-sm">
+                              {record.members?.full_name?.charAt(0) || '?'}
+                            </div>
+                            <span className="font-semibold text-on-surface">{record.members?.full_name || 'Unknown'}</span>
+                          </div>
+                          <span className={`px-4 py-1.5 rounded-full text-xs font-bold tracking-wide uppercase ${
+                            record.status === 'Present' ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400' : 
+                            record.status === 'Absent' ? 'bg-red-500/10 text-red-600 dark:text-red-400' : 
+                            'bg-amber-500/10 text-amber-600 dark:text-amber-400'
+                          }`}>
+                            {record.status}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })
             )}
           </div>
         )}

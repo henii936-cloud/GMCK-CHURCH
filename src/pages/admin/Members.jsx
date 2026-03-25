@@ -7,7 +7,7 @@ import {
   MoreVertical, Edit2, Trash2, CheckCircle2,
   XCircle, FilterX, UserCheck, MapPin,
   Calendar, CreditCard, ChevronDown, BookOpen,
-  Camera, Upload
+  Camera, Upload, Plus, X
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 
@@ -24,6 +24,7 @@ export default function Members() {
   const [deleteId, setDeleteId] = useState(null);
   const [isSaving, setIsSaving] = useState(false);
   const [imageFile, setImageFile] = useState(null);
+  const [ministryInput, setMinistryInput] = useState("");
 
   const [formData, setFormData] = useState({
     full_name: "",
@@ -36,7 +37,8 @@ export default function Members() {
     leave_status: "Active",
     image_url: "",
     join_date: new Date().toISOString().split('T')[0],
-    age_group: "Adult"
+    age_group: "Adult",
+    ministries: []
   });
 
   useEffect(() => {
@@ -74,8 +76,10 @@ export default function Members() {
         leave_status: member.leave_status || "Active",
         image_url: member.image_url || "",
         join_date: member.join_date || new Date().toISOString().split('T')[0],
-        age_group: member.age_group || "Adult"
+        age_group: member.age_group || "Adult",
+        ministries: member.ministries || []
       });
+      setMinistryInput("");
     } else {
       setEditingMember(null);
       setFormData({
@@ -89,8 +93,10 @@ export default function Members() {
         leave_status: "Active",
         image_url: "",
         join_date: new Date().toISOString().split('T')[0],
-        age_group: "Adult"
+        age_group: "Adult",
+        ministries: []
       });
+      setMinistryInput("");
     }
     setShowModal(true);
   };
@@ -336,6 +342,7 @@ export default function Members() {
                 <th style={{ padding: '20px 24px', textAlign: 'left', color: 'var(--text-muted)', fontSize: '0.75rem', fontWeight: '800', textTransform: 'uppercase' }}>Age Group</th>
                 <th style={{ padding: '20px 24px', textAlign: 'left', color: 'var(--text-muted)', fontSize: '0.75rem', fontWeight: '800', textTransform: 'uppercase' }}>Leave</th>
                 <th style={{ padding: '20px 24px', textAlign: 'left', color: 'var(--text-muted)', fontSize: '0.75rem', fontWeight: '800', textTransform: 'uppercase' }}>Marital</th>
+                <th style={{ padding: '20px 24px', textAlign: 'left', color: 'var(--text-muted)', fontSize: '0.75rem', fontWeight: '800', textTransform: 'uppercase' }}>Ministry</th>
                 <th style={{ padding: '20px 24px', textAlign: 'left', color: 'var(--text-muted)', fontSize: '0.75rem', fontWeight: '800', textTransform: 'uppercase' }}>Study Unit</th>
                 <th style={{ padding: '20px 24px', textAlign: 'left', color: 'var(--text-muted)', fontSize: '0.75rem', fontWeight: '800', textTransform: 'uppercase' }}>Join Date</th>
                 <th style={{ padding: '20px 24px', textAlign: 'right' }}>Actions</th>
@@ -403,6 +410,18 @@ export default function Members() {
                     }}>
                       {m.marital_status?.toUpperCase() || 'UNMARRIED'}
                     </span>
+                  </td>
+                  <td style={{ padding: '20px 24px' }}>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', maxWidth: '180px' }}>
+                      {(m.ministries && m.ministries.length > 0) ? m.ministries.map((min, i) => (
+                        <span key={i} style={{
+                          padding: '2px 8px', borderRadius: '100px', fontSize: '0.65rem', fontWeight: '700',
+                          background: 'rgba(14,165,233,0.1)', color: '#0ea5e9', border: '1px solid rgba(14,165,233,0.15)'
+                        }}>
+                          {min}
+                        </span>
+                      )) : <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>--</span>}
+                    </div>
                   </td>
                   <td style={{ padding: '20px 24px' }}>
                     <p style={{ fontSize: '0.875rem', fontWeight: '600', margin: 0 }}>{m.bible_study_groups?.group_name || 'Unassigned'}</p>
@@ -648,6 +667,64 @@ export default function Members() {
                           icon={Calendar}
                         />
                       </div>
+
+                        {/* Ministry Tag Input */}
+                        <div className="md:col-span-2 space-y-2">
+                          <label className="text-sm font-semibold text-on-surface">Ministries</label>
+                          <div className="flex gap-2">
+                            <input
+                              type="text"
+                              className="flex-1 h-12 px-4 rounded-xl border border-outline-variant/20 bg-surface text-on-surface focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+                              placeholder="Type a ministry (e.g. Worship, Prayer)..."
+                              value={ministryInput}
+                              onChange={e => setMinistryInput(e.target.value)}
+                              onKeyDown={e => {
+                                if (e.key === 'Enter') {
+                                  e.preventDefault();
+                                  const val = ministryInput.trim();
+                                  if (val && !formData.ministries.includes(val)) {
+                                    setFormData({ ...formData, ministries: [...formData.ministries, val] });
+                                  }
+                                  setMinistryInput("");
+                                }
+                              }}
+                            />
+                            <button
+                              type="button"
+                              className="h-12 w-12 rounded-xl bg-primary text-on-primary flex items-center justify-center hover:opacity-90 transition-opacity shrink-0"
+                              onClick={() => {
+                                const val = ministryInput.trim();
+                                if (val && !formData.ministries.includes(val)) {
+                                  setFormData({ ...formData, ministries: [...formData.ministries, val] });
+                                }
+                                setMinistryInput("");
+                              }}
+                            >
+                              <Plus size={20} />
+                            </button>
+                          </div>
+                          {formData.ministries.length > 0 && (
+                            <div className="flex flex-wrap gap-2 mt-2">
+                              {formData.ministries.map((min, i) => (
+                                <span
+                                  key={i}
+                                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold"
+                                  style={{ background: 'rgba(14,165,233,0.1)', color: '#0ea5e9', border: '1px solid rgba(14,165,233,0.15)' }}
+                                >
+                                  {min}
+                                  <button
+                                    type="button"
+                                    onClick={() => setFormData({ ...formData, ministries: formData.ministries.filter((_, idx) => idx !== i) })}
+                                    className="hover:opacity-70 transition-opacity"
+                                    style={{ background: 'none', border: 'none', color: '#0ea5e9', cursor: 'pointer', padding: 0, display: 'flex' }}
+                                  >
+                                    <X size={14} />
+                                  </button>
+                                </span>
+                              ))}
+                            </div>
+                          )}
+                        </div>
                     </div>
                   </form>
 

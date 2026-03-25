@@ -397,9 +397,9 @@ export default function Members() {
                   <td style={{ padding: '20px 24px' }}>
                     <span style={{
                       padding: '4px 12px', borderRadius: '100px', fontSize: '0.7rem', fontWeight: '800',
-                      background: m.marital_status === 'Married' ? 'rgba(16,185,129,0.1)' : 'rgba(244,63,94,0.1)',
-                      color: m.marital_status === 'Married' ? '#10b981' : '#f43f5e',
-                      border: `1px solid ${m.marital_status === 'Married' ? '#10b981' : '#f43f5e'}22`
+                      background: m.marital_status === 'Married' ? 'rgba(16,185,129,0.1)' : m.marital_status === 'Widow' ? 'rgba(139,92,246,0.1)' : 'rgba(244,63,94,0.1)',
+                      color: m.marital_status === 'Married' ? '#10b981' : m.marital_status === 'Widow' ? '#8b5cf6' : '#f43f5e',
+                      border: `1px solid ${m.marital_status === 'Married' ? '#10b981' : m.marital_status === 'Widow' ? '#8b5cf6' : '#f43f5e'}22`
                     }}>
                       {m.marital_status?.toUpperCase() || 'UNMARRIED'}
                     </span>
@@ -570,7 +570,7 @@ export default function Members() {
                               value={formData.marital_status}
                               onChange={e => setFormData({ ...formData, marital_status: e.target.value })}
                             >
-                              {['Unmarried', 'Married'].map(s => <option key={s} value={s}>{s}</option>)}
+                              {['Unmarried', 'Married', 'Widow'].map(s => <option key={s} value={s}>{s}</option>)}
                             </select>
                             <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none" size={18} />
                           </div>

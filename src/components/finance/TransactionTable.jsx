@@ -61,8 +61,12 @@ export default function TransactionTable({ transactions = [] }) {
                 >
                   <td className="py-6 pr-4">
                     <div className="flex items-center gap-5">
-                      <div className="w-12 h-12 rounded-xl bg-surface-container-low flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-on-primary transition-all duration-500">
-                        <Icon size={20} />
+                      <div className="w-12 h-12 rounded-xl bg-surface-container-low flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-on-primary transition-all duration-500 overflow-hidden">
+                        {t.members?.image_url ? (
+                          <img src={t.members.image_url} alt={t.members?.full_name} referrerPolicy="no-referrer" className="w-full h-full object-cover" />
+                        ) : (
+                          <Icon size={20} />
+                        )}
                       </div>
                       <div>
                         <p className="font-bold text-on-surface group-hover:text-primary transition-colors">{t.members?.full_name || 'Anonymous'}</p>
@@ -110,10 +114,14 @@ export default function TransactionTable({ transactions = [] }) {
               className="flex items-center gap-3 p-3.5 rounded-xl bg-surface-container-low hover:bg-surface-container transition-all duration-300"
             >
               <div 
-                className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
+                className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 overflow-hidden"
                 style={{ backgroundColor: style.bg, color: style.color }}
               >
-                <Icon size={18} />
+                {t.members?.image_url ? (
+                  <img src={t.members.image_url} alt={t.members?.full_name} referrerPolicy="no-referrer" className="w-full h-full object-cover" />
+                ) : (
+                  <Icon size={18} />
+                )}
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between gap-2 mb-0.5">

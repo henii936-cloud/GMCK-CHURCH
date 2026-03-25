@@ -202,12 +202,16 @@ export default function Attendance() {
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
-                        <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center font-bold text-sm sm:text-lg shrink-0 ${
+                        <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center font-bold text-sm sm:text-lg shrink-0 overflow-hidden ${
                           attendance[m.id] === 'Present' ? 'bg-emerald-500/20 text-emerald-600' : 
                           attendance[m.id] === 'Absent' ? 'bg-red-500/20 text-red-600' : 
                           'bg-amber-500/20 text-amber-600'
                         }`}>
-                          {m.full_name.charAt(0)}
+                          {m.image_url ? (
+                            <img src={m.image_url} alt={m.full_name} referrerPolicy="no-referrer" className="w-full h-full object-cover" />
+                          ) : (
+                            m.full_name.charAt(0)
+                          )}
                         </div>
                         <div className="min-w-0">
                           <h3 className="font-bold text-on-surface text-sm sm:text-lg truncate">{m.full_name}</h3>

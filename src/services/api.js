@@ -16,7 +16,7 @@ export const attendanceService = {
       .from("study_attendance")
       .select(`
         *,
-        members(full_name)
+        members(full_name, image_url)
       `)
       .eq("group_id", groupId)
       .order("date", { ascending: false });
@@ -30,7 +30,7 @@ export const attendanceService = {
       .from("study_attendance")
       .select(`
         *,
-        members(full_name),
+        members(full_name, image_url),
         bible_study_groups(group_name)
       `)
       .order("date", { ascending: false });
@@ -88,7 +88,7 @@ export const financeService = {
       .from("transactions")
       .select(`
         *,
-        members(full_name),
+        members(full_name, image_url),
         profiles(full_name)
       `)
       .order("transaction_date", { ascending: false });
@@ -234,7 +234,7 @@ export const activityService = {
       .from("study_attendance")
       .select(`
         id, date, created_at, group_id,
-        members(full_name),
+        members(full_name, image_url),
         bible_study_groups(group_name)
       `)
       .order("created_at", { ascending: false })

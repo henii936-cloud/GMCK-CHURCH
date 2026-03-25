@@ -285,9 +285,13 @@ export default function RecordGiving() {
                     className={`w-full p-6 rounded-2xl border-2 transition-all duration-500 flex items-center gap-6 text-left group
                       ${formData.member_id === m.id ? 'border-tertiary-fixed-dim bg-tertiary-fixed-dim/5' : 'border-transparent bg-surface-container-low hover:bg-surface-container'}`}
                   >
-                    <div className={`w-12 h-12 rounded-full flex items-center justify-center font-black text-sm transition-all duration-500
+                    <div className={`w-12 h-12 rounded-full flex items-center justify-center font-black text-sm transition-all duration-500 overflow-hidden
                       ${formData.member_id === m.id ? 'bg-tertiary-fixed-dim text-on-tertiary-fixed' : 'bg-primary text-on-primary'}`}>
-                      {m.full_name?.charAt(0)}
+                      {m.image_url ? (
+                        <img src={m.image_url} alt={m.full_name} referrerPolicy="no-referrer" className="w-full h-full object-cover" />
+                      ) : (
+                        m.full_name?.charAt(0)
+                      )}
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-xs font-black text-primary truncate uppercase tracking-wider mb-1">{m.full_name}</p>

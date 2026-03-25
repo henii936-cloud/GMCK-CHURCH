@@ -106,8 +106,12 @@ export default function AttendanceHistory({ history }) {
                   {records.map(record => (
                     <div key={record.id} className="p-3 sm:p-4 flex items-center justify-between hover:bg-surface-container-low transition-colors">
                       <div className="flex items-center gap-2.5 sm:gap-4 min-w-0">
-                        <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-xs sm:text-sm shrink-0">
-                          {record.members?.full_name?.charAt(0) || '?'}
+                        <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-xs sm:text-sm shrink-0 overflow-hidden">
+                          {record.members?.image_url ? (
+                            <img src={record.members.image_url} alt={record.members?.full_name} referrerPolicy="no-referrer" className="w-full h-full object-cover" />
+                          ) : (
+                            record.members?.full_name?.charAt(0) || '?'
+                          )}
                         </div>
                         <span className="font-semibold text-on-surface text-sm sm:text-base truncate">{record.members?.full_name || 'Unknown'}</span>
                       </div>

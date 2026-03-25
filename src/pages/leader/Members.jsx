@@ -106,9 +106,13 @@ export default function LeaderMembers() {
                     <tr key={m.id} className="hover:bg-surface-container-low transition-colors">
                       <td className="py-4 px-4">
                         <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-full bg-primary/10 grid place-items-center font-bold text-primary text-sm">
-                            {m.full_name?.charAt(0) || '?'}
-                          </div>
+                          {m.image_url ? (
+                            <img src={m.image_url} alt={m.full_name} referrerPolicy="no-referrer" className="w-10 h-10 rounded-full object-cover border-2 border-primary/10" />
+                          ) : (
+                            <div className="w-10 h-10 rounded-full bg-primary/10 grid place-items-center font-bold text-primary text-sm">
+                              {m.full_name?.charAt(0) || '?'}
+                            </div>
+                          )}
                           <span className="font-bold text-on-surface text-sm">{m.full_name}</span>
                         </div>
                       </td>
@@ -154,9 +158,13 @@ export default function LeaderMembers() {
             <div className="md:hidden p-3 space-y-2.5">
               {filteredMembers.map((m) => (
                 <div key={m.id} className="flex items-center gap-3 p-3.5 rounded-xl bg-surface-container-low hover:bg-surface-container transition-colors">
-                  <div className="w-10 h-10 rounded-full bg-primary/10 grid place-items-center font-bold text-primary text-sm shrink-0">
-                    {m.full_name?.charAt(0) || '?'}
-                  </div>
+                  {m.image_url ? (
+                    <img src={m.image_url} alt={m.full_name} referrerPolicy="no-referrer" className="w-10 h-10 rounded-full object-cover border-2 border-primary/10 shrink-0" />
+                  ) : (
+                    <div className="w-10 h-10 rounded-full bg-primary/10 grid place-items-center font-bold text-primary text-sm shrink-0">
+                      {m.full_name?.charAt(0) || '?'}
+                    </div>
+                  )}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between gap-2 mb-0.5">
                       <p className="font-bold text-sm text-on-surface truncate">{m.full_name}</p>

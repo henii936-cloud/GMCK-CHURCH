@@ -141,11 +141,13 @@ export default function LeaderMembers() {
                       </td>
                       <td className="py-4 px-4">
                         <span className={`px-2.5 py-1 rounded-full text-[9px] font-black uppercase tracking-widest ${
-                          m.status === 'Active' 
+                          m.leave_status === 'Active' 
                             ? 'bg-emerald-500/10 text-emerald-600' 
+                            : m.leave_status === 'Inactive'
+                            ? 'bg-red-500/10 text-red-600'
                             : 'bg-amber-500/10 text-amber-600'
                         }`}>
-                          {m.status || 'Active'}
+                          {m.leave_status || 'Active'}
                         </span>
                       </td>
                     </tr>
@@ -169,11 +171,13 @@ export default function LeaderMembers() {
                     <div className="flex items-center justify-between gap-2 mb-0.5">
                       <p className="font-bold text-sm text-on-surface truncate">{m.full_name}</p>
                       <span className={`px-2 py-0.5 rounded-full text-[8px] font-black uppercase tracking-widest shrink-0 ${
-                        m.status === 'Active' 
+                        m.leave_status === 'Active' 
                           ? 'bg-emerald-500/10 text-emerald-600' 
+                          : m.leave_status === 'Inactive'
+                          ? 'bg-red-500/10 text-red-600'
                           : 'bg-amber-500/10 text-amber-600'
                       }`}>
-                        {m.status || 'Active'}
+                        {m.leave_status || 'Active'}
                       </span>
                     </div>
                     <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5">

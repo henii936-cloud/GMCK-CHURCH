@@ -33,7 +33,6 @@ export default function Members() {
     group_id: "",
     address: "",
     marital_status: "Unmarried",
-    leave_status: "Active",
     image_url: "",
     join_date: new Date().toISOString().split('T')[0],
     age_group: "Adult"
@@ -71,7 +70,6 @@ export default function Members() {
         group_id: member.group_id || "",
         address: member.address || "",
         marital_status: member.marital_status || "Unmarried",
-        leave_status: member.leave_status || "Active",
         image_url: member.image_url || "",
         join_date: member.join_date || new Date().toISOString().split('T')[0],
         age_group: member.age_group || "Adult"
@@ -86,7 +84,6 @@ export default function Members() {
         group_id: "",
         address: "",
         marital_status: "Unmarried",
-        leave_status: "Active",
         image_url: "",
         join_date: new Date().toISOString().split('T')[0],
         age_group: "Adult"
@@ -371,19 +368,14 @@ export default function Members() {
                     </div>
                   </td>
                   <td style={{ padding: '20px 24px' }}>
-                    <button
-                      onClick={() => handleToggleStatus(m)}
-                      style={{
-                        padding: '4px 12px', borderRadius: '100px', fontSize: '0.7rem', fontWeight: '800',
-                        background: m.status === 'Active' ? 'rgba(16,185,129,0.1)' : 'rgba(239,68,68,0.1)',
-                        color: m.status === 'Active' ? '#10b981' : '#ef4444',
-                        border: `1px solid ${m.status === 'Active' ? '#10b981' : '#ef4444'}22`,
-                        cursor: 'pointer',
-                        transition: 'all 0.2s'
-                      }}
-                    >
-                      {m.status?.toUpperCase() || 'ACTIVE'}
-                    </button>
+                    <span style={{
+                      padding: '4px 12px', borderRadius: '100px', fontSize: '0.7rem', fontWeight: '800',
+                      background: 'rgba(99,102,241,0.1)',
+                      color: 'var(--primary)',
+                      border: '1px solid var(--primary)22'
+                    }}>
+                      {m.age_group?.toUpperCase() || 'ADULT'}
+                    </span>
                   </td>
                   <td style={{ padding: '20px 24px' }}>
                     <span style={{
@@ -591,19 +583,6 @@ export default function Members() {
                           </div>
                         </div>
 
-                        <div className="space-y-2">
-                          <label className="text-sm font-semibold text-on-surface">Leave Status</label>
-                          <div className="relative">
-                            <select
-                              className="w-full h-12 px-4 rounded-xl border border-outline-variant/20 bg-surface text-on-surface focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all appearance-none"
-                              value={formData.leave_status}
-                              onChange={e => setFormData({ ...formData, leave_status: e.target.value })}
-                            >
-                              {['Active', 'On Leave', 'Sick', 'Travelled', 'Suspended'].map(s => <option key={s} value={s}>{s}</option>)}
-                            </select>
-                            <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none" size={18} />
-                          </div>
-                        </div>
 
                         <div className="md:col-span-2">
                           <Input

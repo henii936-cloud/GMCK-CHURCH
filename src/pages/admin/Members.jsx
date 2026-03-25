@@ -2,10 +2,10 @@ import { useState, useEffect } from "react";
 import { memberService, groupService } from "../../services/api";
 import { supabase } from "../../services/supabaseClient";
 import { Card, Button, Input } from "../../components/common/UI";
-import { 
-  Users, UserPlus, Search, Filter, Mail, Phone, 
-  MoreVertical, Edit2, Trash2, CheckCircle2, 
-  XCircle, FilterX, UserCheck, MapPin, 
+import {
+  Users, UserPlus, Search, Filter, Mail, Phone,
+  MoreVertical, Edit2, Trash2, CheckCircle2,
+  XCircle, FilterX, UserCheck, MapPin,
   Calendar, CreditCard, ChevronDown, BookOpen,
   Camera, Upload
 } from "lucide-react";
@@ -32,7 +32,6 @@ export default function Members() {
     gender: "Male",
     group_id: "",
     address: "",
-    status: "Active",
     marital_status: "Unmarried",
     leave_status: "Active",
     image_url: "",
@@ -71,7 +70,6 @@ export default function Members() {
         gender: member.gender || "Male",
         group_id: member.group_id || "",
         address: member.address || "",
-        status: member.status || "Active",
         marital_status: member.marital_status || "Unmarried",
         leave_status: member.leave_status || "Active",
         image_url: member.image_url || "",
@@ -87,7 +85,6 @@ export default function Members() {
         gender: "Male",
         group_id: "",
         address: "",
-        status: "Active",
         marital_status: "Unmarried",
         leave_status: "Active",
         image_url: "",
@@ -131,7 +128,7 @@ export default function Members() {
     setIsSaving(true);
     setError(null);
     setSuccess(null);
-    
+
     try {
       const payload = { ...formData };
       if (!payload.group_id) payload.group_id = null;
@@ -160,10 +157,10 @@ export default function Members() {
         await memberService.createMember(payload);
         setSuccess("New member registered!");
       }
-      
+
       setShowModal(false);
       loadData();
-      
+
       setTimeout(() => setSuccess(null), 3000);
     } catch (err) {
       console.error("Save error:", err);
@@ -200,9 +197,9 @@ export default function Members() {
 
   const filteredMembers = members.filter(m => {
     const term = searchTerm.toLowerCase();
-    const searchMatch = m.full_name.toLowerCase().includes(term) || 
-                       (m.email && m.email.toLowerCase().includes(term)) ||
-                       (m.phone && m.phone.includes(term));
+    const searchMatch = m.full_name.toLowerCase().includes(term) ||
+      (m.email && m.email.toLowerCase().includes(term)) ||
+      (m.phone && m.phone.includes(term));
     const groupMatch = selectedGroup === "All" || m.group_id === selectedGroup;
     return searchMatch && groupMatch;
   });
@@ -231,7 +228,7 @@ export default function Members() {
       {/* Modern Summary Row */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
         {/* Total Card - Featured */}
-        <motion.div 
+        <motion.div
           whileHover={{ y: -2 }}
           className="relative overflow-hidden rounded-2xl bg-primary p-5 text-on-primary shadow-md shadow-primary/20"
         >
@@ -252,7 +249,7 @@ export default function Members() {
         </motion.div>
 
         {/* Male Members */}
-        <motion.div 
+        <motion.div
           whileHover={{ y: -2 }}
           className="rounded-2xl bg-surface border border-outline-variant/20 p-5 shadow-sm flex flex-col justify-between gap-4"
         >
@@ -276,7 +273,7 @@ export default function Members() {
         </motion.div>
 
         {/* Female Members */}
-        <motion.div 
+        <motion.div
           whileHover={{ y: -2 }}
           className="rounded-2xl bg-surface border border-outline-variant/20 p-5 shadow-sm flex flex-col justify-between gap-4"
         >
@@ -304,16 +301,16 @@ export default function Members() {
       <div className="flex flex-col md:flex-row gap-4 mb-8">
         <div className="flex-1 relative">
           <Search size={20} className="absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant" />
-          <input 
-            type="text" 
-            placeholder="Filter by name, identifier or contact info..." 
+          <input
+            type="text"
+            placeholder="Filter by name, identifier or contact info..."
             className="w-full pl-12 pr-4 h-14 rounded-2xl border border-[#181717] bg-surface text-on-surface focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
         <div className="relative md:w-64">
-          <select 
+          <select
             className="w-full h-14 pl-4 pr-10 rounded-2xl border border-[#0e0d0d] bg-surface text-on-surface focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all appearance-none cursor-pointer"
             value={selectedGroup}
             onChange={(e) => setSelectedGroup(e.target.value)}
@@ -336,7 +333,7 @@ export default function Members() {
               <tr style={{ background: 'rgba(255,255,255,0.02)', borderBottom: '1px solid var(--border)' }}>
                 <th style={{ padding: '20px 24px', textAlign: 'left', color: 'var(--text-muted)', fontSize: '0.75rem', fontWeight: '800', textTransform: 'uppercase' }}>Participant Profile</th>
                 <th style={{ padding: '20px 24px', textAlign: 'left', color: 'var(--text-muted)', fontSize: '0.75rem', fontWeight: '800', textTransform: 'uppercase' }}>Contact Info</th>
-                <th style={{ padding: '20px 24px', textAlign: 'left', color: 'var(--text-muted)', fontSize: '0.75rem', fontWeight: '800', textTransform: 'uppercase' }}>Status</th>
+                <th style={{ padding: '20px 24px', textAlign: 'left', color: 'var(--text-muted)', fontSize: '0.75rem', fontWeight: '800', textTransform: 'uppercase' }}>Age Group</th>
                 <th style={{ padding: '20px 24px', textAlign: 'left', color: 'var(--text-muted)', fontSize: '0.75rem', fontWeight: '800', textTransform: 'uppercase' }}>Leave</th>
                 <th style={{ padding: '20px 24px', textAlign: 'left', color: 'var(--text-muted)', fontSize: '0.75rem', fontWeight: '800', textTransform: 'uppercase' }}>Marital</th>
                 <th style={{ padding: '20px 24px', textAlign: 'left', color: 'var(--text-muted)', fontSize: '0.75rem', fontWeight: '800', textTransform: 'uppercase' }}>Study Unit</th>
@@ -350,11 +347,11 @@ export default function Members() {
                   <td style={{ padding: '20px 24px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
                       {m.image_url ? (
-                        <img 
-                          src={m.image_url} 
-                          alt={m.full_name} 
+                        <img
+                          src={m.image_url}
+                          alt={m.full_name}
                           referrerPolicy="no-referrer"
-                          style={{ width: 44, height: 44, borderRadius: '50%', objectFit: 'cover', border: '2px solid var(--primary)22' }} 
+                          style={{ width: 44, height: 44, borderRadius: '50%', objectFit: 'cover', border: '2px solid var(--primary)22' }}
                         />
                       ) : (
                         <div style={{ width: 44, height: 44, borderRadius: 14, background: 'var(--primary)', color: 'white', display: 'grid', placeItems: 'center', fontWeight: 'bold' }}>
@@ -374,9 +371,9 @@ export default function Members() {
                     </div>
                   </td>
                   <td style={{ padding: '20px 24px' }}>
-                    <button 
+                    <button
                       onClick={() => handleToggleStatus(m)}
-                      style={{ 
+                      style={{
                         padding: '4px 12px', borderRadius: '100px', fontSize: '0.7rem', fontWeight: '800',
                         background: m.status === 'Active' ? 'rgba(16,185,129,0.1)' : 'rgba(239,68,68,0.1)',
                         color: m.status === 'Active' ? '#10b981' : '#ef4444',
@@ -389,7 +386,7 @@ export default function Members() {
                     </button>
                   </td>
                   <td style={{ padding: '20px 24px' }}>
-                    <span style={{ 
+                    <span style={{
                       padding: '4px 12px', borderRadius: '100px', fontSize: '0.7rem', fontWeight: '800',
                       background: m.leave_status === 'Active' ? 'rgba(16,185,129,0.1)' : 'rgba(245,158,11,0.1)',
                       color: m.leave_status === 'Active' ? '#10b981' : '#f59e0b',
@@ -399,7 +396,7 @@ export default function Members() {
                     </span>
                   </td>
                   <td style={{ padding: '20px 24px' }}>
-                    <span style={{ 
+                    <span style={{
                       padding: '4px 12px', borderRadius: '100px', fontSize: '0.7rem', fontWeight: '800',
                       background: 'rgba(99,102,241,0.1)',
                       color: 'var(--primary)',
@@ -433,9 +430,9 @@ export default function Members() {
       <AnimatePresence>
         {showModal && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/60 backdrop-blur-sm">
-            <motion.div 
-              initial={{ scale: 0.95, opacity: 0, y: 20 }} 
-              animate={{ scale: 1, opacity: 1, y: 0 }} 
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.95, opacity: 0, y: 20 }}
               className="w-full max-w-4xl bg-surface border border-outline-variant/20 rounded-[2rem] shadow-2xl overflow-hidden flex flex-col md:flex-row max-h-[90vh]"
             >
@@ -449,13 +446,13 @@ export default function Members() {
                     <XCircle size={24} />
                   </button>
                 </div>
-                
+
                 <div className="relative group mb-6">
                   <div className="w-40 h-40 rounded-full overflow-hidden border-4 border-surface bg-surface-container flex items-center justify-center shadow-xl transition-all group-hover:border-primary/20">
                     {formData.image_url ? (
-                      <img 
-                        src={formData.image_url} 
-                        alt="Preview" 
+                      <img
+                        src={formData.image_url}
+                        alt="Preview"
                         className="w-full h-full object-cover"
                         referrerPolicy="no-referrer"
                       />
@@ -463,16 +460,16 @@ export default function Members() {
                       <Users size={64} className="text-on-surface-variant/50" />
                     )}
                   </div>
-                  <label 
-                    htmlFor="image-upload" 
+                  <label
+                    htmlFor="image-upload"
                     className="absolute bottom-2 right-2 p-3 bg-primary text-on-primary rounded-full cursor-pointer shadow-lg hover:scale-110 transition-transform"
                   >
                     <Camera size={20} />
-                    <input 
-                      id="image-upload" 
-                      type="file" 
-                      className="hidden" 
-                      accept="image/*" 
+                    <input
+                      id="image-upload"
+                      type="file"
+                      className="hidden"
+                      accept="image/*"
                       onChange={handleImageChange}
                     />
                   </label>
@@ -483,7 +480,7 @@ export default function Members() {
                 <p className="text-sm text-on-surface-variant text-center mb-8">
                   {formData.email || "No email provided"}
                 </p>
-                
+
                 <div className="w-full space-y-4 mt-auto hidden md:block">
                   <div className="p-4 rounded-2xl bg-surface border border-outline-variant/10">
                     <p className="text-xs font-bold text-primary uppercase tracking-wider mb-1">Age Group</p>
@@ -509,17 +506,17 @@ export default function Members() {
                       Maintain accurate records for church planning and outreach.
                     </p>
                   </div>
-                  <button 
+                  <button
                     onClick={() => setShowModal(false)}
                     className="p-2 rounded-full hover:bg-surface-container text-on-surface-variant hover:text-primary transition-colors"
                   >
                     <XCircle size={24} />
                   </button>
                 </div>
-                
+
                 <div className="p-8 overflow-y-auto custom-scrollbar flex-1">
                   <form id="member-form" onSubmit={handleSaveMember} className="space-y-8">
-                    
+
                     {/* Personal Information Section */}
                     <div>
                       <h3 className="text-sm font-bold text-primary uppercase tracking-widest mb-6 flex items-center gap-2">
@@ -528,37 +525,37 @@ export default function Members() {
                       </h3>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="md:col-span-2">
-                          <Input 
-                            label="Full Legal Name" 
-                            placeholder="e.g. Johnathan Doe" 
-                            value={formData.full_name} 
-                            onChange={e => setFormData({...formData, full_name: e.target.value})} 
-                            required 
+                          <Input
+                            label="Full Legal Name"
+                            placeholder="e.g. Johnathan Doe"
+                            value={formData.full_name}
+                            onChange={e => setFormData({ ...formData, full_name: e.target.value })}
+                            required
                           />
                         </div>
-                        
-                        <Input 
-                          label="Email Address" 
-                          placeholder="member@domain.com" 
-                          value={formData.email} 
-                          onChange={e => setFormData({...formData, email: e.target.value})} 
-                          icon={Mail} 
+
+                        <Input
+                          label="Email Address"
+                          placeholder="member@domain.com"
+                          value={formData.email}
+                          onChange={e => setFormData({ ...formData, email: e.target.value })}
+                          icon={Mail}
                         />
-                        <Input 
-                          label="Phone Number" 
-                          placeholder="+1 (555) 000-0000" 
-                          value={formData.phone} 
-                          onChange={e => setFormData({...formData, phone: e.target.value})} 
-                          icon={Phone} 
+                        <Input
+                          label="Phone Number"
+                          placeholder="+1 (555) 000-0000"
+                          value={formData.phone}
+                          onChange={e => setFormData({ ...formData, phone: e.target.value })}
+                          icon={Phone}
                         />
-                        
+
                         <div className="space-y-2">
                           <label className="text-sm font-semibold text-on-surface">Gender</label>
                           <div className="relative">
-                            <select 
-                              className="w-full h-12 px-4 rounded-xl border border-outline-variant/20 bg-surface text-on-surface focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all appearance-none" 
-                              value={formData.gender} 
-                              onChange={e => setFormData({...formData, gender: e.target.value})}
+                            <select
+                              className="w-full h-12 px-4 rounded-xl border border-outline-variant/20 bg-surface text-on-surface focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all appearance-none"
+                              value={formData.gender}
+                              onChange={e => setFormData({ ...formData, gender: e.target.value })}
                             >
                               {['Male', 'Female', 'Other'].map(s => <option key={s} value={s}>{s}</option>)}
                             </select>
@@ -569,10 +566,10 @@ export default function Members() {
                         <div className="space-y-2">
                           <label className="text-sm font-semibold text-on-surface">Marital Status</label>
                           <div className="relative">
-                            <select 
-                              className="w-full h-12 px-4 rounded-xl border border-outline-variant/20 bg-surface text-on-surface focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all appearance-none" 
-                              value={formData.marital_status} 
-                              onChange={e => setFormData({...formData, marital_status: e.target.value})}
+                            <select
+                              className="w-full h-12 px-4 rounded-xl border border-outline-variant/20 bg-surface text-on-surface focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all appearance-none"
+                              value={formData.marital_status}
+                              onChange={e => setFormData({ ...formData, marital_status: e.target.value })}
                             >
                               {['Unmarried', 'Married'].map(s => <option key={s} value={s}>{s}</option>)}
                             </select>
@@ -583,10 +580,10 @@ export default function Members() {
                         <div className="space-y-2">
                           <label className="text-sm font-semibold text-on-surface">Age Group</label>
                           <div className="relative">
-                            <select 
-                              className="w-full h-12 px-4 rounded-xl border border-outline-variant/20 bg-surface text-on-surface focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all appearance-none" 
-                              value={formData.age_group} 
-                              onChange={e => setFormData({...formData, age_group: e.target.value})}
+                            <select
+                              className="w-full h-12 px-4 rounded-xl border border-outline-variant/20 bg-surface text-on-surface focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all appearance-none"
+                              value={formData.age_group}
+                              onChange={e => setFormData({ ...formData, age_group: e.target.value })}
                             >
                               {['Kids', 'Teenage', 'Youth', 'Adult', 'Senior'].map(s => <option key={s} value={s}>{s}</option>)}
                             </select>
@@ -597,10 +594,10 @@ export default function Members() {
                         <div className="space-y-2">
                           <label className="text-sm font-semibold text-on-surface">Leave Status</label>
                           <div className="relative">
-                            <select 
-                              className="w-full h-12 px-4 rounded-xl border border-outline-variant/20 bg-surface text-on-surface focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all appearance-none" 
-                              value={formData.leave_status} 
-                              onChange={e => setFormData({...formData, leave_status: e.target.value})}
+                            <select
+                              className="w-full h-12 px-4 rounded-xl border border-outline-variant/20 bg-surface text-on-surface focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all appearance-none"
+                              value={formData.leave_status}
+                              onChange={e => setFormData({ ...formData, leave_status: e.target.value })}
                             >
                               {['Active', 'On Leave', 'Sick', 'Travelled', 'Suspended'].map(s => <option key={s} value={s}>{s}</option>)}
                             </select>
@@ -609,12 +606,12 @@ export default function Members() {
                         </div>
 
                         <div className="md:col-span-2">
-                          <Input 
-                            label="Residential Address" 
-                            placeholder="Home address details" 
-                            value={formData.address} 
-                            onChange={e => setFormData({...formData, address: e.target.value})} 
-                            icon={MapPin} 
+                          <Input
+                            label="Residential Address"
+                            placeholder="Home address details"
+                            value={formData.address}
+                            onChange={e => setFormData({ ...formData, address: e.target.value })}
+                            icon={MapPin}
                           />
                         </div>
                       </div>
@@ -632,10 +629,10 @@ export default function Members() {
                         <div className="space-y-2">
                           <label className="text-sm font-semibold text-on-surface">Bible Study Unit</label>
                           <div className="relative">
-                            <select 
-                              className="w-full h-12 px-4 rounded-xl border border-outline-variant/20 bg-surface text-on-surface focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all appearance-none" 
-                              value={formData.group_id} 
-                              onChange={e => setFormData({...formData, group_id: e.target.value})}
+                            <select
+                              className="w-full h-12 px-4 rounded-xl border border-outline-variant/20 bg-surface text-on-surface focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all appearance-none"
+                              value={formData.group_id}
+                              onChange={e => setFormData({ ...formData, group_id: e.target.value })}
                             >
                               <option value="">Unassigned (General Pool)</option>
                               {groups.map(g => <option key={g.id} value={g.id}>{g.group_name}</option>)}
@@ -644,12 +641,12 @@ export default function Members() {
                           </div>
                         </div>
 
-                        <Input 
-                          label="Join Date" 
-                          type="date" 
-                          value={formData.join_date} 
-                          onChange={e => setFormData({...formData, join_date: e.target.value})} 
-                          icon={Calendar} 
+                        <Input
+                          label="Join Date"
+                          type="date"
+                          value={formData.join_date}
+                          onChange={e => setFormData({ ...formData, join_date: e.target.value })}
+                          icon={Calendar}
                         />
                       </div>
                     </div>
@@ -657,23 +654,23 @@ export default function Members() {
 
                   {error && (
                     <div className="mt-6 p-4 rounded-xl bg-error/10 text-error flex items-center gap-3 border border-error/20">
-                      <XCircle size={20} /> 
+                      <XCircle size={20} />
                       <span className="text-sm font-medium">{error}</span>
                     </div>
                   )}
                 </div>
 
                 <div className="px-8 py-6 border-t border-outline-variant/10 bg-surface-container-lowest flex gap-4 justify-end sticky bottom-0 z-10">
-                  <Button 
-                    variant="secondary" 
-                    onClick={() => setShowModal(false)} 
+                  <Button
+                    variant="secondary"
+                    onClick={() => setShowModal(false)}
                     className="px-8"
                     disabled={isSaving}
                   >
                     Cancel
                   </Button>
-                  <Button 
-                    type="submit" 
+                  <Button
+                    type="submit"
                     form="member-form"
                     className="px-8"
                     loading={isSaving}
@@ -707,11 +704,11 @@ export default function Members() {
       {/* Toast */}
       <AnimatePresence>
         {success && (
-          <motion.div 
-            initial={{ y: 100 }} animate={{ y: 0 }} exit={{ opacity: 0 }} 
-            style={{ 
-              position: 'fixed', bottom: '40px', right: '40px', 
-              background: 'var(--secondary)', color: 'white', padding: '16px 24px', 
+          <motion.div
+            initial={{ y: 100 }} animate={{ y: 0 }} exit={{ opacity: 0 }}
+            style={{
+              position: 'fixed', bottom: '40px', right: '40px',
+              background: 'var(--secondary)', color: 'white', padding: '16px 24px',
               borderRadius: '12px', boxShadow: '0 8px 30px rgba(0,0,0,0.3)',
               display: 'flex', alignItems: 'center', gap: '12px', zIndex: 1100
             }}

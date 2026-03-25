@@ -7,7 +7,7 @@ import {
   MoreVertical, Edit2, Trash2, CheckCircle2,
   XCircle, FilterX, UserCheck, MapPin,
   Calendar, CreditCard, ChevronDown, BookOpen,
-  Camera, Upload, Plus, X
+  Camera, Upload, Plus, X, Eye, Heart, User
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 
@@ -25,6 +25,7 @@ export default function Members() {
   const [isSaving, setIsSaving] = useState(false);
   const [imageFile, setImageFile] = useState(null);
   const [ministryInput, setMinistryInput] = useState("");
+  const [viewMember, setViewMember] = useState(null);
 
   const [formData, setFormData] = useState({
     full_name: "",
@@ -350,7 +351,7 @@ export default function Members() {
             </thead>
             <tbody>
               {filteredMembers.map((m) => (
-                <tr key={m.id} className="table-row-hover" style={{ borderBottom: '1px solid var(--border)' }}>
+                <tr key={m.id} className="table-row-hover" style={{ borderBottom: '1px solid var(--border)', cursor: 'pointer' }} onClick={() => setViewMember(m)}>
                   <td style={{ padding: '20px 24px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
                       {m.image_url ? (
@@ -432,7 +433,8 @@ export default function Members() {
                     </span>
                   </td>
                   <td style={{ padding: '20px 24px', textAlign: 'right' }}>
-                    <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px' }} onClick={e => e.stopPropagation()}>
+                      <button onClick={() => setViewMember(m)} style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}><Eye size={16} /></button>
                       <button onClick={() => handleOpenModal(m)} style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}><Edit2 size={16} /></button>
                       <button onClick={() => setDeleteId(m.id)} style={{ background: 'transparent', border: 'none', color: '#ef4444', cursor: 'pointer' }}><Trash2 size={16} /></button>
                     </div>
@@ -443,6 +445,192 @@ export default function Members() {
           </table>
         </div>
       </Card>
+
+      {/* Member Profile View Modal */}
+      <AnimatePresence>
+        {viewMember && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/60 backdrop-blur-sm" onClick={() => setViewMember(null)}>
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.95, opacity: 0, y: 20 }}
+              className="w-full max-w-lg bg-surface border border-outline-variant/20 rounded-[2rem] shadow-2xl overflow-hidden max-h-[90vh] flex flex-col"
+              onClick={e => e.stopPropagation()}
+            >
+              {/* Profile Header */}
+              <div className="bg-primary/5 px-8 pt-8 pb-6 text-center border-b border-outline-variant/10 shrink-0">
+                {viewMember.image_url ? (
+                  <img
+                    src={viewMember.image_url}
+                    alt={viewMember.full_name}
+                    referrerPolicy="no-referrer"
+                    className="w-28 h-28 rounded-full object-cover border-4 border-surface shadow-xl mx-auto mb-4"
+                  />
+                ) : (
+                  <div className="w-28 h-28 rounded-full bg-primary/10 flex items-center justify-center text-primary text-4xl font-black border-4 border-surface shadow-xl mx-auto mb-4">
+                    {viewMember.full_name?.charAt(0)}
+                  </div>
+                )}
+                <h2 className="text-2xl font-black text-on-surface">{viewMember.full_name}</h2>
+                <div className="flex items-center justify-center gap-2 mt-2">
+                  {(() => {
+                    const colors = { Active: '#10b981', Inactive: '#ef4444', Moved: '#f59e0b' };
+                    const c = colors[viewMember.leave_status] || '#10b981';
+                    return (
+                      <span style={{
+                        padding: '4px 14px', borderRadius: '100px', fontSize: '0.7rem', fontWeight: '800',
+                        background: `${c}18`, color: c, border: `1px solid ${c}22`
+                      }}>
+                        {viewMember.leave_status?.toUpperCase() || 'ACTIVE'}
+                      </span>
+                    );
+                  })()}
+                  {(() => {
+                    const colors = { Kids: '#ec4899', Teenage: '#f97316', Youth: '#06b6d4', Adult: '#3b82f6', Senior: '#8b5cf6' };
+                    const c = colors[viewMember.age_group] || '#3b82f6';
+                    return (
+                      <span style={{
+                        padding: '4px 14px', borderRadius: '100px', fontSize: '0.7rem', fontWeight: '800',
+                        background: `${c}18`, color: c, border: `1px solid ${c}22`
+                      }}>
+                        {viewMember.age_group?.toUpperCase() || 'ADULT'}
+                      </span>
+                    );
+                  })()}
+                </div>
+              </div>
+
+              {/* Profile Body */}
+              <div className="p-8 overflow-y-auto custom-scrollbar flex-1">
+                <div className="space-y-5">
+                  {/* Contact Info */}
+                  <div>
+                    <p className="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest mb-3 flex items-center gap-2">
+                      <User size={12} /> Contact Information
+                    </p>
+                    <div className="space-y-3 pl-1">
+                      {viewMember.email && (
+                        <div className="flex items-center gap-3">
+                          <Mail size={16} className="text-primary/50 shrink-0" />
+                          <span className="text-sm font-medium text-on-surface">{viewMember.email}</span>
+                        </div>
+                      )}
+                      {viewMember.phone && (
+                        <div className="flex items-center gap-3">
+                          <Phone size={16} className="text-primary/50 shrink-0" />
+                          <span className="text-sm font-medium text-on-surface">{viewMember.phone}</span>
+                        </div>
+                      )}
+                      {viewMember.address && (
+                        <div className="flex items-center gap-3">
+                          <MapPin size={16} className="text-primary/50 shrink-0" />
+                          <span className="text-sm font-medium text-on-surface">{viewMember.address}</span>
+                        </div>
+                      )}
+                      {!viewMember.email && !viewMember.phone && !viewMember.address && (
+                        <p className="text-sm text-on-surface-variant/50 italic">No contact info provided</p>
+                      )}
+                    </div>
+                  </div>
+
+                  <hr className="border-outline-variant/10" />
+
+                  {/* Personal Details */}
+                  <div>
+                    <p className="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest mb-3 flex items-center gap-2">
+                      <Heart size={12} /> Personal Details
+                    </p>
+                    <div className="grid grid-cols-2 gap-4 pl-1">
+                      <div>
+                        <p className="text-[10px] text-on-surface-variant uppercase font-bold tracking-wider">Gender</p>
+                        <p className="text-sm font-semibold text-on-surface mt-0.5">{viewMember.gender || '--'}</p>
+                      </div>
+                      <div>
+                        <p className="text-[10px] text-on-surface-variant uppercase font-bold tracking-wider">Marital Status</p>
+                        <p className="text-sm font-semibold text-on-surface mt-0.5">
+                          {(() => {
+                            const colors = { Married: '#10b981', Unmarried: '#f43f5e', Widow: '#8b5cf6' };
+                            const c = colors[viewMember.marital_status] || '#6b7280';
+                            return <span style={{ color: c }}>{viewMember.marital_status || '--'}</span>;
+                          })()}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-[10px] text-on-surface-variant uppercase font-bold tracking-wider">Age Group</p>
+                        <p className="text-sm font-semibold text-on-surface mt-0.5">{viewMember.age_group || '--'}</p>
+                      </div>
+                      <div>
+                        <p className="text-[10px] text-on-surface-variant uppercase font-bold tracking-wider">Join Date</p>
+                        <p className="text-sm font-semibold text-on-surface mt-0.5">
+                          {viewMember.join_date ? new Date(viewMember.join_date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : '--'}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <hr className="border-outline-variant/10" />
+
+                  {/* Church Details */}
+                  <div>
+                    <p className="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest mb-3 flex items-center gap-2">
+                      <BookOpen size={12} /> Church Details
+                    </p>
+                    <div className="grid grid-cols-2 gap-4 pl-1">
+                      <div>
+                        <p className="text-[10px] text-on-surface-variant uppercase font-bold tracking-wider">Bible Study Unit</p>
+                        <p className="text-sm font-semibold text-on-surface mt-0.5">{viewMember.bible_study_groups?.group_name || 'Unassigned'}</p>
+                      </div>
+                      <div>
+                        <p className="text-[10px] text-on-surface-variant uppercase font-bold tracking-wider">Leave Status</p>
+                        <p className="text-sm font-semibold text-on-surface mt-0.5">{viewMember.leave_status || 'Active'}</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Ministries */}
+                  {viewMember.ministries && viewMember.ministries.length > 0 && (
+                    <>
+                      <hr className="border-outline-variant/10" />
+                      <div>
+                        <p className="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest mb-3">Ministries</p>
+                        <div className="flex flex-wrap gap-2 pl-1">
+                          {viewMember.ministries.map((min, i) => (
+                            <span
+                              key={i}
+                              style={{
+                                padding: '4px 12px', borderRadius: '100px', fontSize: '0.75rem', fontWeight: '700',
+                                background: 'rgba(14,165,233,0.1)', color: '#0ea5e9', border: '1px solid rgba(14,165,233,0.15)'
+                              }}
+                            >
+                              {min}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    </>
+                  )}
+                </div>
+              </div>
+
+              {/* Footer */}
+              <div className="px-8 py-5 border-t border-outline-variant/10 bg-surface-container-lowest flex gap-3 shrink-0">
+                <button
+                  onClick={() => { setViewMember(null); handleOpenModal(viewMember); }}
+                  className="flex-1 h-12 rounded-xl bg-primary text-on-primary font-bold flex items-center justify-center gap-2 hover:opacity-90 transition-opacity cursor-pointer"
+                >
+                  <Edit2 size={16} /> Edit Profile
+                </button>
+                <button
+                  onClick={() => setViewMember(null)}
+                  className="flex-1 h-12 rounded-xl bg-surface-container-low text-on-surface-variant font-bold flex items-center justify-center hover:bg-surface-container transition-colors cursor-pointer"
+                >
+                  Close
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
 
       {/* Editor Modal */}
       <AnimatePresence>

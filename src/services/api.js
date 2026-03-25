@@ -224,6 +224,15 @@ export const eventService = {
     const { data, error } = await supabase.from("events").insert([event]).select();
     if (error) throw error;
     return data;
+  },
+  updateEvent: async (id, updates) => {
+    const { data, error } = await supabase.from("events").update(updates).eq("id", id).select();
+    if (error) throw error;
+    return data;
+  },
+  deleteEvent: async (id) => {
+    const { error } = await supabase.from("events").delete().eq("id", id);
+    if (error) throw error;
   }
 };
 

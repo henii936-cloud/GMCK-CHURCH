@@ -64,15 +64,18 @@ export default function Study() {
   };
 
   return (
-    <div className="animate-fade-in" style={{ display: 'grid', gridTemplateColumns: 'minmax(300px, 1fr) 300px', gap: '32px' }}>
-      <div>
-        <div style={{ marginBottom: '32px' }}>
-          <h1 style={{ fontSize: '2rem', fontWeight: '800' }}>Study Progress</h1>
-          <p style={{ color: 'var(--text-muted)' }}>Share what your group is learning with the church leadership</p>
-        </div>
+    <div className="animate-fade-in max-w-5xl mx-auto">
+      {/* Header */}
+      <div className="mb-5 sm:mb-8 pl-10 lg:pl-0">
+        <p className="label-sm text-tertiary-fixed-dim mb-1.5 sm:mb-2 tracking-[0.3em] text-[9px] sm:text-[11px]">Spiritual Growth</p>
+        <h1 className="display-lg text-primary mb-1 sm:mb-2">Study <span className="text-tertiary-fixed-dim italic">Progress</span></h1>
+        <p className="text-on-surface-variant font-medium tracking-wide text-xs sm:text-sm hidden sm:block">Share what your group is learning with the church leadership</p>
+      </div>
 
-        <Card style={{ padding: '40px' }}>
-          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_280px] gap-4 sm:gap-8">
+        {/* Form */}
+        <Card className="p-5 sm:p-10">
+          <form onSubmit={handleSubmit} className="flex flex-col gap-4 sm:gap-5">
             <Input 
               label="Study Topic / Key Theme" 
               placeholder="e.g. Ephesians 1:1-10 • Unity in Christ" 
@@ -89,43 +92,52 @@ export default function Study() {
               required
             />
 
-            <div className="form-group">
-              <label className="form-label">Notes / Reflections</label>
+            <div className="space-y-2 sm:space-y-3">
+              <label className="label-sm font-black uppercase tracking-widest text-primary/60 text-[9px] sm:text-[11px]">Notes / Reflections</label>
               <textarea 
-                className="input-field" 
-                style={{ minHeight: '120px', padding: '12px' }}
+                className="w-full bg-surface-container-low rounded-lg sm:rounded-xl px-4 sm:px-6 py-3 sm:py-4 text-sm text-on-surface placeholder:text-on-surface-variant/40 outline-none border-2 border-transparent focus:border-primary/20 focus:bg-surface transition-all resize-none"
+                style={{ minHeight: '100px' }}
                 placeholder="Key takeaways or group reflections..."
                 value={formData.notes}
                 onChange={(e) => setFormData({...formData, notes: e.target.value})}
               />
             </div>
 
-            {message && <p style={{ fontWeight: '700', color: message.includes('Error') ? '#ef4444' : '#10b981', textAlign: 'center' }}>{message}</p>}
+            {message && (
+              <p className={`font-bold text-center text-xs sm:text-sm py-2 px-3 rounded-lg ${
+                message.includes('Error') 
+                  ? 'text-red-600 bg-red-500/10' 
+                  : 'text-emerald-600 bg-emerald-500/10'
+              }`}>
+                {message}
+              </p>
+            )}
 
-            <Button type="submit" style={{ height: '48px', justifyContent: 'center' }} disabled={loading}>
-              {loading ? <Loader2 className="animate-spin" /> : <>Log Study Progress <Send size={18} style={{ marginLeft: '8px' }} /></>}
+            <Button type="submit" className="w-full py-3 sm:py-4 justify-center rounded-xl text-sm sm:text-base" disabled={loading}>
+              {loading ? <Loader2 className="animate-spin" size={18} /> : <>Log Study Progress <Send size={16} className="ml-2" /></>}
             </Button>
           </form>
         </Card>
-      </div>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-        <Card style={{ padding: '32px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
-            <History size={20} color="var(--primary)" />
-            <h3 style={{ fontSize: '1.25rem', fontWeight: '700' }}>Recent Updates</h3>
-          </div>
-          <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem', lineHeight: '1.6' }}>
-            Your logs are automatically visible to the Admin through the global activity feed. This helps with tracking spiritual growth across all groups.
-          </p>
-        </Card>
+        {/* Sidebar info */}
+        <div className="flex flex-col gap-3 sm:gap-6">
+          <Card className="p-5 sm:p-8">
+            <div className="flex items-center gap-2.5 sm:gap-3 mb-3 sm:mb-5">
+              <History size={18} className="text-primary" />
+              <h3 className="text-sm sm:text-lg font-heading font-bold text-primary">Recent Updates</h3>
+            </div>
+            <p className="text-on-surface-variant text-xs sm:text-sm leading-relaxed">
+              Your logs are automatically visible to the Admin through the global activity feed. This helps with tracking spiritual growth across all groups.
+            </p>
+          </Card>
 
-        <div className="glass-card" style={{ padding: '24px', border: '1px solid var(--tertiary)', borderLeftWidth: '6px' }}>
-          <div style={{ display: 'flex', gap: '12px' }}>
-            <CheckCircle2 color="var(--tertiary)" />
-            <div>
-              <h4 style={{ fontWeight: '700', fontSize: '1rem', marginBottom: '4px' }}>Live Visibility</h4>
-              <p style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>Admins can see this topic immediately on their dashboard activity feed.</p>
+          <div className="editorial-card p-4 sm:p-6 border-l-4 border-tertiary-fixed-dim">
+            <div className="flex gap-2.5 sm:gap-3">
+              <CheckCircle2 size={18} className="text-tertiary-fixed-dim shrink-0 mt-0.5" />
+              <div>
+                <h4 className="font-bold text-sm sm:text-base text-on-surface mb-0.5 sm:mb-1">Live Visibility</h4>
+                <p className="text-on-surface-variant text-[10px] sm:text-xs leading-relaxed">Admins can see this topic immediately on their dashboard activity feed.</p>
+              </div>
             </div>
           </div>
         </div>

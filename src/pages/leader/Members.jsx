@@ -21,7 +21,6 @@ export default function LeaderMembers() {
     try {
       setLoading(true);
       
-      // 1. Get the leader's assigned group
       const { data: assignmentData, error: assignmentError } = await supabase
         .from('group_leaders')
         .select('group_id')
@@ -35,7 +34,6 @@ export default function LeaderMembers() {
         return;
       }
 
-      // 2. Fetch members for that group
       const data = await memberService.getMembers();
       const groupMembers = data.filter(m => m.group_id === assignmentData.group_id);
       setMembers(groupMembers);
@@ -53,94 +51,140 @@ export default function LeaderMembers() {
   );
 
   return (
-    <div className="animate-fade-in">
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '32px' }}>
-        <div>
-          <h1 style={{ fontSize: '2rem', fontWeight: '800' }}>Group Members</h1>
-          <p style={{ color: 'var(--text-muted)' }}>View and manage members of your study group</p>
-        </div>
+    <div className="animate-fade-in max-w-5xl mx-auto">
+      {/* Header */}
+      <div className="mb-5 sm:mb-8 pl-10 lg:pl-0">
+        <p className="label-sm text-tertiary-fixed-dim mb-1.5 sm:mb-2 tracking-[0.3em] text-[9px] sm:text-[11px]">Ministry Roster</p>
+        <h1 className="display-lg text-primary mb-1 sm:mb-2">Group <span className="text-tertiary-fixed-dim italic">Members</span></h1>
+        <p className="text-on-surface-variant font-medium tracking-wide text-xs sm:text-sm hidden sm:block">View and manage members of your study group</p>
       </div>
 
-      <Card style={{ padding: '0', overflow: 'hidden', border: '1px solid var(--border)' }}>
-        <div style={{ padding: '24px', background: 'rgba(255,255,255,0.03)', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', gap: '16px' }}>
-          <div style={{ flex: 1, position: 'relative' }}>
-            <Search size={18} style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', opacity: 0.5 }} />
+      <Card className="overflow-hidden !p-0">
+        {/* Search bar */}
+        <div className="p-3 sm:p-6 bg-surface-container-low border-b border-outline-variant/10 flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4">
+          <div className="flex-1 relative">
+            <Search size={16} className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 opacity-40 text-on-surface-variant" />
             <input 
               type="text" 
-              placeholder="Search members by name, email, or phone..." 
+              placeholder="Search members..." 
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="input-field"
-              style={{ paddingLeft: '44px', width: '100%' }}
+              className="w-full py-2.5 sm:py-3 pl-9 sm:pl-12 pr-4 rounded-lg sm:rounded-xl bg-surface-container-lowest text-sm text-on-surface placeholder:text-on-surface-variant/40 outline-none border-2 border-transparent focus:border-primary/20 transition-all"
             />
           </div>
-          <div className="glass-card" style={{ padding: '10px 16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <Users size={18} color="var(--primary)" />
-            <span style={{ fontWeight: '600' }}>{members.length} Members</span>
+          <div className="flex items-center gap-2 px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg sm:rounded-xl bg-surface-container-lowest shrink-0 self-start sm:self-auto">
+            <Users size={16} className="text-primary" />
+            <span className="text-xs sm:text-sm font-bold text-on-surface">{members.length} Members</span>
           </div>
         </div>
 
         {loading ? (
-          <div style={{ padding: '40px', textAlign: 'center' }}>Loading members...</div>
+          <div className="p-10 sm:p-16 text-center">
+            <div className="w-10 h-10 rounded-full border-4 border-surface-container-low border-t-primary animate-spin mx-auto mb-4"></div>
+            <p className="text-sm text-on-surface-variant font-medium">Loading members...</p>
+          </div>
         ) : filteredMembers.length === 0 ? (
-          <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text-muted)' }}>
-            No members found.
+          <div className="p-10 sm:p-16 text-center">
+            <Users size={36} className="mx-auto text-on-surface-variant/20 mb-3" />
+            <p className="text-sm text-on-surface-variant font-medium">No members found.</p>
           </div>
         ) : (
-          <div style={{ padding: '12px' }}>
-            <table className="table-glass">
-              <thead>
-                <tr>
-                  <th>Name</th>
-                  <th>Contact Info</th>
-                  <th>Address</th>
-                  <th>Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredMembers.map((m) => (
-                  <tr key={m.id}>
-                    <td>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                        <div style={{ width: 36, height: 36, borderRadius: '50%', background: 'rgba(99, 102, 241, 0.1)', display: 'grid', placeItems: 'center', fontWeight: '800', color: 'var(--primary)' }}>
-                          {m.full_name?.charAt(0) || '?'}
-                        </div>
-                        <span style={{ fontWeight: '600' }}>{m.full_name}</span>
-                      </div>
-                    </td>
-                    <td>
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                        {m.email && (
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.875rem', color: 'var(--text-muted)' }}>
-                            <Mail size={14} /> {m.email}
+          <>
+            {/* Desktop table */}
+            <div className="hidden md:block overflow-x-auto p-3">
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="border-b border-outline-variant/10">
+                    <th className="pb-4 pt-2 px-4 label-sm">Name</th>
+                    <th className="pb-4 pt-2 px-4 label-sm">Contact Info</th>
+                    <th className="pb-4 pt-2 px-4 label-sm">Address</th>
+                    <th className="pb-4 pt-2 px-4 label-sm">Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredMembers.map((m) => (
+                    <tr key={m.id} className="hover:bg-surface-container-low transition-colors">
+                      <td className="py-4 px-4">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-full bg-primary/10 grid place-items-center font-bold text-primary text-sm">
+                            {m.full_name?.charAt(0) || '?'}
                           </div>
-                        )}
-                        {m.phone && (
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.875rem', color: 'var(--text-muted)' }}>
-                            <Phone size={14} /> {m.phone}
-                          </div>
-                        )}
-                      </div>
-                    </td>
-                    <td>
-                      {m.address ? (
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.875rem', color: 'var(--text-muted)' }}>
-                          <MapPin size={14} /> {m.address}
+                          <span className="font-bold text-on-surface text-sm">{m.full_name}</span>
                         </div>
-                      ) : (
-                        <span style={{ color: 'var(--text-muted)', fontSize: '0.875rem' }}>Not provided</span>
-                      )}
-                    </td>
-                    <td>
-                      <span className={`badge ${m.status === 'Active' ? 'badge-approved' : 'badge-pending'}`}>
+                      </td>
+                      <td className="py-4 px-4">
+                        <div className="flex flex-col gap-1">
+                          {m.email && (
+                            <div className="flex items-center gap-1.5 text-xs text-on-surface-variant">
+                              <Mail size={12} /> {m.email}
+                            </div>
+                          )}
+                          {m.phone && (
+                            <div className="flex items-center gap-1.5 text-xs text-on-surface-variant">
+                              <Phone size={12} /> {m.phone}
+                            </div>
+                          )}
+                        </div>
+                      </td>
+                      <td className="py-4 px-4">
+                        {m.address ? (
+                          <div className="flex items-center gap-1.5 text-xs text-on-surface-variant">
+                            <MapPin size={12} /> {m.address}
+                          </div>
+                        ) : (
+                          <span className="text-xs text-on-surface-variant/50">Not provided</span>
+                        )}
+                      </td>
+                      <td className="py-4 px-4">
+                        <span className={`px-2.5 py-1 rounded-full text-[9px] font-black uppercase tracking-widest ${
+                          m.status === 'Active' 
+                            ? 'bg-emerald-500/10 text-emerald-600' 
+                            : 'bg-amber-500/10 text-amber-600'
+                        }`}>
+                          {m.status || 'Active'}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Mobile card layout */}
+            <div className="md:hidden p-3 space-y-2.5">
+              {filteredMembers.map((m) => (
+                <div key={m.id} className="flex items-center gap-3 p-3.5 rounded-xl bg-surface-container-low hover:bg-surface-container transition-colors">
+                  <div className="w-10 h-10 rounded-full bg-primary/10 grid place-items-center font-bold text-primary text-sm shrink-0">
+                    {m.full_name?.charAt(0) || '?'}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between gap-2 mb-0.5">
+                      <p className="font-bold text-sm text-on-surface truncate">{m.full_name}</p>
+                      <span className={`px-2 py-0.5 rounded-full text-[8px] font-black uppercase tracking-widest shrink-0 ${
+                        m.status === 'Active' 
+                          ? 'bg-emerald-500/10 text-emerald-600' 
+                          : 'bg-amber-500/10 text-amber-600'
+                      }`}>
                         {m.status || 'Active'}
                       </span>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                    </div>
+                    <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5">
+                      {m.phone && (
+                        <span className="flex items-center gap-1 text-[10px] text-on-surface-variant">
+                          <Phone size={10} /> {m.phone}
+                        </span>
+                      )}
+                      {m.email && (
+                        <span className="flex items-center gap-1 text-[10px] text-on-surface-variant truncate">
+                          <Mail size={10} /> {m.email}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </>
         )}
       </Card>
     </div>

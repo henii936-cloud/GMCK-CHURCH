@@ -15,7 +15,7 @@ export default function Attendance() {
   const [saving, setSaving] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [message, setMessage] = useState("");
-  const [activeTab, setActiveTab] = useState("take"); // 'take' or 'history'
+  const [activeTab, setActiveTab] = useState("take");
   const [groupId, setGroupId] = useState(null);
 
   useEffect(() => {
@@ -28,7 +28,6 @@ export default function Attendance() {
     try {
       setLoading(true);
       
-      // 1. Get the leader's assigned group
       const { data: assignmentData, error: assignmentError } = await supabase
         .from('group_leaders')
         .select('group_id')
@@ -45,12 +44,10 @@ export default function Attendance() {
         return;
       }
 
-      // For simplicity, we fetch all and filter by group_id
       const data = await memberService.getMembers();
       const filtered = data.filter(m => m.group_id === currentGroupId);
       setMembers(filtered);
       
-      // Initialize attendance
       const initial = {};
       filtered.forEach(m => initial[m.id] = 'Present');
       setAttendance(initial);
@@ -83,7 +80,6 @@ export default function Attendance() {
       await attendanceService.saveAttendance(records);
       setMessage("Attendance saved successfully!");
       
-      // Reload history and switch to history tab
       const historyData = await attendanceService.getAttendanceHistory(groupId);
       setHistory(historyData);
       
@@ -94,7 +90,6 @@ export default function Attendance() {
     } catch (err) {
       console.error("Save attendance error:", err);
       
-      // Extract detailed error information
       let errorMsg = err.message || 'Please try again.';
       if (err.details) errorMsg += ` (${err.details})`;
       if (err.hint) errorMsg += ` Hint: ${err.hint}`;
@@ -113,116 +108,113 @@ export default function Attendance() {
   const today = new Date().toISOString().split('T')[0];
   const isAttendanceTakenToday = history.some(record => record.date === today);
 
+  const presentCount = Object.values(attendance).filter(s => s === 'Present').length;
+  const absentCount = Object.values(attendance).filter(s => s === 'Absent').length;
+  const excusedCount = Object.values(attendance).filter(s => s === 'Excused').length;
+
   return (
-    <div className="animate-fade-in">
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '32px' }}>
-        <div>
-          <h1 style={{ fontSize: '2rem', fontWeight: '800' }}>Attendance Tracking</h1>
-          <p style={{ color: 'var(--text-muted)' }}>Quickly mark your group members for today's session</p>
+    <div className="animate-fade-in max-w-5xl mx-auto">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 sm:gap-4 mb-5 sm:mb-8">
+        <div className="pl-10 lg:pl-0">
+          <p className="label-sm text-tertiary-fixed-dim mb-1 sm:mb-2 tracking-[0.3em] text-[9px] sm:text-[11px]">Record Keeping</p>
+          <h1 className="display-lg text-primary mb-1 sm:mb-2">Attendance <span className="text-tertiary-fixed-dim italic">Tracking</span></h1>
+          <p className="text-on-surface-variant font-medium text-xs sm:text-sm hidden sm:block">Mark your group members for today's session</p>
         </div>
-        <div style={{ color: 'var(--primary)', fontWeight: '700', fontSize: '1.25rem' }}>
-          {new Date().toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' })}
+        <div className="bg-surface-container-low px-3 sm:px-4 py-2 sm:py-3 rounded-lg sm:rounded-xl border border-outline-variant/10 self-start sm:self-auto">
+          <p className="text-xs sm:text-sm font-bold text-primary">
+            {new Date().toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' })}
+          </p>
         </div>
       </div>
 
-      <div style={{ display: 'flex', gap: '12px', marginBottom: '24px' }}>
+      {/* Tabs */}
+      <div className="flex gap-2 sm:gap-3 mb-4 sm:mb-6">
         <button 
           onClick={() => setActiveTab('take')}
-          style={{ 
-            padding: '10px 20px', 
-            borderRadius: '8px', 
-            border: 'none', 
-            background: activeTab === 'take' ? 'var(--primary)' : 'rgba(255,255,255,0.05)', 
-            color: activeTab === 'take' ? 'white' : 'var(--text-muted)',
-            fontWeight: '600',
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-            transition: '0.2s'
-          }}
+          className={`flex-1 sm:flex-none px-4 sm:px-5 py-2.5 sm:py-3 rounded-lg sm:rounded-xl text-xs sm:text-sm font-bold flex items-center justify-center gap-2 transition-all duration-300 cursor-pointer ${
+            activeTab === 'take' 
+              ? 'bg-primary text-on-primary shadow-md' 
+              : 'bg-surface-container-low text-on-surface-variant hover:bg-surface-container'
+          }`}
         >
-          <ClipboardList size={18} /> Take Attendance
+          <ClipboardList size={16} />
+          <span>Take</span>
         </button>
         <button 
           onClick={() => setActiveTab('history')}
-          style={{ 
-            padding: '10px 20px', 
-            borderRadius: '8px', 
-            border: 'none', 
-            background: activeTab === 'history' ? 'var(--primary)' : 'rgba(255,255,255,0.05)', 
-            color: activeTab === 'history' ? 'white' : 'var(--text-muted)',
-            fontWeight: '600',
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-            transition: '0.2s'
-          }}
+          className={`flex-1 sm:flex-none px-4 sm:px-5 py-2.5 sm:py-3 rounded-lg sm:rounded-xl text-xs sm:text-sm font-bold flex items-center justify-center gap-2 transition-all duration-300 cursor-pointer ${
+            activeTab === 'history' 
+              ? 'bg-primary text-on-primary shadow-md' 
+              : 'bg-surface-container-low text-on-surface-variant hover:bg-surface-container'
+          }`}
         >
-          <Calendar size={18} /> Attendance History
+          <Calendar size={16} />
+          <span>History</span>
         </button>
       </div>
 
-      <Card style={{ padding: '0', overflow: 'hidden', border: '1px solid var(--border)' }}>
+      <Card className="overflow-hidden !p-0">
         {activeTab === 'take' ? (
           isAttendanceTakenToday ? (
-            <div className="p-16 text-center flex flex-col items-center justify-center bg-surface">
-              <div className="w-20 h-20 rounded-full bg-emerald-500/10 text-emerald-500 flex items-center justify-center mb-6">
-                <Check size={40} />
+            <div className="p-8 sm:p-16 text-center flex flex-col items-center justify-center bg-surface">
+              <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-emerald-500/10 text-emerald-500 flex items-center justify-center mb-4 sm:mb-6">
+                <Check size={32} className="sm:hidden" />
+                <Check size={40} className="hidden sm:block" />
               </div>
-              <h2 className="text-2xl font-bold text-on-surface mb-3">Attendance Complete</h2>
-              <p className="text-on-surface-variant mb-8 max-w-md">You have already recorded attendance for today's session. Thank you for keeping the records up to date.</p>
-              <Button onClick={() => setActiveTab('history')} style={{ padding: '12px 24px' }}>
-                View Attendance History
+              <h2 className="text-xl sm:text-2xl font-bold text-on-surface mb-2 sm:mb-3">Attendance Complete</h2>
+              <p className="text-on-surface-variant mb-6 sm:mb-8 max-w-md text-sm sm:text-base">You have already recorded attendance for today's session.</p>
+              <Button onClick={() => setActiveTab('history')} className="text-sm sm:text-base py-2.5 sm:py-3 px-5 sm:px-6">
+                View History
               </Button>
             </div>
           ) : (
           <>
-            <div style={{ padding: '24px', background: 'rgba(255,255,255,0.03)', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', gap: '16px' }}>
-              <div style={{ flex: 1, position: 'relative' }}>
-                <Search size={18} style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', opacity: 0.5 }} />
+            {/* Search + count */}
+            <div className="p-3 sm:p-6 bg-surface-container-low border-b border-outline-variant/10 flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4">
+              <div className="flex-1 relative">
+                <Search size={16} className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 opacity-40 text-on-surface-variant" />
                 <input 
                   type="text" 
                   placeholder="Search members..." 
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="input-field"
-                  style={{ paddingLeft: '44px', width: '100%' }}
+                  className="w-full py-2.5 sm:py-3 pl-9 sm:pl-12 pr-4 rounded-lg sm:rounded-xl bg-surface-container-lowest text-sm text-on-surface placeholder:text-on-surface-variant/40 outline-none border-2 border-transparent focus:border-primary/20 transition-all"
                 />
               </div>
-              <div className="glass-card" style={{ padding: '10px 16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <Users size={18} color="var(--primary)" />
-                <span style={{ fontWeight: '600' }}>{members.length} Total</span>
+              <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-surface-container-lowest shrink-0 self-start sm:self-auto">
+                <Users size={14} className="text-primary" />
+                <span className="text-xs font-bold text-on-surface">{members.length} Total</span>
               </div>
             </div>
 
-            <div className="p-6 bg-surface">
-              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+            {/* Member cards */}
+            <div className="p-3 sm:p-6 bg-surface">
+              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-4">
                 {filteredMembers.map((m) => (
                   <div 
                     key={m.id} 
-                    className={`p-5 rounded-2xl border transition-all duration-200 flex flex-col gap-4 ${
+                    className={`p-3.5 sm:p-5 rounded-xl sm:rounded-2xl border transition-all duration-200 flex flex-col gap-3 sm:gap-4 ${
                       attendance[m.id] === 'Present' ? 'bg-emerald-500/5 border-emerald-500/20 shadow-sm shadow-emerald-500/5' : 
                       attendance[m.id] === 'Absent' ? 'bg-red-500/5 border-red-500/20 shadow-sm shadow-red-500/5' : 
                       'bg-amber-500/5 border-amber-500/20 shadow-sm shadow-amber-500/5'
                     }`}
                   >
                     <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <div className={`w-12 h-12 rounded-full flex items-center justify-center font-bold text-lg ${
-                          attendance[m.id] === 'Present' ? 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-400' : 
-                          attendance[m.id] === 'Absent' ? 'bg-red-500/20 text-red-600 dark:text-red-400' : 
-                          'bg-amber-500/20 text-amber-600 dark:text-amber-400'
+                      <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
+                        <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center font-bold text-sm sm:text-lg shrink-0 ${
+                          attendance[m.id] === 'Present' ? 'bg-emerald-500/20 text-emerald-600' : 
+                          attendance[m.id] === 'Absent' ? 'bg-red-500/20 text-red-600' : 
+                          'bg-amber-500/20 text-amber-600'
                         }`}>
                           {m.full_name.charAt(0)}
                         </div>
-                        <div>
-                          <h3 className="font-bold text-on-surface text-lg">{m.full_name}</h3>
-                          <span className={`text-xs font-bold uppercase tracking-wider ${
-                            attendance[m.id] === 'Present' ? 'text-emerald-600 dark:text-emerald-400' : 
-                            attendance[m.id] === 'Absent' ? 'text-red-600 dark:text-red-400' : 
-                            'text-amber-600 dark:text-amber-400'
+                        <div className="min-w-0">
+                          <h3 className="font-bold text-on-surface text-sm sm:text-lg truncate">{m.full_name}</h3>
+                          <span className={`text-[9px] sm:text-xs font-bold uppercase tracking-wider ${
+                            attendance[m.id] === 'Present' ? 'text-emerald-600' : 
+                            attendance[m.id] === 'Absent' ? 'text-red-600' : 
+                            'text-amber-600'
                           }`}>
                             {attendance[m.id]}
                           </span>
@@ -230,39 +222,39 @@ export default function Attendance() {
                       </div>
                     </div>
                     
-                    <div className="grid grid-cols-3 gap-2 mt-2">
+                    <div className="grid grid-cols-3 gap-1.5 sm:gap-2">
                       <button 
                         onClick={() => setStatus(m.id, 'Present')}
-                        className={`py-2 rounded-xl flex flex-col items-center justify-center gap-1 transition-all ${
+                        className={`py-2 sm:py-2.5 rounded-lg sm:rounded-xl flex flex-col items-center justify-center gap-0.5 sm:gap-1 transition-all cursor-pointer ${
                           attendance[m.id] === 'Present' 
                             ? 'bg-emerald-500 text-white shadow-md shadow-emerald-500/20' 
                             : 'bg-surface-container hover:bg-emerald-500/10 text-on-surface-variant hover:text-emerald-500'
                         }`}
                       >
-                        <Check size={18} />
-                        <span className="text-[10px] font-bold uppercase tracking-wider">Present</span>
+                        <Check size={16} />
+                        <span className="text-[8px] sm:text-[10px] font-bold uppercase tracking-wider">Present</span>
                       </button>
                       <button 
                         onClick={() => setStatus(m.id, 'Absent')}
-                        className={`py-2 rounded-xl flex flex-col items-center justify-center gap-1 transition-all ${
+                        className={`py-2 sm:py-2.5 rounded-lg sm:rounded-xl flex flex-col items-center justify-center gap-0.5 sm:gap-1 transition-all cursor-pointer ${
                           attendance[m.id] === 'Absent' 
                             ? 'bg-red-500 text-white shadow-md shadow-red-500/20' 
                             : 'bg-surface-container hover:bg-red-500/10 text-on-surface-variant hover:text-red-500'
                         }`}
                       >
-                        <X size={18} />
-                        <span className="text-[10px] font-bold uppercase tracking-wider">Absent</span>
+                        <X size={16} />
+                        <span className="text-[8px] sm:text-[10px] font-bold uppercase tracking-wider">Absent</span>
                       </button>
                       <button 
                         onClick={() => setStatus(m.id, 'Excused')}
-                        className={`py-2 rounded-xl flex flex-col items-center justify-center gap-1 transition-all ${
+                        className={`py-2 sm:py-2.5 rounded-lg sm:rounded-xl flex flex-col items-center justify-center gap-0.5 sm:gap-1 transition-all cursor-pointer ${
                           attendance[m.id] === 'Excused' 
                             ? 'bg-amber-500 text-white shadow-md shadow-amber-500/20' 
                             : 'bg-surface-container hover:bg-amber-500/10 text-on-surface-variant hover:text-amber-500'
                         }`}
                       >
-                        <span className="font-black text-sm leading-none h-[18px] flex items-center">E</span>
-                        <span className="text-[10px] font-bold uppercase tracking-wider">Excused</span>
+                        <span className="font-black text-sm leading-none h-4 flex items-center">E</span>
+                        <span className="text-[8px] sm:text-[10px] font-bold uppercase tracking-wider">Excused</span>
                       </button>
                     </div>
                   </div>
@@ -270,58 +262,73 @@ export default function Attendance() {
               </div>
             </div>
 
-            <div style={{ padding: '24px', background: 'rgba(0,0,0,0.1)', borderTop: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-                <Button 
-                  variant="outline" 
+            {/* Footer: stats + actions */}
+            <div className="p-3 sm:p-6 bg-surface-container-low border-t border-outline-variant/10">
+              {/* Stats row */}
+              <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
+                <span className="px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-600 text-[10px] sm:text-xs font-bold">{presentCount} Present</span>
+                <span className="px-2.5 py-1 rounded-full bg-red-500/10 text-red-600 text-[10px] sm:text-xs font-bold">{absentCount} Absent</span>
+                <span className="px-2.5 py-1 rounded-full bg-amber-500/10 text-amber-600 text-[10px] sm:text-xs font-bold">{excusedCount} Excused</span>
+              </div>
+
+              {/* Quick actions */}
+              <div className="flex flex-wrap gap-2 mb-3 sm:mb-4">
+                <button 
                   onClick={() => {
                     const newAttendance = {};
                     members.forEach(m => newAttendance[m.id] = 'Present');
                     setAttendance(newAttendance);
                   }}
-                  style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid var(--border)' }}
+                  className="px-3 py-1.5 sm:py-2 rounded-lg text-[10px] sm:text-xs font-bold bg-surface-container-lowest border border-outline-variant/10 text-on-surface-variant hover:text-primary hover:border-primary/20 transition-all cursor-pointer"
                 >
-                  Mark All Present
-                </Button>
-                <Button 
-                  variant="outline" 
+                  All Present
+                </button>
+                <button 
                   onClick={() => {
                     const newAttendance = {};
                     members.forEach(m => newAttendance[m.id] = 'Absent');
                     setAttendance(newAttendance);
                   }}
-                  style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid var(--border)' }}
+                  className="px-3 py-1.5 sm:py-2 rounded-lg text-[10px] sm:text-xs font-bold bg-surface-container-lowest border border-outline-variant/10 text-on-surface-variant hover:text-primary hover:border-primary/20 transition-all cursor-pointer"
                 >
-                  Mark All Absent
-                </Button>
-                <Button 
-                  variant="outline" 
+                  All Absent
+                </button>
+                <button 
                   onClick={() => {
                     const newAttendance = {};
                     members.forEach(m => newAttendance[m.id] = 'Excused');
                     setAttendance(newAttendance);
                   }}
-                  style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid var(--border)' }}
+                  className="px-3 py-1.5 sm:py-2 rounded-lg text-[10px] sm:text-xs font-bold bg-surface-container-lowest border border-outline-variant/10 text-on-surface-variant hover:text-primary hover:border-primary/20 transition-all cursor-pointer"
                 >
-                  Mark All Excused
-                </Button>
-                
-                <div style={{ display: 'flex', gap: '16px', marginLeft: '16px', fontSize: '0.875rem', fontWeight: '600' }}>
-                  <span style={{ color: '#10b981' }}>{Object.values(attendance).filter(s => s === 'Present').length} Present</span>
-                  <span style={{ color: '#ef4444' }}>{Object.values(attendance).filter(s => s === 'Absent').length} Absent</span>
-                  <span style={{ color: '#f59e0b' }}>{Object.values(attendance).filter(s => s === 'Excused').length} Excused</span>
-                </div>
-
-                {message && <p style={{ fontWeight: '700', color: message.includes('Error') ? '#ef4444' : '#10b981', background: message.includes('Error') ? 'rgba(239, 68, 68, 0.1)' : 'rgba(16, 185, 129, 0.1)', padding: '8px 16px', borderRadius: '8px', fontSize: '0.875rem', marginLeft: '12px' }}>{message}</p>}
+                  All Excused
+                </button>
               </div>
-              <Button onClick={handleSave} disabled={saving || members.length === 0} style={{ minWidth: '180px', justifyContent: 'center' }}>
-                {saving ? <Loader2 className="animate-spin" /> : <>Finalize Attendance <Check size={18} style={{ marginLeft: '8px' }} /></>}
+
+              {/* Message */}
+              {message && (
+                <div className={`mb-3 p-2.5 sm:p-3 rounded-lg text-xs sm:text-sm font-bold text-center ${
+                  message.includes('Error') 
+                    ? 'bg-red-500/10 text-red-600' 
+                    : 'bg-emerald-500/10 text-emerald-600'
+                }`}>
+                  {message}
+                </div>
+              )}
+
+              {/* Submit button */}
+              <Button 
+                onClick={handleSave} 
+                disabled={saving || members.length === 0}
+                className="w-full py-3 sm:py-4 text-sm sm:text-base justify-center rounded-xl"
+              >
+                {saving ? <Loader2 className="animate-spin" size={18} /> : <>Finalize Attendance <Check size={16} className="ml-2" /></>}
               </Button>
             </div>
           </>
           )
         ) : (
-          <div className="p-6 bg-surface">
+          <div className="p-3 sm:p-6 bg-surface">
             <AttendanceHistory history={history} />
           </div>
         )}

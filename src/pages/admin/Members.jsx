@@ -371,14 +371,18 @@ export default function Members() {
                     </div>
                   </td>
                   <td style={{ padding: '20px 24px' }}>
-                    <span style={{
-                      padding: '4px 12px', borderRadius: '100px', fontSize: '0.7rem', fontWeight: '800',
-                      background: 'rgba(99,102,241,0.1)',
-                      color: 'var(--primary)',
-                      border: '1px solid var(--primary)22'
-                    }}>
-                      {m.age_group?.toUpperCase() || 'ADULT'}
-                    </span>
+                    {(() => {
+                      const colors = { Kids: '#ec4899', Teenage: '#f97316', Youth: '#06b6d4', Adult: '#3b82f6', Senior: '#8b5cf6' };
+                      const c = colors[m.age_group] || '#3b82f6';
+                      return (
+                        <span style={{
+                          padding: '4px 12px', borderRadius: '100px', fontSize: '0.7rem', fontWeight: '800',
+                          background: `${c}18`, color: c, border: `1px solid ${c}22`
+                        }}>
+                          {m.age_group?.toUpperCase() || 'ADULT'}
+                        </span>
+                      );
+                    })()}
                   </td>
                   <td style={{ padding: '20px 24px' }}>
                     <span style={{
@@ -393,9 +397,9 @@ export default function Members() {
                   <td style={{ padding: '20px 24px' }}>
                     <span style={{
                       padding: '4px 12px', borderRadius: '100px', fontSize: '0.7rem', fontWeight: '800',
-                      background: 'rgba(99,102,241,0.1)',
-                      color: 'var(--primary)',
-                      border: '1px solid var(--primary)22'
+                      background: m.marital_status === 'Married' ? 'rgba(16,185,129,0.1)' : 'rgba(244,63,94,0.1)',
+                      color: m.marital_status === 'Married' ? '#10b981' : '#f43f5e',
+                      border: `1px solid ${m.marital_status === 'Married' ? '#10b981' : '#f43f5e'}22`
                     }}>
                       {m.marital_status?.toUpperCase() || 'UNMARRIED'}
                     </span>

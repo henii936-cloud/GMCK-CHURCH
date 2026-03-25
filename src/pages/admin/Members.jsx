@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { memberService, groupService } from "../../services/api";
+import { supabase } from "../../services/supabaseClient";
 import { Card, Button, Input } from "../../components/common/UI";
 import { 
   Users, UserPlus, Search, Filter, Mail, Phone, 
@@ -22,6 +23,7 @@ export default function Members() {
   const [success, setSuccess] = useState(null);
   const [deleteId, setDeleteId] = useState(null);
   const [isSaving, setIsSaving] = useState(false);
+  const [imageFile, setImageFile] = useState(null);
 
   const [formData, setFormData] = useState({
     full_name: "",
@@ -99,16 +101,28 @@ export default function Members() {
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      if (file.size > 2 * 1024 * 1024) {
-        setError("Image size must be less than 2MB");
+      if (file.size > 5 * 1024 * 1024) {
+        setError("Image size must be less than 5MB");
         return;
       }
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setFormData({ ...formData, image_url: reader.result });
-      };
-      reader.readAsDataURL(file);
+      // Store the file for upload, and show a local preview
+      setImageFile(file);
+      const previewUrl = URL.createObjectURL(file);
+      setFormData({ ...formData, image_url: previewUrl });
     }
+  };
+
+  const uploadImage = async (file) => {
+    const ext = file.name.split('.').pop();
+    const fileName = `member-${Date.now()}.${ext}`;
+    const { data, error } = await supabase.storage
+      .from('member-photos')
+      .upload(fileName, file, { upsert: true, contentType: file.type });
+    if (error) throw error;
+    const { data: publicData } = supabase.storage
+      .from('member-photos')
+      .getPublicUrl(fileName);
+    return publicData.publicUrl;
   };
 
   const handleSaveMember = async (e) => {
@@ -121,6 +135,13 @@ export default function Members() {
     try {
       const payload = { ...formData };
       if (!payload.group_id) payload.group_id = null;
+
+      // If there's a new image file selected, upload it to Storage first
+      if (imageFile) {
+        const uploadedUrl = await uploadImage(imageFile);
+        payload.image_url = uploadedUrl;
+        setImageFile(null);
+      }
 
       if (editingMember) {
         await memberService.updateMember(editingMember.id, payload);
@@ -136,7 +157,7 @@ export default function Members() {
       setTimeout(() => setSuccess(null), 3000);
     } catch (err) {
       console.error("Save error:", err);
-      setError(err.message || "Security access denied for this operation.");
+      setError(err.message || "Failed to save. Check your connection or image upload.");
     } finally {
       setIsSaving(false);
     }

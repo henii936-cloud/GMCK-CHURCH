@@ -31,20 +31,13 @@ export const AuthProvider = ({ children }) => {
         }
       }
 
-      // 2. Fetch fresh profile with timeout
+      // 2. Fetch fresh profile
       try {
-        const fetchPromise = supabase
+        const { data, error } = await supabase
           .from('profiles')
           .select('*')
           .eq('id', authUser.id)
           .maybeSingle();
-          
-        // 5 second timeout for profile fetch
-        const timeoutPromise = new Promise((_, reject) => 
-          setTimeout(() => reject(new Error("Profile fetch timeout")), 5000)
-        );
-
-        const { data, error } = await Promise.race([fetchPromise, timeoutPromise]);
 
         if (error) throw error;
         
@@ -71,13 +64,7 @@ export const AuthProvider = ({ children }) => {
 
     const initializeAuth = async () => {
       try {
-        // 10 second timeout for getSession
-        const sessionPromise = supabase.auth.getSession();
-        const timeoutPromise = new Promise((_, reject) => 
-          setTimeout(() => reject(new Error("Session fetch timeout")), 10000)
-        );
-        
-        const { data: { session } } = await Promise.race([sessionPromise, timeoutPromise]);
+        const { data: { session } } = await supabase.auth.getSession();
         
         if (mounted) {
           setSession(session);

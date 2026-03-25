@@ -198,47 +198,47 @@ export default function Members() {
       </div>
 
       {/* Modern Summary Row */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
         {/* Total Card - Featured */}
         <motion.div 
-          whileHover={{ y: -4 }}
-          className="relative overflow-hidden rounded-3xl bg-primary p-8 text-on-primary shadow-xl shadow-primary/20"
+          whileHover={{ y: -2 }}
+          className="relative overflow-hidden rounded-2xl bg-primary p-5 text-on-primary shadow-md shadow-primary/20"
         >
-          <div className="absolute -right-10 -top-10 w-40 h-40 bg-white/10 rounded-full blur-2xl"></div>
-          <div className="absolute -bottom-10 -left-10 w-32 h-32 bg-black/10 rounded-full blur-xl"></div>
-          <div className="relative z-10 flex flex-col h-full justify-between gap-6">
+          <div className="absolute -right-6 -top-6 w-24 h-24 bg-white/10 rounded-full blur-xl"></div>
+          <div className="absolute -bottom-6 -left-6 w-20 h-20 bg-black/10 rounded-full blur-lg"></div>
+          <div className="relative z-10 flex flex-col h-full justify-between gap-4">
             <div className="flex justify-between items-start">
-              <div className="p-3 bg-white/20 rounded-2xl backdrop-blur-sm">
-                <Users size={28} className="text-white" />
+              <div className="p-2 bg-white/20 rounded-xl backdrop-blur-sm">
+                <Users size={20} className="text-white" />
               </div>
-              <span className="px-3 py-1 bg-white/20 rounded-full text-xs font-semibold backdrop-blur-sm">Total</span>
+              <span className="px-2 py-0.5 bg-white/20 rounded-full text-[10px] font-semibold backdrop-blur-sm">Total</span>
             </div>
             <div>
-              <p className="text-[#e9ecef] text-sm font-bold uppercase tracking-wider mb-1">Total Congregation</p>
-              <h2 className="text-5xl font-black tracking-tight">{stats.total}</h2>
+              <p className="text-[#e9ecef] text-xs font-bold uppercase tracking-wider mb-0.5">Total Congregation</p>
+              <h2 className="text-3xl font-black tracking-tight">{stats.total}</h2>
             </div>
           </div>
         </motion.div>
 
         {/* Male Members */}
         <motion.div 
-          whileHover={{ y: -4 }}
-          className="rounded-3xl bg-surface border border-outline-variant/20 p-8 shadow-sm flex flex-col justify-between gap-6"
+          whileHover={{ y: -2 }}
+          className="rounded-2xl bg-surface border border-outline-variant/20 p-5 shadow-sm flex flex-col justify-between gap-4"
         >
           <div className="flex justify-between items-start">
-            <div className="p-3 bg-blue-500/10 rounded-2xl text-blue-600">
-              <UserCheck size={28} />
+            <div className="p-2 bg-blue-500/10 rounded-xl text-blue-600">
+              <UserCheck size={20} />
             </div>
           </div>
           <div>
-            <p className="text-on-surface-variant text-sm font-bold uppercase tracking-wider mb-1">Male Members</p>
-            <div className="flex items-end gap-3">
-              <h2 className="text-4xl font-black text-on-surface tracking-tight">{stats.male}</h2>
-              <span className="text-sm font-medium text-on-surface-variant mb-1">
+            <p className="text-on-surface-variant text-xs font-bold uppercase tracking-wider mb-0.5">Male Members</p>
+            <div className="flex items-end gap-2">
+              <h2 className="text-2xl font-black text-on-surface tracking-tight">{stats.male}</h2>
+              <span className="text-xs font-medium text-on-surface-variant mb-0.5">
                 {stats.total > 0 ? Math.round((stats.male / stats.total) * 100) : 0}%
               </span>
             </div>
-            <div className="w-full h-1.5 bg-surface-container-high rounded-full mt-4 overflow-hidden">
+            <div className="w-full h-1 bg-surface-container-high rounded-full mt-3 overflow-hidden">
               <div className="h-full bg-blue-500 rounded-full" style={{ width: `${stats.total > 0 ? (stats.male / stats.total) * 100 : 0}%` }}></div>
             </div>
           </div>
@@ -246,23 +246,23 @@ export default function Members() {
 
         {/* Female Members */}
         <motion.div 
-          whileHover={{ y: -4 }}
-          className="rounded-3xl bg-surface border border-outline-variant/20 p-8 shadow-sm flex flex-col justify-between gap-6"
+          whileHover={{ y: -2 }}
+          className="rounded-2xl bg-surface border border-outline-variant/20 p-5 shadow-sm flex flex-col justify-between gap-4"
         >
           <div className="flex justify-between items-start">
-            <div className="p-3 bg-pink-500/10 rounded-2xl text-pink-600">
-              <Filter size={28} />
+            <div className="p-2 bg-pink-500/10 rounded-xl text-pink-600">
+              <Filter size={20} />
             </div>
           </div>
           <div>
-            <p className="text-on-surface-variant text-sm font-bold uppercase tracking-wider mb-1">Female Members</p>
-            <div className="flex items-end gap-3">
-              <h2 className="text-4xl font-black text-on-surface tracking-tight">{stats.female}</h2>
-              <span className="text-sm font-medium text-on-surface-variant mb-1">
+            <p className="text-on-surface-variant text-xs font-bold uppercase tracking-wider mb-0.5">Female Members</p>
+            <div className="flex items-end gap-2">
+              <h2 className="text-2xl font-black text-on-surface tracking-tight">{stats.female}</h2>
+              <span className="text-xs font-medium text-on-surface-variant mb-0.5">
                 {stats.total > 0 ? Math.round((stats.female / stats.total) * 100) : 0}%
               </span>
             </div>
-            <div className="w-full h-1.5 bg-surface-container-high rounded-full mt-4 overflow-hidden">
+            <div className="w-full h-1 bg-surface-container-high rounded-full mt-3 overflow-hidden">
               <div className="h-full bg-pink-500 rounded-full" style={{ width: `${stats.total > 0 ? (stats.female / stats.total) * 100 : 0}%` }}></div>
             </div>
           </div>

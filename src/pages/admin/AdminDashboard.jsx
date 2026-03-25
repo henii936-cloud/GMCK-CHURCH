@@ -77,11 +77,11 @@ export default function AdminDashboard() {
   };
 
   const statCards = [
-    { label: 'Total Members', value: stats.members, icon: Users, color: '#6366f1' },
-    { label: 'Bible Study Groups', value: stats.groups, icon: MapPin, color: '#10b981' },
-    { label: 'Group Leaders', value: stats.leaders, icon: ShieldCheck, color: '#f59e0b' },
-    { label: 'Weekly Attendance', value: `${stats.attendance}%`, icon: ClipboardList, color: '#ec4899' },
-    { label: 'Total Finance', value: `$${stats.finance.toLocaleString()}`, icon: DollarSign, color: '#8b5cf6' }
+    { label: 'Total Members', value: stats.members, icon: Users, color: 'var(--color-premium-sapphire)' },
+    { label: 'Bible Study Groups', value: stats.groups, icon: MapPin, color: 'var(--color-premium-emerald)' },
+    { label: 'Group Leaders', value: stats.leaders, icon: ShieldCheck, color: 'var(--color-premium-gold)' },
+    { label: 'Weekly Attendance', value: `${stats.attendance}%`, icon: ClipboardList, color: 'var(--color-premium-ruby)' },
+    { label: 'Total Finance', value: `$${stats.finance.toLocaleString()}`, icon: DollarSign, color: 'var(--color-premium-amethyst)' }
   ];
 
   return (
@@ -110,21 +110,37 @@ export default function AdminDashboard() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.1 }}
-            className="editorial-card group p-4 flex flex-col justify-between"
+            className="editorial-card group p-5 flex flex-col justify-between relative overflow-hidden"
+            style={{ 
+              borderTop: `4px solid ${stat.color}`,
+              boxShadow: `0 8px 24px -8px color-mix(in srgb, ${stat.color} 30%, transparent)`
+            }}
           >
-            <div className="flex justify-between items-center mb-2">
-                <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-surface-container-low transition-transform group-hover:rotate-6">
-                  <stat.icon size={20} style={{ color: stat.color }} />
+            <div 
+              className="absolute inset-0 opacity-0 group-hover:opacity-10 transition-opacity duration-500 pointer-events-none"
+              style={{ background: `linear-gradient(135deg, ${stat.color}, transparent)` }}
+            />
+            <div className="flex justify-between items-start mb-6 relative z-10">
+                <div 
+                  className="w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-500 group-hover:scale-110 group-hover:-rotate-6 shadow-sm"
+                  style={{ backgroundColor: `color-mix(in srgb, ${stat.color} 15%, transparent)`, color: stat.color }}
+                >
+                  <stat.icon size={24} strokeWidth={2} />
                 </div>
-                <div className="flex items-center gap-1 text-[10px] font-black uppercase tracking-widest text-primary/40">
-                  <TrendingUp size={12} />
+                <div 
+                  className="flex items-center gap-1 text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full"
+                  style={{ backgroundColor: `color-mix(in srgb, ${stat.color} 10%, transparent)`, color: stat.color }}
+                >
+                  <TrendingUp size={12} strokeWidth={2.5} />
                   <span>+12%</span>
                 </div>
             </div>
 
-            <div>
-                <p className="label-sm opacity-60 mb-1 text-xs">{stat.label}</p>
-                <h3 className="text-2xl font-heading font-bold text-primary">{loading ? '...' : stat.value}</h3>
+            <div className="relative z-10">
+                <p className="label-sm opacity-70 mb-1.5 text-[11px] tracking-[0.15em]">{stat.label}</p>
+                <h3 className="text-3xl font-heading font-bold" style={{ color: stat.color }}>
+                  {loading ? '...' : stat.value}
+                </h3>
             </div>
           </motion.div>
         ))}

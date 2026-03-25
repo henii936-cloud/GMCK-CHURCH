@@ -22,6 +22,13 @@
   --color-on-surface: #191c1d;
   --color-on-surface-variant: #44474e;
   
+  /* Premium Design System Colors */
+  --color-premium-sapphire: #0f2b46;
+  --color-premium-gold: #d4af37;
+  --color-premium-emerald: #065f46;
+  --color-premium-ruby: #9f1239;
+  --color-premium-amethyst: #581c87;
+  
   --color-outline-variant: rgba(195, 198, 208, 0.15);
   
   --radius-md: 0.75rem;

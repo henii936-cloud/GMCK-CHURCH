@@ -182,6 +182,7 @@ export default function RecordGiving() {
                     <option value="tithe">Tithe</option>
                     <option value="offering">Offering</option>
                     <option value="donation">Donation</option>
+                    <option value="first_fruit">First Fruit</option>
                   </select>
                 </div>
 

@@ -36,7 +36,7 @@ export default function Reports() {
     }
   };
 
-  const totalIncome = transactions.filter(t => t.type === 'tithe' || t.category === 'Tithes' || t.type === 'offering' || t.category === 'Offering' || t.type === 'donation' || t.category === 'Donation' || t.type === 'Income').reduce((sum, t) => sum + t.amount, 0);
+  const totalIncome = transactions.filter(t => t.type === 'tithe' || t.category === 'Tithes' || t.type === 'offering' || t.category === 'Offering' || t.type === 'donation' || t.category === 'Donation' || t.type === 'first_fruit' || t.category === 'First Fruit' || t.type === 'Income').reduce((sum, t) => sum + t.amount, 0);
   const totalExpense = transactions.filter(t => t.type === 'Expense').reduce((sum, t) => sum + t.amount, 0);
   const balance = totalIncome - totalExpense;
 

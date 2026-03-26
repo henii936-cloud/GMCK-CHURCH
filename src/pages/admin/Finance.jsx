@@ -5,7 +5,7 @@ import {
   DollarSign, TrendingUp, TrendingDown, CheckCircle, Clock,
   Wallet, Heart, ArrowDownRight, PieChart as PieChartIcon,
   BarChart3, CalendarDays, Banknote, ShieldCheck, AlertCircle,
-  ArrowUpRight, Layers, Receipt
+  ArrowUpRight, Layers, Receipt, Sprout
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import TransactionTable from "../../components/finance/TransactionTable";
@@ -22,7 +22,7 @@ const COLORS = {
   amethyst: 'var(--color-premium-amethyst)',
 };
 
-const PIE_COLORS = ['#002c53', '#d4af37', '#065f46', '#9f1239'];
+const PIE_COLORS = ['#002c53', '#d4af37', '#065f46', '#be185d', '#9f1239'];
 
 export default function Finance() {
   const [transactions, setTransactions] = useState([]);
@@ -63,8 +63,9 @@ export default function Finance() {
     const totalTithes = transactions.filter(t => t.type === 'tithe' || t.category === 'Tithes').reduce((sum, t) => sum + (t.amount || 0), 0);
     const totalOfferings = transactions.filter(t => t.type === 'offering' || t.category === 'Offering').reduce((sum, t) => sum + (t.amount || 0), 0);
     const totalDonations = transactions.filter(t => t.type === 'donation' || t.category === 'Donation').reduce((sum, t) => sum + (t.amount || 0), 0);
+    const totalFirstFruit = transactions.filter(t => t.type === 'first_fruit' || t.category === 'First Fruit').reduce((sum, t) => sum + (t.amount || 0), 0);
     const totalExpenses = transactions.filter(t => t.type === 'expense' || t.category === 'Expense').reduce((sum, t) => sum + (t.amount || 0), 0);
-    const totalIncome = totalTithes + totalOfferings + totalDonations;
+    const totalIncome = totalTithes + totalOfferings + totalDonations + totalFirstFruit;
     const netBalance = totalIncome - totalExpenses;
 
     const approvedBudgets = budgets.filter(b => b.status === 'Approved');
@@ -73,7 +74,7 @@ export default function Finance() {
     const budgetUsage = totalIncome > 0 ? ((totalBudgeted / totalIncome) * 100) : 0;
 
     return {
-      totalTithes, totalOfferings, totalDonations, totalExpenses,
+      totalTithes, totalOfferings, totalDonations, totalFirstFruit, totalExpenses,
       totalIncome, netBalance, approvedBudgets, pendingBudgets,
       totalBudgeted, budgetUsage
     };
@@ -84,6 +85,7 @@ export default function Finance() {
     { name: 'Tithes', value: metrics.totalTithes },
     { name: 'Offerings', value: metrics.totalOfferings },
     { name: 'Donations', value: metrics.totalDonations },
+    { name: 'First Fruit', value: metrics.totalFirstFruit },
     { name: 'Expenses', value: metrics.totalExpenses },
   ].filter(d => d.value > 0), [metrics]);
 
@@ -114,7 +116,7 @@ export default function Finance() {
       value: `$${metrics.totalIncome.toLocaleString()}`,
       icon: TrendingUp,
       color: COLORS.emerald,
-      description: 'Tithes + Offerings + Donations'
+      description: 'Tithes + Offerings + Donations + First Fruit'
     },
     {
       label: 'Total Expenses',
@@ -161,6 +163,7 @@ export default function Finance() {
     { label: 'Tithes', value: metrics.totalTithes, icon: Wallet, color: COLORS.sapphire },
     { label: 'Offerings', value: metrics.totalOfferings, icon: DollarSign, color: COLORS.emerald },
     { label: 'Donations', value: metrics.totalDonations, icon: Heart, color: COLORS.gold },
+    { label: 'First Fruit', value: metrics.totalFirstFruit, icon: Sprout, color: '#be185d' },
   ];
 
   const maxIncome = Math.max(...incomeBreakdown.map(i => i.value), 1);

@@ -1,13 +1,14 @@
 import { motion } from "motion/react";
-import { ListFilter, Search, ArrowRight, Wallet, DollarSign, Heart, ArrowDownRight, User } from "lucide-react";
+import { ListFilter, Search, ArrowRight, Wallet, DollarSign, Heart, ArrowDownRight, User, Sprout } from "lucide-react";
 
 export default function TransactionTable({ transactions = [] }) {
   const getTypeColor = (type) => {
     switch (type?.toLowerCase()) {
-      case 'tithe': return { color: '#002c53', bg: 'rgba(0,44,83,0.05)', icon: Wallet };
-      case 'offering': return { color: '#002c53', bg: 'rgba(0,44,83,0.05)', icon: DollarSign };
-      case 'donation': return { color: '#eac077', bg: 'rgba(234,192,119,0.1)', icon: Heart };
-      case 'expense': return { color: '#eac077', bg: 'rgba(234,192,119,0.1)', icon: ArrowDownRight };
+      case 'tithe': return { color: '#002c53', bg: 'rgba(0,44,83,0.08)', icon: Wallet };
+      case 'offering': return { color: '#065f46', bg: 'rgba(6,95,70,0.08)', icon: DollarSign };
+      case 'donation': return { color: '#d97706', bg: 'rgba(217,119,6,0.08)', icon: Heart };
+      case 'first_fruit': return { color: '#be185d', bg: 'rgba(190,24,93,0.08)', icon: Sprout };
+      case 'expense': return { color: '#9f1239', bg: 'rgba(159,18,57,0.08)', icon: ArrowDownRight };
       default: return { color: '#44474e', bg: 'rgba(68,71,78,0.05)', icon: User };
     }
   };

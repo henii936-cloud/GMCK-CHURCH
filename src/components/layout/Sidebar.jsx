@@ -51,6 +51,7 @@ export default function Sidebar() {
       { name: "Bible Study Groups", icon: MapPin, path: "/admin/groups" },
       { name: "Study Progress", icon: BookOpen, path: "/admin/progress" },
       { name: "Events", icon: Activity, path: "/admin/events" },
+      { name: "Evangelism", icon: Heart, path: "/admin/evangelism" },
       { name: "Finance", icon: DollarSign, path: "/admin/finance" },
       { name: "Budgets", icon: Wallet, path: "/admin/budgets" },
     ],

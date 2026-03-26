@@ -12,6 +12,7 @@ import LeaderDashboard from "./pages/leader/LeaderDashboard";
 import AdminLeaders from "./pages/admin/Leaders";
 import AdminProgress from "./pages/admin/Progress";
 import AdminEvents from "./pages/admin/Events";
+import AdminEvangelism from "./pages/admin/Evangelism";
 import AdminFinance from "./pages/admin/Finance";
 import AdminBudgets from "./pages/admin/Budgets";
 import AdminMembers from "./pages/admin/Members";
@@ -58,6 +59,7 @@ export default function App() {
             <Route path="reports" element={<AdminReports />} />
             <Route path="progress" element={<AdminProgress />} />
             <Route path="events" element={<AdminEvents />} />
+            <Route path="evangelism" element={<AdminEvangelism />} />
             <Route path="finance" element={<AdminFinance />} />
             <Route path="budgets" element={<AdminBudgets />} />
             <Route path="programs" element={<AdminActivities />} />

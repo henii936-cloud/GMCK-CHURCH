@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { groupService, memberService } from "../../services/api";
 import { Card, Button, Input } from "../../components/common/UI";
-import { MapPin, Users, User, Plus, Search, BookOpen, Layers, Activity, Trash2 } from "lucide-react";
+import { MapPin, Users, User, Plus, Search, BookOpen, Layers, Activity, Trash2, XCircle, AlertCircle, UsersRound } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { supabase } from "../../services/supabaseClient";
 
@@ -180,35 +180,100 @@ export default function Groups() {
       )}
 
       {/* Modal for Group Creation */}
-      {showModal && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(8px)', display: 'grid', placeItems: 'center', zIndex: 1000, padding: '20px' }}>
-          <motion.div 
-            initial={{ scale: 0.9, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            className="glass-card" 
-            style={{ width: '100%', maxWidth: '500px', padding: '40px' }}
-          >
-            <h2 style={{ fontSize: '1.75rem', fontWeight: '800', marginBottom: '24px' }}>Create <span style={{ color: 'var(--primary)' }}>Study Group</span></h2>
-            
-            <form onSubmit={handleCreateGroup} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-              <Input label="Group Name" placeholder="e.g. Young Adults Fellowship" value={newGroup.group_name} onChange={e => setNewGroup({...newGroup, group_name: e.target.value})} required />
-              
-              <Input label="Primary Meeting Location" placeholder="e.g. Main Hall / Online" value={newGroup.location} onChange={e => setNewGroup({...newGroup, location: e.target.value})} />
-              
-              {error && (
-                <div style={{ color: '#ef4444', fontSize: '0.875rem', fontWeight: '600' }}>
-                  {error}
+      <AnimatePresence>
+        {showModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/60 backdrop-blur-sm" onClick={() => setShowModal(false)}>
+            <motion.div
+              onClick={(e) => e.stopPropagation()}
+              initial={{ scale: 0.95, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.95, opacity: 0, y: 20 }}
+              className="w-full max-w-lg bg-surface border border-outline-variant/20 rounded-[2rem] shadow-2xl overflow-hidden flex flex-col max-h-[90vh]"
+            >
+              {/* Modal Header */}
+              <div className="px-8 py-6 border-b border-outline-variant/10 flex justify-between items-center bg-surface/80 backdrop-blur-md">
+                <div>
+                  <h2 className="text-2xl font-bold text-primary">
+                    Create <span className="text-on-surface">Study Group</span>
+                  </h2>
+                  <p className="text-sm text-on-surface-variant mt-1">
+                    Establish a new community gathering
+                  </p>
                 </div>
-              )}
-              
-              <div style={{ display: 'flex', gap: '12px', marginTop: '12px' }}>
-                <Button type="submit" style={{ flex: 1 }} icon={Plus} loading={isSaving}>Save Group</Button>
-                <Button variant="secondary" onClick={() => setShowModal(false)} disabled={isSaving}>Cancel</Button>
+                <button
+                  onClick={() => setShowModal(false)}
+                  className="p-2 rounded-full hover:bg-surface-container text-on-surface-variant hover:text-primary transition-colors cursor-pointer"
+                >
+                  <XCircle size={24} />
+                </button>
               </div>
-            </form>
-          </motion.div>
-        </div>
-      )}
+
+              {/* Modal Body */}
+              <div className="p-8 overflow-y-auto custom-scrollbar flex-1">
+                <form id="group-form" onSubmit={handleCreateGroup} className="space-y-6">
+                  {/* Group Name */}
+                  <div className="space-y-2">
+                    <label className="text-sm font-semibold text-on-surface">Group Name *</label>
+                    <div className="relative">
+                      <UsersRound size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant/50" />
+                      <input
+                        type="text"
+                        required
+                        placeholder="e.g. Young Adults Fellowship"
+                        value={newGroup.group_name}
+                        onChange={e => setNewGroup({...newGroup, group_name: e.target.value})}
+                        className="w-full h-14 pl-12 pr-4 rounded-xl border border-outline-variant/20 bg-surface text-on-surface focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Location */}
+                  <div className="space-y-2">
+                    <label className="text-sm font-semibold text-on-surface">Meeting Location</label>
+                    <div className="relative">
+                      <MapPin size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant/50" />
+                      <input
+                        type="text"
+                        placeholder="e.g. Main Hall / Online"
+                        value={newGroup.location}
+                        onChange={e => setNewGroup({...newGroup, location: e.target.value})}
+                        className="w-full h-14 pl-12 pr-4 rounded-xl border border-outline-variant/20 bg-surface text-on-surface focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+                      />
+                    </div>
+                  </div>
+
+                  {error && (
+                    <div className="p-4 rounded-xl bg-error/10 text-error flex items-center gap-3 border border-error/20">
+                      <AlertCircle size={20} />
+                      <span className="text-sm font-medium">{error}</span>
+                    </div>
+                  )}
+                </form>
+              </div>
+
+              {/* Modal Footer */}
+              <div className="px-8 py-6 border-t border-outline-variant/10 bg-surface-container-lowest flex gap-4 justify-end">
+                <Button
+                  variant="secondary"
+                  onClick={() => setShowModal(false)}
+                  className="px-8"
+                  disabled={isSaving}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="submit"
+                  form="group-form"
+                  className="px-8 shadow-lg shadow-primary/20 pulse-animation"
+                  loading={isSaving}
+                >
+                  Create Group
+                </Button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
 
       {/* Modal for Group Deletion */}
       {groupToDelete && (

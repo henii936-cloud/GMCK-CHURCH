@@ -5,7 +5,7 @@ import {
   Calendar, MapPin, Clock, Plus, Search, Trash2, Edit2,
   XCircle, CheckCircle2, Users, ChevronDown, AlertCircle,
   CalendarDays, CalendarCheck, Tag, FileText, Eye,
-  Mic, Music, UserCheck, StickyNote
+  Mic, Music, UserCheck, StickyNote, Zap, Mic2, Star
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 
@@ -35,6 +35,33 @@ export default function Events() {
   const [success, setSuccess] = useState(null);
   const [error, setError] = useState(null);
   const [isSaving, setIsSaving] = useState(false);
+
+  // PLANNER STATES
+  const [activeTab, setActiveTab] = useState("events");
+  const [showPlannerModal, setShowPlannerModal] = useState(false);
+  const [newPlan, setNewPlan] = useState({
+    type: "Sunday Service", date: "", time: "",
+    preacher: "", worshipLeader: "", theme: "", program: "Weekly"
+  });
+  const [programPlans, setProgramPlans] = useState([
+    { id: 1, type: "Sunday Service", date: "2026-03-22", time: "10:00 AM", preacher: "Rev. Samuel Johnson", worshipLeader: "Sarah Miller & Team", theme: "The Grace of Giving", program: "Weekly" },
+    { id: 2, type: "Tuesday Morning Program", date: "2026-03-24", time: "06:00 AM", preacher: "Pastor Daniel Okoro", worshipLeader: "David King", theme: "Morning Devotion", program: "Weekly" },
+    { id: 3, type: "Wednesday Night Program", date: "2026-03-25", time: "07:00 PM", preacher: "Evang. Grace Temi", worshipLeader: "Instrumentalists Only", theme: "Warfare Prayers", program: "Weekly" }
+  ]);
+
+  const handleAddPlan = (e) => {
+    e.preventDefault();
+    setProgramPlans([{ ...newPlan, id: Date.now() }, ...programPlans]);
+    setShowPlannerModal(false);
+    setNewPlan({ type: "Sunday Service", date: "", time: "", preacher: "", worshipLeader: "", theme: "", program: "Weekly" });
+  };
+
+  const getServiceColor = (type) => {
+    if (type.includes("Sunday")) return "#6366f1";
+    if (type.includes("Tuesday")) return "#10b981";
+    if (type.includes("Wednesday")) return "#f59e0b";
+    return "#ec4899";
+  };
 
   const [formData, setFormData] = useState({
     title: "",
@@ -197,16 +224,29 @@ export default function Events() {
           </h1>
           <p className="text-on-surface-variant font-medium mt-1">Plan, organize, and track all church activities</p>
         </div>
-        <Button
-          onClick={() => openModal()}
-          icon={Plus}
-          className="rounded-full px-6 shadow-lg shadow-primary/20 pulse-animation"
-        >
-          Create Event
-        </Button>
+        <div style={{ display: 'flex', background: 'rgba(255,255,255,0.05)', borderRadius: '12px', padding: '6px' }}>
+          <button onClick={() => setActiveTab("events")} style={{ padding: '8px 20px', borderRadius: '8px', fontSize: '0.875rem', fontWeight: '700', background: activeTab === 'events' ? 'var(--primary)' : 'transparent', color: activeTab === 'events' ? 'white' : 'var(--text-muted)', transition: '0.3s', border: 'none', cursor: 'pointer' }}>
+            Event Directory
+          </button>
+          <button onClick={() => setActiveTab("planner")} style={{ padding: '8px 20px', borderRadius: '8px', fontSize: '0.875rem', fontWeight: '700', background: activeTab === 'planner' ? 'var(--primary)' : 'transparent', color: activeTab === 'planner' ? 'white' : 'var(--text-muted)', transition: '0.3s', border: 'none', cursor: 'pointer' }}>
+            Program Planner
+          </button>
+        </div>
+        {activeTab === 'events' && (
+          <Button
+            onClick={() => openModal()}
+            icon={Plus}
+            className="rounded-full px-6 shadow-lg shadow-primary/20 pulse-animation"
+          >
+            Create Event
+          </Button>
+        )}
       </div>
 
-      {/* Stats Row */}
+      <AnimatePresence mode="wait">
+        {activeTab === 'events' && (
+          <motion.div key="events" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }}>
+            {/* Stats Row */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
         <motion.div
           whileHover={{ y: -2 }}
@@ -819,6 +859,115 @@ export default function Events() {
             </motion.div>
           </div>
         )}
+
+        {/* END SECTION FOR TAB EVENTS */}
+        </motion.div>
+        )}
+
+        {/* START SECTION FOR PLANNER */}
+        {activeTab === 'planner' && (
+          <motion.div key="planner" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
+            <div style={{ display: 'flex', gap: '16px', marginBottom: '32px' }}>
+              <Button icon={Plus} style={{ flex: 1 }} onClick={() => setShowPlannerModal(true)}>Schedule New Program</Button>
+              <Button variant="secondary" icon={CalendarDays} style={{ flex: 1 }}>View Monthly Calendar</Button>
+              <Button variant="secondary" icon={Star} style={{ flex: 1 }}>Yearly Outlook</Button>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(380px, 1fr))', gap: '24px' }}>
+              {programPlans.map((plan, i) => (
+                <motion.div key={plan.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.08 }}>
+                  <Card style={{ padding: '0', overflow: 'hidden', borderLeft: `6px solid ${getServiceColor(plan.type)}` }}>
+                    <div style={{ padding: '28px' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '20px' }}>
+                        <div style={{ padding: '5px 12px', borderRadius: '8px', background: `${getServiceColor(plan.type)}22`, color: getServiceColor(plan.type), fontSize: '0.7rem', fontWeight: '800', textTransform: 'uppercase' }}>
+                          {plan.type}
+                        </div>
+                        <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem', fontWeight: '600' }}>{plan.program}</span>
+                      </div>
+
+                      <h3 style={{ fontSize: '1.35rem', fontWeight: '800', marginBottom: '16px' }}>"{plan.theme || 'Untitled Program'}"</h3>
+                      
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', borderTop: '1px solid var(--border)', paddingTop: '20px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                          <div style={{ width: 40, height: 40, borderRadius: 10, background: 'rgba(255,255,255,0.05)', display: 'grid', placeItems: 'center' }}>
+                            <Mic2 size={18} color="var(--primary)" />
+                          </div>
+                          <div>
+                            <p style={{ fontSize: '0.65rem', color: 'var(--text-muted)', fontWeight: '700', textTransform: 'uppercase' }}>Preacher</p>
+                            <p style={{ fontWeight: '700', fontSize: '1rem' }}>{plan.preacher || 'TBA'}</p>
+                          </div>
+                        </div>
+
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                          <div style={{ width: 40, height: 40, borderRadius: 10, background: 'rgba(255,255,255,0.05)', display: 'grid', placeItems: 'center' }}>
+                            <Music size={18} color="#ec4899" />
+                          </div>
+                          <div>
+                            <p style={{ fontSize: '0.65rem', color: 'var(--text-muted)', fontWeight: '700', textTransform: 'uppercase' }}>Worship Leader</p>
+                            <p style={{ fontWeight: '700', fontSize: '1rem' }}>{plan.worshipLeader || 'TBA'}</p>
+                          </div>
+                        </div>
+
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                          <div style={{ width: 40, height: 40, borderRadius: 10, background: 'rgba(255,255,255,0.05)', display: 'grid', placeItems: 'center' }}>
+                            <Calendar size={18} color="var(--text-muted)" />
+                          </div>
+                          <p style={{ fontWeight: '600', fontSize: '0.9rem' }}>{plan.date ? new Date(plan.date).toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' }) : 'Set Date'} @ {plan.time || 'Set Time'}</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div style={{ background: 'rgba(255,255,255,0.03)', padding: '14px 28px', borderTop: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between' }}>
+                      <button style={{ color: 'var(--text-muted)', fontSize: '0.825rem', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '6px', background: 'none', border: 'none', cursor: 'pointer' }}><Zap size={14} /> Edit</button>
+                      <button style={{ color: '#ef4444', fontSize: '0.825rem', fontWeight: '600', background: 'none', border: 'none', cursor: 'pointer' }}>Postpone</button>
+                    </div>
+                  </Card>
+                </motion.div>
+              ))}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* PLANNER MODAL */}
+      {showPlannerModal && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(8px)', display: 'grid', placeItems: 'center', zIndex: 1000, padding: '20px' }}>
+          <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="glass-card" style={{ width: '100%', maxWidth: '600px', padding: '40px' }}>
+            <h2 style={{ fontSize: '1.75rem', fontWeight: '800', marginBottom: '24px' }}>Strategic <span style={{ color: 'var(--primary)' }}>Planner</span></h2>
+            <form onSubmit={handleAddPlan} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+              <div style={{ gridColumn: 'span 2' }}>
+                <Input label="Program Theme" placeholder="e.g. Divine Restoration" value={newPlan.theme} onChange={e => setNewPlan({...newPlan, theme: e.target.value})} required />
+              </div>
+              <div className="form-group">
+                <label style={{ display: 'block', marginBottom: '6px', fontSize: '0.875rem', fontWeight: '500', color: 'var(--text-muted)' }}>Service Category</label>
+                <select className="input-field" value={newPlan.type} onChange={e => setNewPlan({...newPlan, type: e.target.value})}>
+                  <option>Sunday Service</option>
+                  <option>Tuesday Morning Program</option>
+                  <option>Wednesday Night Program</option>
+                  <option>Special Event</option>
+                </select>
+              </div>
+              <div className="form-group">
+                <label style={{ display: 'block', marginBottom: '6px', fontSize: '0.875rem', fontWeight: '500', color: 'var(--text-muted)' }}>Cycle</label>
+                <select className="input-field" value={newPlan.program} onChange={e => setNewPlan({...newPlan, program: e.target.value})}>
+                  <option>Weekly</option>
+                  <option>Monthly</option>
+                  <option>Annual</option>
+                </select>
+              </div>
+              <Input label="Preacher" placeholder="Enter name" value={newPlan.preacher} onChange={e => setNewPlan({...newPlan, preacher: e.target.value})} />
+              <Input label="Worship Leader" placeholder="Enter name" value={newPlan.worshipLeader} onChange={e => setNewPlan({...newPlan, worshipLeader: e.target.value})} />
+              <Input type="date" label="Date" value={newPlan.date} onChange={e => setNewPlan({...newPlan, date: e.target.value})} />
+              <Input type="time" label="Start Time" value={newPlan.time} onChange={e => setNewPlan({...newPlan, time: e.target.value})} />
+              
+              <div style={{ gridColumn: 'span 2', display: 'flex', gap: '12px', marginTop: '12px' }}>
+                <Button type="submit" style={{ flex: 1 }}>Publish Program</Button>
+                <Button variant="secondary" onClick={() => setShowPlannerModal(false)}>Cancel</Button>
+              </div>
+            </form>
+          </motion.div>
+        </div>
+      )}
       </AnimatePresence>
 
       {/* Delete Confirmation */}

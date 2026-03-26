@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { supabase } from "../../services/supabaseClient";
 import { Card, Button, Input } from "../../components/common/UI";
 import {
@@ -23,6 +24,7 @@ const CATEGORIES = [
 const getCategoryStyle = (cat) => CATEGORIES.find(c => c.value === cat) || CATEGORIES[0];
 
 export default function Events() {
+  const { t } = useTranslation();
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
@@ -238,7 +240,7 @@ export default function Events() {
             icon={Plus}
             className="rounded-full px-6 shadow-lg shadow-primary/20 pulse-animation"
           >
-            Create Event
+            {t("Create Event")}
           </Button>
         )}
       </div>
@@ -859,10 +861,11 @@ export default function Events() {
             </motion.div>
           </div>
         )}
+      </AnimatePresence>
 
-        {/* END SECTION FOR TAB EVENTS */}
-        </motion.div>
-        )}
+      {/* END SECTION FOR TAB EVENTS */}
+      </motion.div>
+      )}
 
         {/* START SECTION FOR PLANNER */}
         {activeTab === 'planner' && (
@@ -935,6 +938,7 @@ export default function Events() {
       </AnimatePresence>
 
       {/* PLANNER MODAL */}
+      <AnimatePresence>
       {showPlannerModal && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(8px)', display: 'grid', placeItems: 'center', zIndex: 1000, padding: '20px' }}>
           <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="glass-card" style={{ width: '100%', maxWidth: '600px', padding: '40px' }}>

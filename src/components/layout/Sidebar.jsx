@@ -1,4 +1,5 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Button } from "../common/UI";
 import { motion } from "motion/react";
 import {
@@ -14,6 +15,13 @@ export default function Sidebar() {
   const location = useLocation();
   const navigate = useNavigate();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const { t, i18n } = useTranslation();
+
+  const toggleLanguage = () => {
+    const newLang = i18n.language === 'en' ? 'am' : 'en';
+    i18n.changeLanguage(newLang);
+    localStorage.setItem('app_language', newLang);
+  };
 
   // Close sidebar on route change (mobile)
   useEffect(() => {
@@ -100,7 +108,7 @@ export default function Sidebar() {
                     />
                   )}
                   <item.icon size={20} className={isActive ? 'text-primary' : 'text-on-surface-variant group-hover:text-primary transition-colors duration-500'} />
-                  <span className={`text-sm tracking-tight ${isActive ? 'font-black' : 'font-medium'}`}>{item.name}</span>
+                  <span className={`text-sm tracking-tight ${isActive ? 'font-black' : 'font-medium'}`}>{t(item.name)}</span>
                   {isActive && <ChevronRight size={14} className="ml-auto text-primary/40" />}
                 </Link>
               </li>
@@ -109,7 +117,17 @@ export default function Sidebar() {
         </ul>
       </nav>
 
-      <div className="mt-auto pt-10 border-t border-outline-variant/10">
+      <div className="mt-auto pt-6 border-t border-outline-variant/10">
+        
+        {/* Language Switcher */}
+        <button
+          onClick={toggleLanguage}
+          className="w-full flex items-center justify-between px-4 py-3 mb-4 rounded-xl text-sm text-on-surface-variant hover:text-primary hover:bg-surface-container transition-all duration-300"
+        >
+          <span className="font-medium tracking-tight text-xs uppercase">{t("Language")}: {i18n.language === 'en' ? 'English' : 'አማርኛ'}</span>
+          <span className="text-xs font-black bg-surface-container-high px-2 py-1 rounded-md">{i18n.language === 'en' ? 'AM' : 'EN'}</span>
+        </button>
+
         <div className="flex items-center gap-4 mb-8">
           <div className="w-12 h-12 rounded-2xl bg-tertiary-fixed-dim grid place-items-center font-heading font-bold text-on-tertiary-fixed shadow-whisper">
             {user?.full_name?.charAt(0) || 'U'}
@@ -124,7 +142,7 @@ export default function Sidebar() {
           className="w-full flex items-center justify-center gap-3 py-4 rounded-xl font-black uppercase tracking-[0.2em] text-[10px] text-on-surface-variant hover:text-primary hover:bg-surface-container transition-all duration-500"
         >
           <LogOut size={16} />
-          <span>Sign Out</span>
+          <span>{t("Sign Out")}</span>
         </button>
       </div>
     </>

@@ -88,44 +88,44 @@ export default function ApprovedBudgets() {
                 transition={{ delay: index * 0.05, duration: 0.5, ease: "easeOut" }}
               >
                 <Card 
-                  className={`group relative overflow-hidden transition-all duration-500 hover:shadow-2xl hover:-translate-y-1 ${isUsed ? 'opacity-60 grayscale-[0.5]' : ''}`}
+                  className={`group relative overflow-hidden transition-all duration-500 hover:shadow-xl hover:-translate-y-1 !p-5 ${isUsed ? 'opacity-60 grayscale-[0.5]' : ''}`}
                 >
                   {/* Status Indicator */}
-                  <div className={`absolute top-0 right-0 px-6 py-2 rounded-bl-2xl label-sm font-black uppercase tracking-widest text-[10px] ${isUsed ? 'bg-primary/5 text-primary/40' : 'bg-tertiary-fixed-dim text-on-tertiary-fixed'}`}>
+                  <div className={`absolute top-0 right-0 px-4 py-1.5 rounded-bl-xl label-sm font-black uppercase tracking-widest text-[8px] ${isUsed ? 'bg-primary/5 text-primary/40' : 'bg-tertiary-fixed-dim text-on-tertiary-fixed'}`}>
                     {isUsed ? 'Utilized' : 'Available'}
                   </div>
 
-                  <div className="flex items-start justify-between mb-10">
-                    <div className={`w-16 h-16 rounded-2xl grid place-items-center transition-colors duration-500 ${isUsed ? 'bg-primary/5 text-primary/20' : 'bg-primary text-on-primary shadow-lg shadow-primary/20'}`}>
-                      <Wallet size={32} />
+                  <div className="flex items-start justify-between mb-5">
+                    <div className={`w-10 h-10 rounded-xl grid place-items-center transition-colors duration-500 ${isUsed ? 'bg-primary/5 text-primary/20' : 'bg-primary text-on-primary shadow-md shadow-primary/20'}`}>
+                      <Wallet size={20} />
                     </div>
-                    <div className="text-right pt-2">
-                      <p className="label-sm text-tertiary-fixed-dim font-black uppercase tracking-widest mb-1">{team}</p>
-                      <p className="display-sm text-primary leading-none">${b.amount.toLocaleString()}</p>
+                    <div className="text-right pt-1">
+                      <p className="label-sm text-tertiary-fixed-dim font-black uppercase tracking-widest text-[8px] mb-0.5">{team}</p>
+                      <p className="text-xl font-heading font-bold text-primary leading-none">${b.amount.toLocaleString()}</p>
                     </div>
                   </div>
 
-                  <div className="space-y-6">
+                  <div className="space-y-3">
                     <div>
-                      <h3 className="headline-sm text-primary mb-2 line-clamp-1">{name}</h3>
-                      <p className="label-sm opacity-60 leading-relaxed">
-                        Approved for disbursement. Ensure all receipts are logged within 48 hours of spending.
+                      <h3 className="text-sm font-bold text-primary mb-1 line-clamp-1">{name}</h3>
+                      <p className="text-[10px] opacity-60 leading-relaxed">
+                        Approved for disbursement.
                       </p>
                     </div>
 
-                    <div className={`flex items-center gap-3 p-4 rounded-xl border transition-colors duration-500 ${isUsed ? 'bg-primary/5 border-primary/10 text-primary/40' : 'bg-tertiary-fixed-dim/5 border-tertiary-fixed-dim/20 text-tertiary-fixed-dim'}`}>
-                      {isUsed ? <XCircle size={18} /> : <CheckCircle size={18} />}
-                      <span className="label-sm font-black uppercase tracking-widest text-[11px]">
-                        {isUsed ? 'Budget Fully Utilized' : 'Funds Ready for Disbursement'}
+                    <div className={`flex items-center gap-2 p-2.5 rounded-lg border transition-colors duration-500 ${isUsed ? 'bg-primary/5 border-primary/10 text-primary/40' : 'bg-tertiary-fixed-dim/5 border-tertiary-fixed-dim/20 text-tertiary-fixed-dim'}`}>
+                      {isUsed ? <XCircle size={14} /> : <CheckCircle size={14} />}
+                      <span className="text-[9px] font-black uppercase tracking-widest">
+                        {isUsed ? 'Fully Utilized' : 'Ready for Disbursement'}
                       </span>
                     </div>
 
                     <Button 
                       onClick={() => handleToggleUsed(b.id, isUsed)}
-                      className={`w-full h-14 rounded-xl font-black uppercase tracking-widest text-[11px] transition-all duration-500 ${isUsed ? 'bg-primary/5 text-primary/40 hover:bg-primary/10' : 'bg-primary text-on-primary hover:opacity-90 shadow-xl shadow-primary/10'}`}
+                      className={`w-full h-10 rounded-lg font-black uppercase tracking-widest text-[9px] transition-all duration-500 ${isUsed ? 'bg-primary/5 text-primary/40 hover:bg-primary/10' : 'bg-primary text-on-primary hover:opacity-90 shadow-lg shadow-primary/10'}`}
                       icon={isUsed ? Clock : ShieldCheck}
                     >
-                      {isUsed ? 'Reactivate Budget' : 'Mark as Utilized'}
+                      {isUsed ? 'Reactivate' : 'Mark Utilized'}
                     </Button>
                   </div>
                 </Card>

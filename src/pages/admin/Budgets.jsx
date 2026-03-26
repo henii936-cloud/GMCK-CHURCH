@@ -86,47 +86,63 @@ export default function Budgets() {
         // VIEW 1: TEAMS DASHBOARD
         // ==========================================
         <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '40px' }}>
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
             <div>
-              <h1 style={{ fontSize: '2.5rem', fontWeight: '800', letterSpacing: '-0.025em' }}>
-                Teams & <span style={{ color: 'var(--tertiary)' }}>Departments</span>
+              <h1 className="text-4xl font-black tracking-tight text-on-surface">
+                Teams & <span className="text-tertiary">Departments</span>
               </h1>
-              <p style={{ color: 'var(--text-muted)', fontSize: '1.1rem', fontWeight: '500' }}>Manage financial allocations across church groups</p>
+              <p className="text-on-surface-variant font-medium mt-1">Manage financial allocations across church groups</p>
             </div>
-            <Button onClick={() => setShowTeamModal(true)} icon={Plus} style={{ background: 'var(--tertiary)', padding: '12px 24px', fontSize: '1rem' }}>
+            <Button onClick={() => setShowTeamModal(true)} icon={Plus} className="bg-tertiary text-on-tertiary hover:bg-tertiary/90 px-6 rounded-full shadow-lg shadow-tertiary/20">
               Add New Team
             </Button>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '24px' }}>
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
             {allTeams.map((team, i) => {
               const teamBudgets = budgets.filter(b => ((b.name && b.name.includes("::")) ? b.name.split("::")[0] : "General") === team);
               const totalAllocated = teamBudgets.reduce((sum, b) => sum + (b.amount || 0), 0);
               const totalApproved = teamBudgets.filter(b => b.status === "Approved").reduce((sum, b) => sum + (b.amount || 0), 0);
+              const progressPercentage = totalAllocated > 0 ? Math.min((totalApproved / totalAllocated) * 100, 100) : 0;
               
               return (
                 <motion.div key={team} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}>
-                  <Card style={{ padding: '0', overflow: 'hidden', height: '100%', display: 'flex', flexDirection: 'column', cursor: 'pointer', transition: 'all 0.2s', border: '1px solid var(--border)' }} className="hover:border-tertiary/50 hover:shadow-lg" onClick={() => openTeamDetails(team)}>
-                    <div style={{ padding: '24px', flex: 1 }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '20px' }}>
-                        <div style={{ width: 50, height: 50, borderRadius: 14, background: 'rgba(16, 185, 129, 0.1)', display: 'grid', placeItems: 'center' }}>
-                          <Users size={24} color="var(--tertiary)" />
+                  <Card 
+                    className="p-0 overflow-hidden h-full flex flex-col cursor-pointer transition-all duration-300 border border-outline-variant/20 hover:border-tertiary/50 hover:shadow-xl hover:shadow-tertiary/10 group bg-surface relative"
+                    onClick={() => openTeamDetails(team)}
+                  >
+                    <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-tertiary/40 to-tertiary/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+                    
+                    <div className="p-6 flex-1 flex flex-col">
+                      <div className="flex items-start gap-4 mb-6">
+                        <div className="w-14 h-14 rounded-2xl bg-tertiary/10 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform duration-300 shadow-inner">
+                          <Users size={28} className="text-tertiary" />
                         </div>
-                        <div>
-                          <h3 style={{ fontSize: '1.25rem', fontWeight: '800' }}>{team}</h3>
-                          <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: '600' }}>{teamBudgets.length} Budget Plans</span>
+                        <div className="flex-1 min-w-0 pt-1">
+                          <h3 className="text-xl font-black text-on-surface truncate group-hover:text-tertiary transition-colors">{team}</h3>
+                          <span className="text-sm font-medium text-on-surface-variant">{teamBudgets.length} Budget Plans</span>
                         </div>
                       </div>
 
-                      <div style={{ display: 'flex', gap: '16px', background: 'rgba(255,255,255,0.03)', padding: '16px', borderRadius: '12px' }}>
-                        <div style={{ flex: 1 }}>
-                          <p style={{ fontSize: '0.7rem', textTransform: 'uppercase', color: 'var(--text-muted)', fontWeight: '700', marginBottom: '4px' }}>Requested</p>
-                          <p style={{ fontSize: '1.1rem', fontWeight: '800', color: 'var(--text)' }}>${totalAllocated.toLocaleString()}</p>
+                      <div className="mt-auto bg-surface-container-lowest rounded-xl p-4 border border-outline-variant/10">
+                        <div className="flex justify-between items-center gap-4">
+                          <div className="flex-1">
+                            <p className="text-[10px] uppercase font-black tracking-widest text-on-surface-variant/60 mb-1">Requested</p>
+                            <p className="text-lg font-black text-on-surface">${totalAllocated.toLocaleString()}</p>
+                          </div>
+                          <div className="w-px h-10 bg-outline-variant/20" />
+                          <div className="flex-1 text-right">
+                            <p className="text-[10px] uppercase font-black tracking-widest text-emerald-500/60 mb-1">Approved</p>
+                            <p className="text-lg font-black text-emerald-500">${totalApproved.toLocaleString()}</p>
+                          </div>
                         </div>
-                        <div style={{ width: '1px', background: 'var(--border)' }} />
-                        <div style={{ flex: 1 }}>
-                          <p style={{ fontSize: '0.7rem', textTransform: 'uppercase', color: 'var(--text-muted)', fontWeight: '700', marginBottom: '4px' }}>Approved</p>
-                          <p style={{ fontSize: '1.1rem', fontWeight: '800', color: '#10b981' }}>${totalApproved.toLocaleString()}</p>
+                        
+                        {/* Progress Bar */}
+                        <div className="w-full h-1.5 bg-surface-container-highest rounded-full mt-4 overflow-hidden relative">
+                          <div 
+                            className="absolute top-0 left-0 h-full bg-emerald-500 rounded-full transition-all duration-1000 ease-out" 
+                            style={{ width: `${progressPercentage}%` }} 
+                          />
                         </div>
                       </div>
                     </div>

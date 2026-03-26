@@ -912,7 +912,12 @@ export default function Events() {
                           <div style={{ width: 40, height: 40, borderRadius: 10, background: 'rgba(255,255,255,0.05)', display: 'grid', placeItems: 'center' }}>
                             <Calendar size={18} color="var(--text-muted)" />
                           </div>
-                          <p style={{ fontWeight: '600', fontSize: '0.9rem' }}>{plan.date ? new Date(plan.date).toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' }) : 'Set Date'} @ {plan.time || 'Set Time'}</p>
+                          <p style={{ fontWeight: '600', fontSize: '0.9rem' }}>
+                            {plan.date ? (() => {
+                              const [y, m, d] = plan.date.split('-');
+                              return new Date(y, m - 1, d).toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' });
+                            })() : 'Set Date'} @ {plan.time || 'Set Time'}
+                          </p>
                         </div>
                       </div>
                     </div>

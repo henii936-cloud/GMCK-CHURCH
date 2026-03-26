@@ -183,7 +183,7 @@ export default function Budgets() {
                   return (
                     <motion.div key={budget.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}>
                       <Card style={{ padding: '0', overflow: 'hidden', height: '100%', display: 'flex', flexDirection: 'column' }}>
-                        <div style={{ height: '5px', background: isApproved ? '#10b981' : '#f59e0b' }} />
+                        <div style={{ height: '5px', background: isApproved ? (budget.is_used ? '#ef4444' : '#10b981') : '#f59e0b' }} />
                         <div style={{ padding: '24px', flex: 1, display: 'flex', flexDirection: 'column' }}>
                           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px' }}>
                             <div style={{ display: 'inline-block', padding: '4px 10px', borderRadius: '6px', background: isApproved ? 'rgba(16, 185, 129, 0.1)' : 'rgba(245, 158, 11, 0.1)', color: isApproved ? '#10b981' : '#f59e0b', fontSize: '0.7rem', fontWeight: '800', textTransform: 'uppercase' }}>
@@ -210,9 +210,9 @@ export default function Budgets() {
                                   fontWeight: '900', 
                                   padding: '2px 8px', 
                                   borderRadius: '4px', 
-                                  background: budget.is_used ? 'rgba(255,255,255,0.05)' : 'rgba(16, 185, 129, 0.1)',
-                                  color: budget.is_used ? 'var(--text-muted)' : '#10b981',
-                                  border: `1px solid ${budget.is_used ? 'var(--border)' : 'rgba(16, 185, 129, 0.2)'}`
+                                  background: budget.is_used ? 'rgba(239, 68, 68, 0.1)' : 'rgba(16, 185, 129, 0.1)',
+                                  color: budget.is_used ? '#ef4444' : '#10b981',
+                                  border: `1px solid ${budget.is_used ? 'rgba(239, 68, 68, 0.2)' : 'rgba(16, 185, 129, 0.2)'}`
                                 }}>
                                   {budget.is_used ? 'FUNDS USED' : 'FUNDS AVAILABLE'}
                                 </span>

@@ -88,45 +88,45 @@ export default function ApprovedBudgets() {
                 transition={{ delay: index * 0.05, duration: 0.5, ease: "easeOut" }}
               >
                 <Card 
-                  className={`group relative overflow-hidden transition-all duration-500 hover:shadow-xl hover:-translate-y-1 !p-5 ${isUsed ? 'opacity-60 grayscale-[0.5]' : ''}`}
+                  className={`group relative overflow-hidden transition-all duration-500 hover:shadow-xl hover:-translate-y-1 !p-5`}
+                  style={{ borderTop: `3px solid ${isUsed ? '#ef4444' : '#10b981'}` }}
                 >
                   {/* Status Indicator */}
-                  <div className={`absolute top-0 right-0 px-4 py-1.5 rounded-bl-xl label-sm font-black uppercase tracking-widest text-[8px] ${isUsed ? 'bg-primary/5 text-primary/40' : 'bg-tertiary-fixed-dim text-on-tertiary-fixed'}`}>
+                  <div className={`absolute top-0 right-0 px-4 py-1.5 rounded-bl-xl font-black uppercase tracking-widest text-[8px] ${isUsed ? 'bg-red-500/10 text-red-500' : 'bg-emerald-500/10 text-emerald-600'}`}>
                     {isUsed ? 'Utilized' : 'Available'}
                   </div>
 
                   <div className="flex items-start justify-between mb-5">
-                    <div className={`w-10 h-10 rounded-xl grid place-items-center transition-colors duration-500 ${isUsed ? 'bg-primary/5 text-primary/20' : 'bg-primary text-on-primary shadow-md shadow-primary/20'}`}>
+                    <div className={`w-10 h-10 rounded-xl grid place-items-center transition-colors duration-500 ${isUsed ? 'bg-red-500/10 text-red-500' : 'bg-emerald-500/10 text-emerald-600'}`}>
                       <Wallet size={20} />
                     </div>
                     <div className="text-right pt-1">
-                      <p className="label-sm text-tertiary-fixed-dim font-black uppercase tracking-widest text-[8px] mb-0.5">{team}</p>
-                      <p className="text-xl font-heading font-bold text-primary leading-none">${b.amount.toLocaleString()}</p>
+                      <p className={`font-black uppercase tracking-widest text-[8px] mb-0.5 ${isUsed ? 'text-red-400' : 'text-emerald-500'}`}>{team}</p>
+                      <p className="text-xl font-heading font-bold text-on-surface leading-none">${b.amount.toLocaleString()}</p>
                     </div>
                   </div>
 
                   <div className="space-y-3">
                     <div>
-                      <h3 className="text-sm font-bold text-primary mb-1 line-clamp-1">{name}</h3>
+                      <h3 className="text-sm font-bold text-on-surface mb-1 line-clamp-1">{name}</h3>
                       <p className="text-[10px] opacity-60 leading-relaxed">
                         Approved for disbursement.
                       </p>
                     </div>
 
-                    <div className={`flex items-center gap-2 p-2.5 rounded-lg border transition-colors duration-500 ${isUsed ? 'bg-primary/5 border-primary/10 text-primary/40' : 'bg-tertiary-fixed-dim/5 border-tertiary-fixed-dim/20 text-tertiary-fixed-dim'}`}>
+                    <div className={`flex items-center gap-2 p-2.5 rounded-lg border transition-colors duration-500 ${isUsed ? 'bg-red-500/5 border-red-500/15 text-red-500' : 'bg-emerald-500/5 border-emerald-500/15 text-emerald-600'}`}>
                       {isUsed ? <XCircle size={14} /> : <CheckCircle size={14} />}
                       <span className="text-[9px] font-black uppercase tracking-widest">
                         {isUsed ? 'Fully Utilized' : 'Ready for Disbursement'}
                       </span>
                     </div>
 
-                    <Button 
+                    <button 
                       onClick={() => handleToggleUsed(b.id, isUsed)}
-                      className={`w-full h-10 rounded-lg font-black uppercase tracking-widest text-[9px] transition-all duration-500 ${isUsed ? 'bg-primary/5 text-primary/40 hover:bg-primary/10' : 'bg-primary text-on-primary hover:opacity-90 shadow-lg shadow-primary/10'}`}
-                      icon={isUsed ? Clock : ShieldCheck}
+                      className={`w-full h-10 rounded-lg font-black uppercase tracking-widest text-[9px] flex items-center justify-center gap-2 transition-all duration-500 cursor-pointer ${isUsed ? 'bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white border border-red-500/20' : 'bg-emerald-600 text-white hover:bg-emerald-700 shadow-lg shadow-emerald-600/20'}`}
                     >
-                      {isUsed ? 'Reactivate' : 'Mark Utilized'}
-                    </Button>
+                      {isUsed ? <><Clock size={14} /> Reactivate</> : <><ShieldCheck size={14} /> Mark Utilized</>}
+                    </button>
                   </div>
                 </Card>
               </motion.div>

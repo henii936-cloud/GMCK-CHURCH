@@ -22,7 +22,10 @@ export default function Layout({ allowedRoles }) {
     const rolePath = {
       admin: "/admin",
       bible_leader: "/leader",
-      finance: "/finance"
+      finance: "/finance",
+      management: "/management",
+      youth_ministry: "/youth",
+      shepherd: "/shepherd",
     };
     return <Navigate to={rolePath[userRole] || "/login"} replace />;
   }

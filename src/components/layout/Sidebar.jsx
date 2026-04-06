@@ -5,7 +5,7 @@ import { motion } from "motion/react";
 import {
   Users, Layers, DollarSign, Activity, Settings,
   MapPin, BookOpen, ClipboardList, LogOut, ChevronRight, ShieldCheck, Wallet, Heart, ArrowDownRight,
-  Menu, X
+  Menu, X, Briefcase, Zap, Eye, UserCheck, Calendar, Shield
 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import { useState, useEffect } from "react";
@@ -74,7 +74,23 @@ export default function Sidebar() {
       { name: "Record Giving", icon: DollarSign, path: "/finance/record" },
       { name: "Expenses", icon: ArrowDownRight, path: "/finance/expenses" },
       { name: "Reports", icon: ClipboardList, path: "/finance/reports" },
-    ]
+    ],
+    management: [
+      { name: "Dashboard", icon: Layers, path: "/management" },
+      { name: "Church Workers", icon: UserCheck, path: "/management/workers" },
+      { name: "Salary Management", icon: Wallet, path: "/management/salaries" },
+      { name: "Finance Overview", icon: DollarSign, path: "/management/finance" },
+    ],
+    youth_ministry: [
+      { name: "Dashboard", icon: Layers, path: "/youth" },
+      { name: "Youth Members", icon: Users, path: "/youth/members" },
+      { name: "Youth Events", icon: Calendar, path: "/youth/events" },
+    ],
+    shepherd: [
+      { name: "Overview", icon: Layers, path: "/shepherd" },
+      { name: "Assigned Groups", icon: Shield, path: "/shepherd/groups" },
+      { name: "Attendance Reports", icon: ClipboardList, path: "/shepherd/reports" },
+    ],
   };
 
   const navItems = menuItems[user?.role?.toLowerCase()] || [];

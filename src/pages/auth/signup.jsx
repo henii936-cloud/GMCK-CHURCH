@@ -3,7 +3,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { 
   ShieldCheck, Mail, Lock, 
   ArrowRight, ChevronLeft, Users, 
-  Zap, CheckCircle2, User, MapPin, DollarSign
+  Zap, CheckCircle2, User, MapPin, DollarSign, Briefcase, Eye
 } from 'lucide-react';
 import { motion } from 'motion/react';
 import { Button, Card, Input } from '../../components/common/UI';
@@ -63,7 +63,43 @@ export default function Signup() {
       shadow: 'shadow-primary/10',
       gradient: 'from-primary/10 to-transparent',
       desc: 'Manage church resources with transparency and stewardship.' 
-    }
+    },
+    { 
+      id: 'management', 
+      name: 'Management', 
+      icon: Briefcase, 
+      color: 'text-primary',
+      bg: 'bg-primary',
+      border: 'border-primary',
+      bgLight: 'bg-primary/5',
+      shadow: 'shadow-primary/10',
+      gradient: 'from-primary/10 to-transparent',
+      desc: 'Executive operational and financial controller of the church.' 
+    },
+    { 
+      id: 'youth_ministry', 
+      name: 'Youth Ministry', 
+      icon: Zap, 
+      color: 'text-tertiary-fixed-dim',
+      bg: 'bg-tertiary-fixed-dim',
+      border: 'border-tertiary-fixed-dim',
+      bgLight: 'bg-tertiary-fixed-dim/10',
+      shadow: 'shadow-tertiary-fixed-dim/20',
+      gradient: 'from-tertiary-fixed-dim/20 to-transparent',
+      desc: 'Manage youth programs, events, and engagement initiatives.' 
+    },
+    { 
+      id: 'shepherd', 
+      name: 'Shepherd', 
+      icon: Eye, 
+      color: 'text-primary',
+      bg: 'bg-primary',
+      border: 'border-primary',
+      bgLight: 'bg-primary/5',
+      shadow: 'shadow-primary/10',
+      gradient: 'from-primary/10 to-transparent',
+      desc: 'Supervisory spiritual oversight for assigned groups and leaders.' 
+    },
   ];
 
   useEffect(() => {

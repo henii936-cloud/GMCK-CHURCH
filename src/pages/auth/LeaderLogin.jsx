@@ -43,15 +43,15 @@ export default function LeaderLogin() {
       }
 
       const userRole = data.profile?.role || data.user?.user_metadata?.role;
-      if (userRole === "admin") {
-        navigate("/admin");
-      } else if (userRole === "bible_leader") {
-        navigate("/leader");
-      } else if (userRole === "finance") {
-        navigate("/finance");
-      } else {
-        navigate("/");
-      }
+      const routes = {
+        admin: "/admin",
+        bible_leader: "/leader",
+        finance: "/finance",
+        management: "/management",
+        youth_ministry: "/youth",
+        shepherd: "/shepherd",
+      };
+      navigate(routes[userRole] || "/");
 
     } catch (err) {
       console.error("Leader Login Error:", err.message);

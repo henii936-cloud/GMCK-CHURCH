@@ -110,12 +110,14 @@ export default function ShepherdLogin() {
         </Card>
 
         <div className="mt-12 text-center">
-          <p className="text-primary/40 text-xs font-medium">
-            Other portals:{" "}
-            <Link to="/login/admin" className="text-primary font-black uppercase tracking-widest hover:underline ml-1">Admin</Link>{" "}
-            <Link to="/login/management" className="text-primary font-black uppercase tracking-widest hover:underline ml-1">Management</Link>{" "}
-            <Link to="/login/youth" className="text-primary font-black uppercase tracking-widest hover:underline ml-1">Youth Ministry</Link>
-          </p>
+          <p className="text-primary/40 text-xs font-medium uppercase tracking-widest mb-4 opacity-50">Select Another Portal</p>
+          <div className="flex flex-wrap justify-center gap-4 text-[10px] font-black uppercase tracking-[0.2em]">
+            <Link to="/login/admin" className="text-primary hover:text-tertiary-fixed-dim transition-colors">Admin</Link>
+            <Link to="/login/leader" className="text-primary hover:text-tertiary-fixed-dim transition-colors">Leader</Link>
+            <Link to="/login/finance" className="text-primary hover:text-tertiary-fixed-dim transition-colors">Finance</Link>
+            <Link to="/login/management" className="text-primary hover:text-tertiary-fixed-dim transition-colors">Management</Link>
+            <Link to="/login/youth" className="text-primary hover:text-tertiary-fixed-dim transition-colors">Youth</Link>
+          </div>
         </div>
       </motion.div>
     </div>

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { memberService, groupService } from "../../services/api";
+import { memberService, groupService, ministryService } from "../../services/api";
 import { supabase } from "../../services/supabaseClient";
 import { Card, Button, Input } from "../../components/common/UI";
 import {
@@ -24,8 +24,10 @@ export default function Members() {
   const [deleteId, setDeleteId] = useState(null);
   const [isSaving, setIsSaving] = useState(false);
   const [imageFile, setImageFile] = useState(null);
-  const [ministryInput, setMinistryInput] = useState("");
   const [viewMember, setViewMember] = useState(null);
+  const [availableMinistries, setAvailableMinistries] = useState([]);
+  const [newMinistryName, setNewMinistryName] = useState("");
+  const [isAddingMinistry, setIsAddingMinistry] = useState(false);
 
   const [formData, setFormData] = useState({
     full_name: "",
@@ -49,12 +51,14 @@ export default function Members() {
   const loadData = async () => {
     setLoading(true);
     try {
-      const [membersData, groupsData] = await Promise.all([
+      const [membersData, groupsData, ministriesData] = await Promise.all([
         memberService.getMembers(),
-        groupService.getGroups()
+        groupService.getGroups(),
+        ministryService.getMinistries()
       ]);
       setMembers(membersData || []);
       setGroups(groupsData || []);
+      setAvailableMinistries(ministriesData || []);
     } catch (err) {
       console.error("Error loading data:", err);
       setError("Synchronisation failed. Re-connecting...");
@@ -80,7 +84,7 @@ export default function Members() {
         age_group: member.age_group || "Adult",
         ministries: member.ministries || []
       });
-      setMinistryInput("");
+      setNewMinistryName("");
     } else {
       setEditingMember(null);
       setFormData({
@@ -97,7 +101,7 @@ export default function Members() {
         age_group: "Adult",
         ministries: []
       });
-      setMinistryInput("");
+      setNewMinistryName("");
     }
     setShowModal(true);
   };
@@ -856,57 +860,92 @@ export default function Members() {
                         />
                       </div>
 
-                        {/* Ministry Tag Input */}
-                        <div className="md:col-span-2 space-y-2">
-                          <label className="text-sm font-semibold text-on-surface">Ministries</label>
-                          <div className="flex gap-2">
-                            <input
-                              type="text"
-                              className="flex-1 h-12 px-4 rounded-xl border border-outline-variant/20 bg-surface text-on-surface focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
-                              placeholder="Type a ministry (e.g. Worship, Prayer)..."
-                              value={ministryInput}
-                              onChange={e => setMinistryInput(e.target.value)}
-                              onKeyDown={e => {
-                                if (e.key === 'Enter') {
-                                  e.preventDefault();
-                                  const val = ministryInput.trim();
-                                  if (val && !formData.ministries.includes(val)) {
-                                    setFormData({ ...formData, ministries: [...formData.ministries, val] });
-                                  }
-                                  setMinistryInput("");
-                                }
-                              }}
-                            />
-                            <button
+                        {/* Ministry Selection Section */}
+                        <div className="md:col-span-2 space-y-4">
+                          <div className="flex justify-between items-center">
+                            <label className="text-sm font-bold text-on-surface flex items-center gap-2">
+                              <Heart size={16} className="text-primary" /> Ministries & Teams
+                            </label>
+                            <button 
                               type="button"
-                              className="h-12 w-12 rounded-xl bg-primary text-on-primary flex items-center justify-center hover:opacity-90 transition-opacity shrink-0"
-                              onClick={() => {
-                                const val = ministryInput.trim();
-                                if (val && !formData.ministries.includes(val)) {
-                                  setFormData({ ...formData, ministries: [...formData.ministries, val] });
-                                }
-                                setMinistryInput("");
-                              }}
+                              onClick={() => setIsAddingMinistry(!isAddingMinistry)}
+                              className="text-[10px] font-black uppercase tracking-widest text-primary hover:text-tertiary-fixed-dim transition-colors flex items-center gap-1"
                             >
-                              <Plus size={20} />
+                              {isAddingMinistry ? <X size={12} /> : <Plus size={12} />} 
+                              {isAddingMinistry ? 'Cancel' : 'Add New Team'}
                             </button>
                           </div>
-                          {formData.ministries.length > 0 && (
-                            <div className="flex flex-wrap gap-2 mt-2">
-                              {formData.ministries.map((min, i) => (
-                                <span
-                                  key={i}
-                                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold"
-                                  style={{ background: 'rgba(14,165,233,0.1)', color: '#0ea5e9', border: '1px solid rgba(14,165,233,0.15)' }}
+
+                          {isAddingMinistry && (
+                            <motion.div 
+                              initial={{ opacity: 0, y: -10 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              className="flex gap-2 p-4 bg-primary/5 rounded-2xl border border-primary/10"
+                            >
+                              <input 
+                                type="text"
+                                placeholder="New ministry name..."
+                                value={newMinistryName}
+                                onChange={e => setNewMinistryName(e.target.value)}
+                                className="flex-1 bg-surface border-none rounded-xl px-4 py-2 text-sm focus:ring-1 focus:ring-primary"
+                              />
+                              <Button 
+                                type="button"
+                                size="sm" 
+                                onClick={async () => {
+                                  if (!newMinistryName.trim()) return;
+                                  try {
+                                    const newMin = await ministryService.createMinistry(newMinistryName);
+                                    setAvailableMinistries([...availableMinistries, newMin].sort((a,b) => a.name.localeCompare(b.name)));
+                                    setNewMinistryName("");
+                                    setIsAddingMinistry(false);
+                                  } catch (err) {
+                                    setError("Ministry already exists or error occurred.");
+                                  }
+                                }}
+                              >
+                                Create
+                              </Button>
+                            </motion.div>
+                          )}
+
+                          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                            {availableMinistries.map((min) => {
+                              const isSelected = formData.ministries.includes(min.name);
+                              return (
+                                <button
+                                  key={min.id}
+                                  type="button"
+                                  onClick={() => {
+                                    const newSelected = isSelected 
+                                      ? formData.ministries.filter(m => m !== min.name)
+                                      : [...formData.ministries, min.name];
+                                    setFormData({ ...formData, ministries: newSelected });
+                                  }}
+                                  className={`flex items-center gap-2 p-3 rounded-xl border text-left transition-all duration-300
+                                    ${isSelected 
+                                      ? 'bg-primary/10 border-primary shadow-sm' 
+                                      : 'bg-surface border-outline-variant/10 hover:border-primary/30 opacity-70'}`}
                                 >
-                                  {min}
-                                  <button
-                                    type="button"
-                                    onClick={() => setFormData({ ...formData, ministries: formData.ministries.filter((_, idx) => idx !== i) })}
-                                    className="hover:opacity-70 transition-opacity"
-                                    style={{ background: 'none', border: 'none', color: '#0ea5e9', cursor: 'pointer', padding: 0, display: 'flex' }}
-                                  >
-                                    <X size={14} />
+                                  <div className={`w-4 h-4 rounded border flex items-center justify-center transition-colors
+                                    ${isSelected ? 'bg-primary border-primary' : 'bg-transparent border-on-surface-variant'}`}>
+                                    {isSelected && <Plus size={12} className="text-on-primary rotate-45" />}
+                                  </div>
+                                  <span className={`text-[11px] font-bold uppercase tracking-wider ${isSelected ? 'text-primary' : 'text-on-surface-variant'}`}>
+                                    {min.name}
+                                  </span>
+                                </button>
+                              );
+                            })}
+                          </div>
+
+                          {formData.ministries.length > 0 && (
+                            <div className="flex flex-wrap gap-2 pt-2">
+                              {formData.ministries.map((m, i) => (
+                                <span key={i} className="px-3 py-1 bg-primary text-on-primary rounded-full text-[10px] font-bold uppercase tracking-wider flex items-center gap-2">
+                                  {m}
+                                  <button type="button" onClick={() => setFormData({ ...formData, ministries: formData.ministries.filter(sm => sm !== m) })}>
+                                    <X size={10} />
                                   </button>
                                 </span>
                               ))}

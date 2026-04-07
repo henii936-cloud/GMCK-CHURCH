@@ -301,3 +301,30 @@ export const activityService = {
     return combined;
   }
 };
+
+export const ministryService = {
+  getMinistries: async () => {
+    const { data, error } = await supabase
+      .from("ministries")
+      .select("*")
+      .order("name");
+    if (error) throw error;
+    return data;
+  },
+  createMinistry: async (name) => {
+    const { data, error } = await supabase
+      .from("ministries")
+      .insert([{ name }])
+      .select();
+    if (error) throw error;
+    return data[0];
+  },
+  deleteMinistry: async (id) => {
+    const { error } = await supabase
+      .from("ministries")
+      .delete()
+      .eq("id", id);
+    if (error) throw error;
+    return true;
+  }
+};

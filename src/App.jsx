@@ -49,6 +49,7 @@ import YouthMembers from "./pages/youth/YouthMembers";
 import ShepherdDashboard from "./pages/shepherd/ShepherdDashboard";
 import ShepherdGroups from "./pages/shepherd/ShepherdGroups";
 import ShepherdReports from "./pages/shepherd/ShepherdReports";
+import ShepherdMinistries from "./pages/shepherd/Ministries";
 
 export default function App() {
   console.log("App component mounted");
@@ -83,6 +84,7 @@ export default function App() {
             <Route path="finance" element={<AdminFinance />} />
             <Route path="budgets" element={<AdminBudgets />} />
             <Route path="programs" element={<AdminActivities />} />
+            <Route path="ministries" element={<ShepherdMinistries />} />
           </Route>
 
           {/* Leader Routes */}
@@ -122,6 +124,7 @@ export default function App() {
             <Route index element={<ShepherdDashboard />} />
             <Route path="groups" element={<ShepherdGroups />} />
             <Route path="reports" element={<ShepherdReports />} />
+            <Route path="ministries" element={<ShepherdMinistries />} />
           </Route>
 
           <Route path="/" element={<Landing />} />

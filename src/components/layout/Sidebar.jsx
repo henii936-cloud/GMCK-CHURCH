@@ -60,6 +60,7 @@ export default function Sidebar() {
       { name: "Study Progress", icon: BookOpen, path: "/admin/progress" },
       { name: "Events", icon: Activity, path: "/admin/events" },
       { name: "Evangelism", icon: Heart, path: "/admin/evangelism" },
+      { name: "Ministries", icon: Heart, path: "/admin/ministries" },
       { name: "Finance", icon: DollarSign, path: "/admin/finance" },
       { name: "Budgets", icon: Wallet, path: "/admin/budgets" },
     ],
@@ -88,6 +89,7 @@ export default function Sidebar() {
     ],
     shepherd: [
       { name: "Overview", icon: Layers, path: "/shepherd" },
+      { name: "Ministries", icon: Heart, path: "/shepherd/ministries" },
       { name: "Assigned Groups", icon: Shield, path: "/shepherd/groups" },
       { name: "Attendance Reports", icon: ClipboardList, path: "/shepherd/reports" },
     ],

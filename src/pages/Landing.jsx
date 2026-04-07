@@ -1,6 +1,9 @@
 import React, { useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Layers, Users, BookOpen, DollarSign, ArrowRight, Heart, Sparkles, Shield, Zap, Globe, Menu, X } from 'lucide-react';
+import { 
+  Layers, Users, BookOpen, DollarSign, ArrowRight, Heart, Sparkles, 
+  Shield, Zap, Globe, Menu, X, Briefcase, Eye, ChevronRight 
+} from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Button } from '../components/common/UI';
 import { useAuth } from '../context/AuthContext';
@@ -10,6 +13,7 @@ export default function Landing() {
   const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
   const [scrolled, setScrolled] = React.useState(false);
+  const [showRoleSelector, setShowRoleSelector] = React.useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -94,12 +98,24 @@ export default function Landing() {
               <Link to="/community" className="label-sm text-on-surface-variant hover:text-primary transition-colors">Groups</Link>
               <div className="h-4 w-[1px] bg-primary/10"></div>
               <div className="flex items-center gap-6">
-                <Link to="/login" className="label-sm font-bold text-primary hover:text-tertiary-fixed-dim transition-colors">Sign In</Link>
-                <Link to="/signup">
-                  <Button className="bg-primary hover:bg-tertiary-fixed-dim text-on-primary hover:text-primary rounded-xl px-8 py-3 h-auto font-bold transition-all duration-500">
-                    Get Started
-                  </Button>
-                </Link>
+                <div className="relative group">
+                  <button className="label-sm font-black uppercase tracking-widest text-primary hover:text-tertiary-fixed-dim transition-colors flex items-center gap-2 cursor-pointer">
+                    Sign In <ChevronRight size={14} className="rotate-90" />
+                  </button>
+                  <div className="absolute top-full right-0 mt-4 w-64 p-4 rounded-2xl bg-surface shadow-2xl border border-primary/5 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-[110]">
+                    <div className="grid gap-1">
+                      <Link to="/login/admin" className="p-3 rounded-xl hover:bg-primary/5 transition-colors text-xs font-bold text-primary flex justify-between items-center group/item">Admin Portal <ArrowRight size={12} className="opacity-0 group-hover/item:opacity-100 transition-all" /></Link>
+                      <Link to="/login/leader" className="p-3 rounded-xl hover:bg-tertiary-fixed-dim/10 transition-colors text-xs font-bold text-primary flex justify-between items-center group/item">Leader Portal <ArrowRight size={12} className="opacity-0 group-hover/item:opacity-100 transition-all" /></Link>
+                      <Link to="/login/finance" className="p-3 rounded-xl hover:bg-primary/5 transition-colors text-xs font-bold text-primary flex justify-between items-center group/item">Finance Portal <ArrowRight size={12} className="opacity-0 group-hover/item:opacity-100 transition-all" /></Link>
+                      <Link to="/login/management" className="p-3 rounded-xl hover:bg-primary/5 transition-colors text-xs font-bold text-primary flex justify-between items-center group/item">Management <ArrowRight size={12} className="opacity-0 group-hover/item:opacity-100 transition-all" /></Link>
+                      <Link to="/login/youth" className="p-3 rounded-xl hover:bg-tertiary-fixed-dim/10 transition-colors text-xs font-bold text-primary flex justify-between items-center group/item">Youth Ministry <ArrowRight size={12} className="opacity-0 group-hover/item:opacity-100 transition-all" /></Link>
+                      <Link to="/login/shepherd" className="p-3 rounded-xl hover:bg-primary/5 transition-colors text-xs font-bold text-primary flex justify-between items-center group/item">Shepherd <ArrowRight size={12} className="opacity-0 group-hover/item:opacity-100 transition-all" /></Link>
+                    </div>
+                  </div>
+                </div>
+                <Button onClick={() => setShowRoleSelector(true)} className="bg-primary hover:bg-tertiary-fixed-dim text-on-primary hover:text-primary rounded-xl px-8 py-3 h-auto font-black uppercase tracking-widest text-[10px] transition-all duration-500">
+                  Get Started
+                </Button>
               </div>
             </div>
 
@@ -120,15 +136,19 @@ export default function Landing() {
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="fixed inset-x-6 top-28 z-[90] p-8 rounded-[2rem] bg-surface shadow-2xl border border-primary/5 md:hidden flex flex-col gap-6"
+            className="fixed inset-x-6 top-28 z-[90] p-8 rounded-[2rem] bg-surface shadow-2xl border border-primary/5 md:hidden flex flex-col gap-4 max-h-[70vh] overflow-y-auto"
           >
-            <Link to="/login/admin" className="headline-sm text-primary p-4 hover:bg-surface-container-low rounded-2xl transition-all">Admin Portal</Link>
-            <Link to="/login/leader" className="headline-sm text-primary p-4 hover:bg-surface-container-low rounded-2xl transition-all">Leader Portal</Link>
-            <Link to="/login/finance" className="headline-sm text-primary p-4 hover:bg-surface-container-low rounded-2xl transition-all">Finance Portal</Link>
-            <div className="h-[1px] bg-primary/10"></div>
-            <Link to="/signup">
-              <Button className="w-full bg-primary py-6 rounded-2xl h-auto font-bold text-on-primary">Join Our Community</Button>
-            </Link>
+            <p className="text-[10px] font-black uppercase tracking-widest text-primary/30 mb-2">Auth Portals</p>
+            <div className="grid grid-cols-1 gap-2">
+              <Link to="/login/admin" className="p-4 bg-primary/5 rounded-2xl text-primary font-bold flex justify-between items-center">Admin <span>&rarr;</span></Link>
+              <Link to="/login/leader" className="p-4 bg-tertiary-fixed-dim/5 rounded-2xl text-primary font-bold flex justify-between items-center">Leader <span>&rarr;</span></Link>
+              <Link to="/login/finance" className="p-4 bg-primary/5 rounded-2xl text-primary font-bold flex justify-between items-center">Finance <span>&rarr;</span></Link>
+              <Link to="/login/management" className="p-4 bg-primary/5 rounded-2xl text-primary font-bold flex justify-between items-center">Management <span>&rarr;</span></Link>
+              <Link to="/login/youth" className="p-4 bg-tertiary-fixed-dim/5 rounded-2xl text-primary font-bold flex justify-between items-center">Youth <span>&rarr;</span></Link>
+              <Link to="/login/shepherd" className="p-4 bg-primary/5 rounded-2xl text-primary font-bold flex justify-between items-center">Shepherd <span>&rarr;</span></Link>
+            </div>
+            <div className="h-[1px] bg-primary/10 my-2"></div>
+            <Button onClick={() => { setShowRoleSelector(true); setIsMenuOpen(false); }} className="w-full bg-primary py-6 rounded-2xl h-auto font-black uppercase tracking-widest text-[11px] text-on-primary">Join Community</Button>
           </motion.div>
         )}
       </AnimatePresence>
@@ -165,16 +185,26 @@ export default function Landing() {
           </motion.p>
 
           <motion.div variants={itemVariants} className="flex flex-col sm:flex-row gap-6 justify-center">
-            <Link to="/signup">
-              <Button className="px-12 py-8 text-xl h-auto rounded-2xl bg-primary text-on-primary hover:bg-tertiary-fixed-dim hover:text-primary group shadow-whisper transition-all duration-500 font-bold">
-                Launch Platform <ArrowRight size={24} className="ml-3 transition-transform group-hover:translate-x-2" />
+            <Button 
+              onClick={() => setShowRoleSelector(true)}
+              className="px-12 py-8 text-xl h-auto rounded-3xl bg-primary text-on-primary hover:bg-tertiary-fixed-dim hover:text-primary group shadow-whisper transition-all duration-500 font-black uppercase tracking-widest text-sm"
+            >
+              Launch Platform <ArrowRight size={24} className="ml-3 transition-transform group-hover:translate-x-2" />
+            </Button>
+            <div className="relative group">
+              <Button variant="outline" className="px-12 py-8 text-xl h-auto rounded-3xl border-primary/10 bg-surface-container-low text-primary hover:bg-surface-container transition-all duration-500 font-black uppercase tracking-widest text-sm">
+                Access Portals
               </Button>
-            </Link>
-            <Link to="/login">
-              <Button variant="outline" className="px-12 py-8 text-xl h-auto rounded-2xl border-primary/10 bg-surface-container-low text-primary hover:bg-surface-container transition-all duration-500 font-bold">
-                Admin Console
-              </Button>
-            </Link>
+              <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-4 w-64 p-4 rounded-3xl bg-surface shadow-2xl border border-primary/5 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50">
+                <div className="grid gap-1">
+                  {['admin', 'leader', 'finance', 'management', 'youth', 'shepherd'].map(p => (
+                    <Link key={p} to={`/login/${p}`} className="p-3 rounded-xl hover:bg-primary/5 transition-colors text-[10px] font-black uppercase tracking-widest text-primary flex justify-between items-center group/p">
+                      {p.replace('_', ' ')} Portal <ChevronRight size={12} className="opacity-0 group-hover/p:opacity-100 translate-x-[-10px] group-hover/p:translate-x-0 transition-all" />
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            </div>
           </motion.div>
         </motion.div>
       </section>
@@ -187,38 +217,43 @@ export default function Landing() {
             <p className="text-on-surface-variant max-w-2xl mx-auto font-medium tracking-wide">Tailored interfaces for every aspect of church governance and community life.</p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {[
-              { id: 'admin', name: 'Master Admin', icon: Shield, color: 'text-primary', bg: 'bg-surface-container', path: '/login/admin', desc: 'Manage users, roles, and global church settings.' },
-              { id: 'bible_leader', name: 'Bible Leader', icon: Users, color: 'text-emerald-700', bg: 'bg-emerald-50', path: '/login/leader', desc: 'Lead groups, track studies, and nurture members.' },
-              { id: 'finance', name: 'Financial Office', icon: DollarSign, color: 'text-amber-700', bg: 'bg-amber-50', path: '/login/finance', desc: 'Secure budget tracking and financial oversight.' }
+              { id: 'admin', name: 'Master Admin', icon: Shield, color: 'text-primary', bg: 'bg-primary/5', path: '/login/admin', desc: 'Manage users, roles, and global church settings.' },
+              { id: 'bible_leader', name: 'Bible Leader', icon: BookOpen, color: 'text-tertiary-fixed-dim', bg: 'bg-tertiary-fixed-dim/5', path: '/login/leader', desc: 'Lead groups, track studies, and nurture members.' },
+              { id: 'finance', name: 'Financial Office', icon: DollarSign, color: 'text-primary', bg: 'bg-primary/5', path: '/login/finance', desc: 'Secure budget tracking and financial oversight.' },
+              { id: 'management', name: 'Management', icon: Briefcase, color: 'text-primary', bg: 'bg-primary/5', path: '/login/management', desc: 'Oversee church operations and financial controller.' },
+              { id: 'youth_ministry', name: 'Youth Ministry', icon: Zap, color: 'text-tertiary-fixed-dim', bg: 'bg-tertiary-fixed-dim/5', path: '/login/youth', desc: 'Manage youth programs, events, and engagement.' },
+              { id: 'shepherd', name: 'Shepherd', icon: Eye, color: 'text-primary', bg: 'bg-primary/5', path: '/login/shepherd', desc: 'Spiritual oversight for assigned groups and leaders.' }
             ].map((r, i) => (
               <motion.div
                 key={r.id}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.1 }}
+                transition={{ delay: i * 0.05 }}
                 viewport={{ once: true }}
-                className="editorial-card group hover:scale-[1.02] transition-all duration-500"
+                className="group h-full"
               >
-                <div className={`w-16 h-16 rounded-2xl ${r.bg} ${r.color} flex items-center justify-center mb-10 transition-all duration-500 group-hover:rotate-6 shadow-sm`}>
-                  <r.icon size={32} />
-                </div>
+                <div className="editorial-card p-10 h-full flex flex-col hover:border-primary/20 transition-all duration-700 bg-surface-container shadow-whisper">
+                  <div className={`w-14 h-14 rounded-2xl ${r.bg} ${r.color} flex items-center justify-center mb-8 transition-all duration-700 group-hover:rotate-12`}>
+                    <r.icon size={28} />
+                  </div>
 
-                <h3 className="headline-sm text-primary mb-4">{r.name}</h3>
-                <p className="text-on-surface-variant mb-10 text-sm leading-relaxed font-medium">{r.desc}</p>
+                  <h3 className="headline-sm text-primary mb-3 font-black">{r.name}</h3>
+                  <p className="text-on-surface-variant mb-10 text-sm leading-relaxed font-medium opacity-70 flex-1">{r.desc}</p>
 
-                <div className="flex flex-col gap-4">
-                  <Link to={r.path} className="w-full">
-                    <Button className="w-full py-6 h-auto rounded-xl bg-primary text-on-primary hover:bg-tertiary-fixed-dim hover:text-primary transition-all duration-500 font-bold">
-                      Enter Portal
-                    </Button>
-                  </Link>
-                  <Link to="/signup" state={{ role: r.id }} className="w-full">
-                    <Button variant="outline" className="w-full py-6 h-auto rounded-xl border-primary/10 bg-surface-container-low text-primary hover:bg-surface-container transition-all duration-500 font-bold">
-                      Create Role
-                    </Button>
-                  </Link>
+                  <div className="flex flex-col gap-3">
+                    <Link to={r.path} className="w-full">
+                      <Button className="w-full py-5 h-auto rounded-xl bg-primary text-on-primary hover:bg-tertiary-fixed-dim hover:text-primary transition-all duration-500 font-black uppercase tracking-widest text-[10px]">
+                        Sign In
+                      </Button>
+                    </Link>
+                    <Link to="/signup" state={{ role: r.id }} className="w-full text-center">
+                      <span className="text-[10px] font-black uppercase tracking-[0.2em] text-on-surface-variant/40 hover:text-primary transition-colors cursor-pointer py-2 block">
+                        Apply for Role
+                      </span>
+                    </Link>
+                  </div>
                 </div>
               </motion.div>
             ))}
@@ -284,16 +319,78 @@ export default function Landing() {
           <div className="relative z-10">
             <h2 className="display-md text-on-primary mb-10 tracking-tight">Ready to Transform Your <span className="text-tertiary-fixed-dim italic">Church?</span></h2>
             <p className="text-on-primary/70 mb-16 text-xl font-medium tracking-wide max-w-2xl mx-auto">Join hundreds of leaders managing their community with precision and heart.</p>
-            <Link to="/signup">
-              <Button className="bg-tertiary-fixed-dim text-primary hover:bg-surface rounded-2xl px-16 py-8 text-2xl h-auto font-bold border-none shadow-xl transition-all duration-500">
-                Get Started Now
-              </Button>
-            </Link>
+            <Button 
+              onClick={() => setShowRoleSelector(true)}
+              className="bg-tertiary-fixed-dim text-primary hover:bg-surface rounded-3xl px-16 py-8 text-2xl h-auto font-black uppercase tracking-[0.2em] border-none shadow-xl transition-all duration-500"
+            >
+              Get Started Now
+            </Button>
           </div>
         </motion.div>
       </section>
 
-      {/* Footer */}
+
+      {/* Role Selection Modal */}
+      <AnimatePresence>
+        {showRoleSelector && (
+          <>
+            <motion.div 
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-primary/20 backdrop-blur-md z-[200]" 
+              onClick={() => setShowRoleSelector(false)}
+            />
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.9, y: 40 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.9, y: 40 }}
+              className="fixed inset-0 flex items-center justify-center p-6 z-[210] pointer-events-none"
+            >
+              <div className="bg-surface-container rounded-[3rem] p-12 md:p-16 max-w-4xl w-full shadow-2xl border border-primary/5 pointer-events-auto relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 blur-[80px] -mr-32 -mt-32 rounded-full" />
+                
+                <button onClick={() => setShowRoleSelector(false)} className="absolute top-8 right-8 w-12 h-12 rounded-2xl bg-surface-container-low hover:bg-surface-container-high flex items-center justify-center text-primary transition-all">
+                  <X size={24} />
+                </button>
+
+                <div className="text-center mb-12 relative z-10">
+                  <h2 className="display-sm text-primary mb-4">Choose Your <span className="text-tertiary-fixed-dim italic">Journey</span></h2>
+                  <p className="label-sm text-on-surface-variant uppercase tracking-[0.3em] opacity-60">Role-Based Authentication Access</p>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 relative z-10">
+                  {[
+                    { id: 'admin', name: 'Master Admin', icon: Shield, col: 'bg-primary/5 text-primary' },
+                    { id: 'bible_leader', name: 'Bible Leader', icon: BookOpen, col: 'bg-tertiary-fixed-dim/10 text-tertiary-fixed-dim' },
+                    { id: 'finance', name: 'Finance Office', icon: DollarSign, col: 'bg-primary/5 text-primary' },
+                    { id: 'management', name: 'Management', icon: Briefcase, col: 'bg-primary/5 text-primary' },
+                    { id: 'youth_ministry', name: 'Youth Ministry', icon: Zap, col: 'bg-tertiary-fixed-dim/10 text-tertiary-fixed-dim' },
+                    { id: 'shepherd', name: 'Shepherd', icon: Eye, col: 'bg-primary/5 text-primary' }
+                  ].map((r, i) => (
+                    <motion.div
+                      key={r.id}
+                      initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.04 }}
+                    >
+                      <div className="group p-6 rounded-3xl bg-surface hover:bg-surface-container-high border border-primary/5 hover:border-primary/20 transition-all duration-500 cursor-pointer h-full flex flex-col items-center text-center">
+                        <div className={`w-14 h-14 rounded-2xl ${r.col} flex items-center justify-center mb-6 group-hover:scale-110 transition-transform`}>
+                          <r.icon size={26} />
+                        </div>
+                        <h4 className="text-primary font-black uppercase tracking-widest text-[11px] mb-6">{r.name}</h4>
+                        <div className="flex flex-col gap-2 w-full mt-auto">
+                          <Link to={`/login/${r.id.split('_')[0]}`} className="w-full">
+                            <Button className="w-full py-4 h-auto rounded-xl bg-primary text-on-primary hover:bg-tertiary-fixed-dim hover:text-primary text-[10px] font-black uppercase tracking-widest transition-all">Sign In</Button>
+                          </Link>
+                          <Link to="/signup" state={{ role: r.id }} className="w-full">
+                            <Button variant="outline" className="w-full py-4 h-auto rounded-xl border-primary/10 text-primary hover:bg-surface-container text-[10px] font-black uppercase tracking-widest transition-all">Sign Up</Button>
+                          </Link>
+                        </div>
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+
       <footer className="py-32 px-6 border-t border-primary/5 bg-surface-container-low">
         <div className="container mx-auto max-w-7xl">
           <div className="flex flex-col md:flex-row justify-between items-start gap-16">

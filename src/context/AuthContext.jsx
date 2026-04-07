@@ -91,11 +91,16 @@ export const AuthProvider = ({ children }) => {
         if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'USER_UPDATED') {
           // Don't set loading to true if we already have a user, to prevent flicker
           if (!user) setLoading(true);
-          const userData = await loadUser(newSession);
-          if (event === 'SIGNED_IN' && userData) {
-            logLogin(userData);
-          }
-        } else if (event === 'SIGNED_OUT') {
+          loadUser(newSession).then(userData => {
+            if (event === 'SIGNED_IN' && userData) {
+              logLogin(userData); // Don't await
+            }
+          });
+        }
+        
+        if (event === 'SIGNED_OUT') {
+          const oldUser = user;
+          logLogout(oldUser?.id);
           setUser(null);
           setLoading(false);
         }
@@ -135,21 +140,22 @@ export const AuthProvider = ({ children }) => {
 
   const logLogout = async (userId) => {
     try {
-      const logId = sessionStorage.getItem('current_login_log_id');
+      const logId = sessionStorage.getItem('login_log_id');
       if (logId) {
         await supabase.from('login_logs').update({ logout_time: new Date().toISOString() }).eq('id', logId);
-        sessionStorage.removeItem('current_login_log_id');
+        sessionStorage.removeItem('login_log_id');
       }
       
       if (userId) {
         await supabase.from('activity_logs').insert({
           user_id: userId,
           action: 'logout',
-          description: `User logged out`
+          description: 'User logged out',
+          entity_type: 'auth'
         });
       }
     } catch (err) {
-      console.error("Logout tracking error:", err);
+      console.error("Logout log error:", err);
     }
   };
 
@@ -244,14 +250,10 @@ export const AuthProvider = ({ children }) => {
     return data;
   };
 
-  const logout = async () => {
+  const logout = () => {
     setLoading(true);
-    const userId = user?.id;
-    if (userId) {
-      localStorage.removeItem(`profile_${userId}`);
-      await logLogout(userId);
-    }
-    await supabase.auth.signOut();
+    logLogout(user?.id);
+    return supabase.auth.signOut();
   };
 
   return (

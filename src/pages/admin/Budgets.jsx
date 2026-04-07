@@ -1,3 +1,6 @@
+import { useState, useEffect } from "react";
+import { financeService } from "../../services/api";
+import { Card, Button, Input } from "../../components/common/UI";
 import { DollarSign, Layers, CheckCircle2, AlertCircle, Plus, Users, ArrowLeft, Wallet, Loader2, ShieldCheck, PenTool, XCircle } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import { motion, AnimatePresence } from "motion/react";
@@ -18,6 +21,7 @@ export default function Budgets() {
   const [newTeamName, setNewTeamName] = useState("");
   const [sessionTeams, setSessionTeams] = useState(["Worship Department", "Youth Ministry", "Media Team"]);
   const [newBudget, setNewBudget] = useState({ name: "", amount_total: 0 });
+  const [submittingId, setSubmittingId] = useState(null);
   const { user } = useAuth();
   const isAdmin = user?.role === 'admin';
 
@@ -38,11 +42,15 @@ export default function Budgets() {
   };
 
   const handleApprove = async (id, role, status = 'approved') => {
+    if (!user) return;
     try {
+      setSubmittingId(id);
       await financeService.approveBudget(id, { id: user.id, full_name: user.full_name }, status, role, "Approved via Dashboard");
-      loadData();
+      await loadData();
     } catch (err) {
       console.error("Approval error:", err);
+    } finally {
+      setSubmittingId(null);
     }
   };
 
@@ -248,28 +256,36 @@ export default function Budgets() {
                               <div className="mt-4 space-y-3">
                                 {isAdmin && (
                                   <div className="flex gap-2">
-                                    {(budget.status === 'Pending') && (
-                                      <button 
-                                        onClick={() => handleApprove(budget.id, 'justifier')}
-                                        className="flex-1 h-9 rounded-lg bg-emerald-500/10 text-emerald-600 font-black uppercase text-[9px] tracking-widest hover:bg-emerald-500 hover:text-white transition-all flex items-center justify-center gap-2"
-                                      >
-                                        <PenTool size={14} /> Justify
-                                      </button>
+                                    {submittingId === budget.id ? (
+                                      <div className="flex-1 h-9 rounded-lg bg-surface-container flex items-center justify-center">
+                                        <Loader2 size={16} className="animate-spin text-primary" />
+                                      </div>
+                                    ) : (
+                                      <>
+                                        {(budget.status === 'Pending') && (
+                                          <button 
+                                            onClick={() => handleApprove(budget.id, 'justifier')}
+                                            className="flex-1 h-9 rounded-lg bg-emerald-500/10 text-emerald-600 font-black uppercase text-[9px] tracking-widest hover:bg-emerald-500 hover:text-white transition-all flex items-center justify-center gap-2"
+                                          >
+                                            <PenTool size={14} /> Justify
+                                          </button>
+                                        )}
+                                        {(budget.status === 'Partially Approved') && (
+                                          <button 
+                                            onClick={() => handleApprove(budget.id, 'signer')}
+                                            className="flex-1 h-9 rounded-lg bg-primary text-white font-black uppercase text-[9px] tracking-widest hover:bg-primary/90 transition-all flex items-center justify-center gap-2 shadow-lg shadow-primary/20"
+                                          >
+                                            <ShieldCheck size={14} /> Sign
+                                          </button>
+                                        )}
+                                        <button 
+                                          onClick={() => handleApprove(budget.id, budget.status === 'Pending' ? 'justifier' : 'signer', 'rejected')}
+                                          className="w-9 h-9 rounded-lg bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white transition-all flex items-center justify-center"
+                                        >
+                                          <XCircle size={14} />
+                                        </button>
+                                      </>
                                     )}
-                                    {(budget.status === 'Partially Approved') && (
-                                      <button 
-                                        onClick={() => handleApprove(budget.id, 'signer')}
-                                        className="flex-1 h-9 rounded-lg bg-primary text-white font-black uppercase text-[9px] tracking-widest hover:bg-primary/90 transition-all flex items-center justify-center gap-2 shadow-lg shadow-primary/20"
-                                      >
-                                        <ShieldCheck size={14} /> Sign
-                                      </button>
-                                    )}
-                                    <button 
-                                      onClick={() => handleApprove(budget.id, budget.status === 'Pending' ? 'justifier' : 'signer', 'rejected')}
-                                      className="w-9 h-9 rounded-lg bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white transition-all flex items-center justify-center"
-                                    >
-                                      <XCircle size={14} />
-                                    </button>
                                   </div>
                                 )}
                                 <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '4px' }}>

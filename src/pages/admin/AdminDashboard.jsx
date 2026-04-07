@@ -19,12 +19,22 @@ export default function AdminDashboard() {
   const [upcomingEvents, setUpcomingEvents] = useState([]);
   const [onlineElders, setOnlineElders] = useState([]);
   const [activityLogs, setActivityLogs] = useState([]);
+  const [pendingApprovals, setPendingApprovals] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchStats();
-    fetchRecentData();
+    loadDashboardData();
   }, []);
+
+  const loadDashboardData = async () => {
+    setLoading(true);
+    await Promise.all([
+      fetchStats(),
+      fetchRecentData(),
+      fetchPendingApprovals()
+    ]);
+    setLoading(false);
+  };
 
   const fetchStats = async () => {
     try {
@@ -76,9 +86,17 @@ export default function AdminDashboard() {
       setActivityLogs(activityData.data || []);
     } catch (err) {
       console.error("Error fetching recent data:", err);
-    } finally {
-      setLoading(false);
     }
+  };
+
+  const fetchPendingApprovals = async () => {
+    const { data } = await supabase
+      .from('budgets')
+      .select('*, approvals(*)')
+      .in('status', ['Pending', 'Partially Approved'])
+      .order('created_at', { ascending: false })
+      .limit(5);
+    setPendingApprovals(data || []);
   };
 
   const statCards = [
@@ -207,47 +225,100 @@ export default function AdminDashboard() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6 pb-6">
-        <div className="editorial-card p-6 min-h-[300px] flex flex-col">
-          <h3 className="headline-sm text-primary text-xl mb-6 flex items-center gap-3">
-            <Eye size={20} className="text-tertiary-fixed-dim" /> Elders <span className="text-tertiary-fixed-dim italic">Activity</span>
-          </h3>
-          <div className="space-y-4">
-            {onlineElders.map(elder => {
-              const lastActive = new Date(elder.last_active);
-              const isOnline = (new Date() - lastActive) < 5 * 60 * 1000;
-              return (
-                <div key={elder.id} className="flex items-center justify-between p-3 rounded-2xl bg-surface-container-low border border-outline-variant/5">
-                  <div className="flex items-center gap-4">
-                    <div className="relative">
-                      <div className="w-10 h-10 rounded-full bg-primary/10 grid place-items-center text-primary font-black">
-                        {elder.full_name?.charAt(0) || 'U'}
-                      </div>
-                      {isOnline && <div className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-emerald-500 rounded-full border-2 border-surface shadow-sm" />}
-                    </div>
-                    <div>
-                      <p className="text-sm font-bold text-primary">{elder.full_name}</p>
-                      <p className="text-[10px] font-black uppercase text-on-surface-variant/50 tracking-widest">{elder.role}</p>
-                    </div>
+        <div className="space-y-8">
+          <div className="bg-surface border border-outline-variant/10 rounded-[32px] p-8">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-xl font-black text-on-surface flex items-center gap-3">
+                <ShieldCheck className="text-primary" size={24} />
+                Pending <span className="text-primary">Approvals</span>
+              </h2>
+              <span className="px-3 py-1 bg-primary/10 text-primary text-[10px] font-black rounded-full">
+                {pendingApprovals.length} ACTION ITEMS
+              </span>
+            </div>
+            <div className="space-y-4">
+              {pendingApprovals.length === 0 ? (
+                <div className="py-8 text-center bg-surface-container-lowest rounded-2xl border border-dashed border-outline-variant/20">
+                  <Activity size={32} className="mx-auto text-on-surface-variant/20 mb-2" />
+                  <p className="text-xs font-bold text-on-surface-variant/40 italic">All caught up!</p>
+                </div>
+              ) : pendingApprovals.map(budget => (
+                <div key={budget.id} className="p-4 bg-surface-container-lowest rounded-2xl border border-outline-variant/5 hover:border-primary/20 transition-all group">
+                  <div className="flex justify-between items-start mb-2">
+                    <h3 className="text-sm font-black text-on-surface truncate pr-4">
+                      {budget.name.split('::')[1] || budget.name}
+                    </h3>
+                    <span className={`text-[9px] font-black px-2 py-0.5 rounded uppercase tracking-tighter ${
+                      budget.status === 'Pending' ? 'bg-amber-100 text-amber-700' : 'bg-emerald-100 text-emerald-700'
+                    }`}>
+                      {budget.status === 'Pending' ? 'Needs Justifier' : 'Needs Signer'}
+                    </span>
                   </div>
-                  <div className="text-right">
-                    <p className="text-[10px] font-black tracking-widest text-on-surface-variant uppercase flex items-center gap-2 justify-end">
-                      {isOnline ? <span className="text-emerald-500">Currently Online</span> : <span>Last active {lastActive.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>}
-                    </p>
+                  <div className="flex items-center justify-between">
+                    <p className="text-lg font-black text-primary">${budget.amount?.toLocaleString()}</p>
+                    {budget.approvals && budget.approvals.length > 0 && (
+                      <div className="flex items-center gap-1">
+                        {budget.approvals.map(app => (
+                          <div key={app.id} title={`${app.approver_name} (${app.role})`} className={`w-5 h-5 rounded-full border-2 border-surface flex items-center justify-center text-[7px] font-black ${
+                            app.role === 'justifier' ? 'bg-emerald-500 text-white' : 'bg-primary text-white'
+                          }`}>
+                            {app.approver_name[0]}
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 </div>
-              );
-            })}
+              ))}
+            </div>
+          </div>
+
+          <div className="bg-surface border border-outline-variant/10 rounded-[32px] p-8">
+            <h2 className="text-xl font-black text-on-surface mb-6 flex items-center gap-3">
+              <Eye className="text-tertiary" size={24} />
+              Elders <span className="text-tertiary">Activity</span>
+            </h2>
+            <div className="space-y-4">
+              {onlineElders.map(elder => {
+                const lastActive = new Date(elder.last_active);
+                const isOnline = (new Date() - lastActive) < 5 * 60 * 1000;
+                return (
+                  <div key={elder.id} className="flex items-center justify-between p-3 bg-surface-container-lowest rounded-2xl border border-outline-variant/5">
+                    <div className="flex items-center gap-3">
+                      <div className={`w-10 h-10 rounded-full flex items-center justify-center text-lg font-black ${
+                        isOnline ? 'bg-emerald-500/10 text-emerald-500 border-2 border-emerald-500/20' : 'bg-on-surface-variant/5 text-on-surface-variant'
+                      }`}>
+                        {elder.full_name?.[0] || 'U'}
+                      </div>
+                      <div>
+                        <p className="text-sm font-black text-on-surface">{elder.full_name}</p>
+                        <p className="text-[10px] font-bold text-on-surface-variant/60 uppercase tracking-widest">{elder.role}</p>
+                      </div>
+                    </div>
+                    {isOnline && (
+                      <div className="flex items-center gap-1.5 px-3 py-1 bg-emerald-500/10 rounded-full">
+                        <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                        <span className="text-[10px] font-black text-emerald-600 uppercase">Live</span>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
           </div>
         </div>
 
-        <div className="editorial-card p-6 min-h-[300px] flex flex-col">
-          <h3 className="headline-sm text-primary text-xl mb-6 flex items-center gap-3">
-            <Activity size={20} className="text-tertiary-fixed-dim" /> Multi-User <span className="text-tertiary-fixed-dim italic">Audit Trail</span>
-          </h3>
-          <div className="space-y-3 overflow-y-auto max-h-[300px] pr-2 custom-scrollbar">
-            {activityLogs.map(log => (
-              <div key={log.id} className="flex gap-4 items-start p-3 hover:bg-surface-container-low rounded-xl transition-all">
-                <div className={`mt-1 w-8 h-8 rounded-lg grid place-items-center shrink-0 ${
+        <div className="bg-surface border border-outline-variant/10 rounded-[32px] p-8">
+          <h2 className="text-xl font-black text-on-surface mb-6 flex items-center gap-3">
+            <Activity className="text-primary" size={24} />
+            Multi-User <span className="text-primary">Audit Trail</span>
+          </h2>
+          <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
+            {activityLogs.length === 0 ? (
+              <p className="text-xs text-on-surface-variant/40 italic text-center py-4">No recent system activity logs available.</p>
+            ) : activityLogs.map(log => (
+              <div key={log.id} className="flex gap-4 p-4 bg-surface-container-lowest rounded-2xl border border-outline-variant/5 relative overflow-hidden group">
+                <div className={`shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${
                   log.action === 'approve' ? 'bg-emerald-500/10 text-emerald-600' :
                   log.action === 'reject' ? 'bg-red-500/10 text-red-500' :
                   'bg-primary/5 text-primary'
@@ -255,14 +326,13 @@ export default function AdminDashboard() {
                   {log.action === 'approve' ? <ShieldCheck size={14} /> : log.action === 'reject' ? <AlertCircle size={14} /> : <Clock size={14} />}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-xs font-bold text-primary">{log.description}</p>
-                  <p className="text-[10px] opacity-60 mt-1 uppercase tracking-widest font-black">
-                    {log.profiles?.full_name} • {new Date(log.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                  <p className="text-xs font-bold text-on-surface mb-1 leading-snug">{log.description}</p>
+                  <p className="text-[10px] text-on-surface-variant/60 font-medium">
+                    {new Date(log.created_at).toLocaleTimeString()} • {new Date(log.created_at).toLocaleDateString()}
                   </p>
                 </div>
               </div>
             ))}
-            {activityLogs.length === 0 && <p className="text-center py-12 text-on-surface-variant/40 text-sm">No activity logs recorded yet.</p>}
           </div>
         </div>
       </div>

@@ -50,6 +50,15 @@ import ShepherdDashboard from "./pages/shepherd/ShepherdDashboard";
 import ShepherdGroups from "./pages/shepherd/ShepherdGroups";
 import ShepherdReports from "./pages/shepherd/ShepherdReports";
 import ShepherdMinistries from "./pages/shepherd/Ministries";
+// Kids Ministry pages
+import KidsLogin from "./pages/auth/KidsLogin";
+import KidsRoute from "./routes/KidsRoute";
+import KidsDashboard from "./pages/kids/KidsDashboard";
+import KidsMembers from "./pages/kids/KidsMembers";
+import KidsClasses from "./pages/kids/KidsClasses";
+import KidsAttendance from "./pages/kids/KidsAttendance";
+import KidsEvents from "./pages/kids/KidsEvents";
+import KidsReports from "./pages/kids/KidsReports";
 
 export default function App() {
   console.log("App component mounted");
@@ -68,6 +77,7 @@ export default function App() {
           <Route path="/login/management" element={<ManagementLogin />} />
           <Route path="/login/youth" element={<YouthLogin />} />
           <Route path="/login/shepherd" element={<ShepherdLogin />} />
+          <Route path="/login/kids" element={<KidsLogin />} />
           <Route path="/login" element={<Navigate to="/login/admin" />} />
           <Route path="/signup" element={<Signup />} />
 
@@ -125,6 +135,16 @@ export default function App() {
             <Route path="groups" element={<ShepherdGroups />} />
             <Route path="reports" element={<ShepherdReports />} />
             <Route path="ministries" element={<ShepherdMinistries />} />
+          </Route>
+
+          {/* Kids Ministry Routes */}
+          <Route path="/kids" element={<KidsRoute><Layout allowedRoles={['kids_ministry', 'admin']} /></KidsRoute>}>
+            <Route index element={<KidsDashboard />} />
+            <Route path="members" element={<KidsMembers />} />
+            <Route path="classes" element={<KidsClasses />} />
+            <Route path="attendance" element={<KidsAttendance />} />
+            <Route path="events" element={<KidsEvents />} />
+            <Route path="reports" element={<KidsReports />} />
           </Route>
 
           <Route path="/" element={<Landing />} />

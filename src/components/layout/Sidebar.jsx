@@ -93,6 +93,14 @@ export default function Sidebar() {
       { name: "Assigned Groups", icon: Shield, path: "/shepherd/groups" },
       { name: "Attendance Reports", icon: ClipboardList, path: "/shepherd/reports" },
     ],
+    kids_ministry: [
+      { name: "Dashboard", icon: Layers, path: "/kids" },
+      { name: "Kids Members", icon: Users, path: "/kids/members" },
+      { name: "Classes", icon: Layers, path: "/kids/classes" },
+      { name: "Attendance", icon: ClipboardList, path: "/kids/attendance" },
+      { name: "Kids Events", icon: Calendar, path: "/kids/events" },
+      { name: "Reports", icon: Activity, path: "/kids/reports" },
+    ],
   };
 
   const navItems = menuItems[user?.role?.toLowerCase()] || [];

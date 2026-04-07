@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { 
   Layers, Users, BookOpen, DollarSign, ArrowRight, Heart, Sparkles, 
-  Shield, Zap, Globe, Menu, X, Briefcase, Eye, ChevronRight 
+  Shield, Zap, Globe, Menu, X, Briefcase, Eye, ChevronRight, Baby 
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Button } from '../components/common/UI';
@@ -110,6 +110,7 @@ export default function Landing() {
                       <Link to="/login/management" className="p-3 rounded-xl hover:bg-primary/5 transition-colors text-xs font-bold text-primary flex justify-between items-center group/item">Management <ArrowRight size={12} className="opacity-0 group-hover/item:opacity-100 transition-all" /></Link>
                       <Link to="/login/youth" className="p-3 rounded-xl hover:bg-tertiary-fixed-dim/10 transition-colors text-xs font-bold text-primary flex justify-between items-center group/item">Youth Ministry <ArrowRight size={12} className="opacity-0 group-hover/item:opacity-100 transition-all" /></Link>
                       <Link to="/login/shepherd" className="p-3 rounded-xl hover:bg-primary/5 transition-colors text-xs font-bold text-primary flex justify-between items-center group/item">Shepherd <ArrowRight size={12} className="opacity-0 group-hover/item:opacity-100 transition-all" /></Link>
+                      <Link to="/login/kids" className="p-3 rounded-xl hover:bg-tertiary-fixed-dim/10 transition-colors text-xs font-bold text-primary flex justify-between items-center group/item">Kids Ministry <ArrowRight size={12} className="opacity-0 group-hover/item:opacity-100 transition-all" /></Link>
                     </div>
                   </div>
                 </div>
@@ -146,6 +147,7 @@ export default function Landing() {
               <Link to="/login/management" className="p-4 bg-primary/5 rounded-2xl text-primary font-bold flex justify-between items-center">Management <span>&rarr;</span></Link>
               <Link to="/login/youth" className="p-4 bg-tertiary-fixed-dim/5 rounded-2xl text-primary font-bold flex justify-between items-center">Youth <span>&rarr;</span></Link>
               <Link to="/login/shepherd" className="p-4 bg-primary/5 rounded-2xl text-primary font-bold flex justify-between items-center">Shepherd <span>&rarr;</span></Link>
+              <Link to="/login/kids" className="p-4 bg-tertiary-fixed-dim/5 rounded-2xl text-primary font-bold flex justify-between items-center">Kids Ministry <span>&rarr;</span></Link>
             </div>
             <div className="h-[1px] bg-primary/10 my-2"></div>
             <Button onClick={() => { setShowRoleSelector(true); setIsMenuOpen(false); }} className="w-full bg-primary py-6 rounded-2xl h-auto font-black uppercase tracking-widest text-[11px] text-on-primary">Join Community</Button>
@@ -197,7 +199,7 @@ export default function Landing() {
               </Button>
               <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-4 w-64 p-4 rounded-3xl bg-surface shadow-2xl border border-primary/5 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50">
                 <div className="grid gap-1">
-                  {['admin', 'leader', 'finance', 'management', 'youth', 'shepherd'].map(p => (
+                  {['admin', 'leader', 'finance', 'management', 'youth', 'shepherd', 'kids'].map(p => (
                     <Link key={p} to={`/login/${p}`} className="p-3 rounded-xl hover:bg-primary/5 transition-colors text-[10px] font-black uppercase tracking-widest text-primary flex justify-between items-center group/p">
                       {p.replace('_', ' ')} Portal <ChevronRight size={12} className="opacity-0 group-hover/p:opacity-100 translate-x-[-10px] group-hover/p:translate-x-0 transition-all" />
                     </Link>
@@ -224,7 +226,8 @@ export default function Landing() {
               { id: 'finance', name: 'Financial Office', icon: DollarSign, color: 'text-primary', bg: 'bg-primary/5', path: '/login/finance', desc: 'Secure budget tracking and financial oversight.' },
               { id: 'management', name: 'Management', icon: Briefcase, color: 'text-primary', bg: 'bg-primary/5', path: '/login/management', desc: 'Oversee church operations and financial controller.' },
               { id: 'youth_ministry', name: 'Youth Ministry', icon: Zap, color: 'text-tertiary-fixed-dim', bg: 'bg-tertiary-fixed-dim/5', path: '/login/youth', desc: 'Manage youth programs, events, and engagement.' },
-              { id: 'shepherd', name: 'Shepherd', icon: Eye, color: 'text-primary', bg: 'bg-primary/5', path: '/login/shepherd', desc: 'Spiritual oversight for assigned groups and leaders.' }
+              { id: 'shepherd', name: 'Shepherd', icon: Eye, color: 'text-primary', bg: 'bg-primary/5', path: '/login/shepherd', desc: 'Spiritual oversight for assigned groups and leaders.' },
+              { id: 'kids_ministry', name: 'Kids Ministry', icon: Baby, color: 'text-tertiary-fixed-dim', bg: 'bg-tertiary-fixed-dim/5', path: '/login/kids', desc: 'Secure tracking for childrens ministry and spiritual growth.' }
             ].map((r, i) => (
               <motion.div
                 key={r.id}
@@ -362,7 +365,8 @@ export default function Landing() {
                     { id: 'finance', name: 'Finance Office', icon: DollarSign, col: 'bg-primary/5 text-primary' },
                     { id: 'management', name: 'Management', icon: Briefcase, col: 'bg-primary/5 text-primary' },
                     { id: 'youth_ministry', name: 'Youth Ministry', icon: Zap, col: 'bg-tertiary-fixed-dim/10 text-tertiary-fixed-dim' },
-                    { id: 'shepherd', name: 'Shepherd', icon: Eye, col: 'bg-primary/5 text-primary' }
+                    { id: 'shepherd', name: 'Shepherd', icon: Eye, col: 'bg-primary/5 text-primary' },
+                    { id: 'kids_ministry', name: 'Kids Ministry', icon: Baby, col: 'bg-tertiary-fixed-dim/10 text-tertiary-fixed-dim' }
                   ].map((r, i) => (
                     <motion.div
                       key={r.id}

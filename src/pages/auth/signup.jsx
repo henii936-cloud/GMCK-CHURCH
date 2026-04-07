@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { 
-  ShieldCheck, Mail, Lock, 
-  ArrowRight, ChevronLeft, Users, 
-  Zap, CheckCircle2, User, MapPin, DollarSign, Briefcase, Eye
+  Zap, CheckCircle2, User, MapPin, DollarSign, Briefcase, Eye, Baby
 } from 'lucide-react';
 import { motion } from 'motion/react';
 import { Button, Card, Input } from '../../components/common/UI';
@@ -99,6 +97,18 @@ export default function Signup() {
       shadow: 'shadow-primary/10',
       gradient: 'from-primary/10 to-transparent',
       desc: 'Supervisory spiritual oversight for assigned groups and leaders.' 
+    },
+    { 
+      id: 'kids_ministry', 
+      name: 'Kids Ministry', 
+      icon: Baby, 
+      color: 'text-tertiary-fixed-dim',
+      bg: 'bg-tertiary-fixed-dim',
+      border: 'border-tertiary-fixed-dim',
+      bgLight: 'bg-tertiary-fixed-dim/10',
+      shadow: 'shadow-tertiary-fixed-dim/20',
+      gradient: 'from-tertiary-fixed-dim/20 to-transparent',
+      desc: 'Nurture the youngest members of our community and manage kids programs.' 
     },
   ];
 

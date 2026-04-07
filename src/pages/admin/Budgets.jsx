@@ -1,7 +1,5 @@
-import { useState, useEffect } from "react";
-import { financeService } from "../../services/api";
-import { Card, Button, Input } from "../../components/common/UI";
-import { DollarSign, Layers, CheckCircle2, AlertCircle, Plus, Users, ArrowLeft, Wallet, Loader2 } from "lucide-react";
+import { DollarSign, Layers, CheckCircle2, AlertCircle, Plus, Users, ArrowLeft, Wallet, Loader2, ShieldCheck, PenTool, XCircle } from "lucide-react";
+import { useAuth } from "../../context/AuthContext";
 import { motion, AnimatePresence } from "motion/react";
 
 export default function Budgets() {
@@ -20,6 +18,8 @@ export default function Budgets() {
   const [newTeamName, setNewTeamName] = useState("");
   const [sessionTeams, setSessionTeams] = useState(["Worship Department", "Youth Ministry", "Media Team"]);
   const [newBudget, setNewBudget] = useState({ name: "", amount_total: 0 });
+  const { user } = useAuth();
+  const isAdmin = user?.role === 'admin';
 
   useEffect(() => {
     loadData();
@@ -34,6 +34,15 @@ export default function Budgets() {
       console.error("Error loading budgets:", err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleApprove = async (id, role, status = 'approved') => {
+    try {
+      await financeService.approveBudget(id, { id: user.id, full_name: user.full_name }, status, role, "Approved via Dashboard");
+      loadData();
+    } catch (err) {
+      console.error("Approval error:", err);
     }
   };
 
@@ -236,9 +245,56 @@ export default function Budgets() {
                             )}
                             
                             {!isApproved && (
-                              <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '4px', marginTop: '12px' }}>
-                                <AlertCircle size={12} color="#f59e0b" /> Pending admin review in Finance
-                              </p>
+                              <div className="mt-4 space-y-3">
+                                {isAdmin && (
+                                  <div className="flex gap-2">
+                                    {(budget.status === 'Pending') && (
+                                      <button 
+                                        onClick={() => handleApprove(budget.id, 'justifier')}
+                                        className="flex-1 h-9 rounded-lg bg-emerald-500/10 text-emerald-600 font-black uppercase text-[9px] tracking-widest hover:bg-emerald-500 hover:text-white transition-all flex items-center justify-center gap-2"
+                                      >
+                                        <PenTool size={14} /> Justify
+                                      </button>
+                                    )}
+                                    {(budget.status === 'Partially Approved') && (
+                                      <button 
+                                        onClick={() => handleApprove(budget.id, 'signer')}
+                                        className="flex-1 h-9 rounded-lg bg-primary text-white font-black uppercase text-[9px] tracking-widest hover:bg-primary/90 transition-all flex items-center justify-center gap-2 shadow-lg shadow-primary/20"
+                                      >
+                                        <ShieldCheck size={14} /> Sign
+                                      </button>
+                                    )}
+                                    <button 
+                                      onClick={() => handleApprove(budget.id, budget.status === 'Pending' ? 'justifier' : 'signer', 'rejected')}
+                                      className="w-9 h-9 rounded-lg bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white transition-all flex items-center justify-center"
+                                    >
+                                      <XCircle size={14} />
+                                    </button>
+                                  </div>
+                                )}
+                                <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                  <AlertCircle size={12} color="#f59e0b" /> 
+                                  {budget.status === 'Pending' ? 'Requires Justifier Signature' : 'Requires Final Signatory'}
+                                </p>
+                              </div>
+                            )}
+
+                            {/* Attribution History */}
+                            {budget.approvals && budget.approvals.length > 0 && (
+                              <div className="mt-4 pt-4 border-t border-outline-variant/10 space-y-2">
+                                <p className="text-[8px] font-black uppercase tracking-[0.2em] text-on-surface-variant/40">Approval Attribution</p>
+                                {budget.approvals.map(app => (
+                                  <div key={app.id} className="flex items-center justify-between text-[10px]">
+                                    <div className="flex items-center gap-2">
+                                      <div className={`w-4 h-4 rounded-full flex items-center justify-center text-[7px] font-black ${app.role === 'justifier' ? 'bg-emerald-100 text-emerald-700' : 'bg-primary/10 text-primary'}`}>
+                                        {app.role === 'justifier' ? 'J' : 'S'}
+                                      </div>
+                                      <span className="font-bold text-on-surface/70">{app.approver_name}</span>
+                                    </div>
+                                    <span className="opacity-40">{new Date(app.approved_at).toLocaleDateString()}</span>
+                                  </div>
+                                ))}
+                              </div>
                             )}
                           </div>
                         </div>

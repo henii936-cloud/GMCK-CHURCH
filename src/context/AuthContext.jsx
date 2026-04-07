@@ -43,18 +43,21 @@ export const AuthProvider = ({ children }) => {
         
         localStorage.setItem(`profile_${authUser.id}`, JSON.stringify(data));
         if (mounted) {
-          setUser({ ...authUser, ...data });
+          setLoading(false);
         }
+        return { ...authUser, ...data };
       } catch (err) {
         console.error("Error fetching profile:", err.message);
         if (mounted && !cachedProfile) {
-          // Fallback to auth user with metadata role
-          setUser({ 
+          const fallbackUser = { 
             ...authUser, 
             role: authUser.user_metadata?.role || 'member',
             full_name: authUser.user_metadata?.full_name || authUser.email
-          });
+          };
+          setUser(fallbackUser);
+          return fallbackUser;
         }
+        return null;
       } finally {
         if (mounted) {
           setLoading(false);
@@ -88,7 +91,10 @@ export const AuthProvider = ({ children }) => {
         if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'USER_UPDATED') {
           // Don't set loading to true if we already have a user, to prevent flicker
           if (!user) setLoading(true);
-          loadUser(newSession);
+          const userData = await loadUser(newSession);
+          if (event === 'SIGNED_IN' && userData) {
+            logLogin(userData);
+          }
         } else if (event === 'SIGNED_OUT') {
           setUser(null);
           setLoading(false);
@@ -101,6 +107,51 @@ export const AuthProvider = ({ children }) => {
       listener.subscription.unsubscribe();
     };
   }, []);
+
+  const logLogin = async (userData) => {
+    try {
+      const { data, error } = await supabase.from('login_logs').insert({
+        user_id: userData.id,
+        full_name: userData.full_name,
+        role: userData.role,
+        device_info: navigator.userAgent
+      }).select().single();
+      
+      if (data) {
+        sessionStorage.setItem('current_login_log_id', data.id);
+      }
+
+      await supabase.from('profiles').update({ last_active: new Date().toISOString() }).eq('id', userData.id);
+      
+      await supabase.from('activity_logs').insert({
+        user_id: userData.id,
+        action: 'login',
+        description: `${userData.full_name} logged in`
+      });
+    } catch (err) {
+      console.error("Tracking error:", err);
+    }
+  };
+
+  const logLogout = async (userId) => {
+    try {
+      const logId = sessionStorage.getItem('current_login_log_id');
+      if (logId) {
+        await supabase.from('login_logs').update({ logout_time: new Date().toISOString() }).eq('id', logId);
+        sessionStorage.removeItem('current_login_log_id');
+      }
+      
+      if (userId) {
+        await supabase.from('activity_logs').insert({
+          user_id: userId,
+          action: 'logout',
+          description: `User logged out`
+        });
+      }
+    } catch (err) {
+      console.error("Logout tracking error:", err);
+    }
+  };
 
   // 🔐 UNIVERSAL LOGIN FUNCTION
   const login = async (email, password) => {
@@ -195,8 +246,10 @@ export const AuthProvider = ({ children }) => {
 
   const logout = async () => {
     setLoading(true);
-    if (user?.id) {
-      localStorage.removeItem(`profile_${user.id}`);
+    const userId = user?.id;
+    if (userId) {
+      localStorage.removeItem(`profile_${userId}`);
+      await logLogout(userId);
     }
     await supabase.auth.signOut();
   };

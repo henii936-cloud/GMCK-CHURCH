@@ -99,16 +99,63 @@ export const financeService = {
   getBudgets: async () => {
     const { data, error } = await supabase
       .from("budgets")
-      .select("*")
+      .select(`
+        *,
+        approvals(*)
+      `)
       .order("created_at", { ascending: false });
     if (error) throw error;
+    return data;
+  },
+
+  approveBudget: async (requestId, approver, status, role, comment) => {
+    // 1. Record approval
+    const { error: approvalError } = await supabase.from('approvals').insert({
+      request_id: requestId,
+      approver_id: approver.id,
+      approver_name: approver.full_name,
+      role,
+      status,
+      comment
+    });
+    if (approvalError) throw approvalError;
+
+    // 2. Log activity
+    await supabase.from('activity_logs').insert({
+      user_id: approver.id,
+      action: status === 'approved' ? 'approve' : 'reject',
+      description: `${approver.full_name} ${status === 'approved' ? 'approved' : 'rejected'} budget as ${role}`,
+      entity_type: 'budget',
+      entity_id: requestId
+    });
+
+    // 3. Update budget status
+    let newStatus;
+    if (status === 'rejected') {
+      newStatus = 'Rejected';
+    } else {
+      // If signer approved, it's fully approved regardless of current status
+      // If justifier approved and it was Pending, it's partially approved
+      newStatus = role === 'signer' ? 'Approved' : 'Partially Approved';
+    }
+    
+    const { data, error: budgetError } = await supabase
+      .from('budgets')
+      .update({ status: newStatus })
+      .eq('id', requestId)
+      .select();
+      
+    if (budgetError) throw budgetError;
     return data;
   },
 
   getApprovedBudgets: async () => {
     const { data, error } = await supabase
       .from("budgets")
-      .select("*")
+      .select(`
+        *,
+        approvals(*)
+      `)
       .eq("status", "Approved")
       .order("created_at", { ascending: false });
     if (error) throw error;

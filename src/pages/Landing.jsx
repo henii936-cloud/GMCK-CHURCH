@@ -28,7 +28,11 @@ export default function Landing() {
       const rolePath = {
         admin: "/admin",
         bible_leader: "/leader",
-        finance: "/finance"
+        finance: "/finance",
+        management: "/management",
+        youth_ministry: "/youth",
+        shepherd: "/shepherd",
+        kids_ministry: "/kids"
       };
       navigate(rolePath[user.role] || "/");
     }

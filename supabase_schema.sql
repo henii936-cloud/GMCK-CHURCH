@@ -329,37 +329,4 @@ ALTER TABLE public.study_progress ADD CONSTRAINT study_progress_status_check
   CHECK (status IN ('Completed', 'In Progress', 'Not Started'));
 */
 
--- =====================================================
--- QUARTERLY REPORTS
--- =====================================================
-CREATE TABLE IF NOT EXISTS public.quarterly_reports (
-  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  created_by UUID REFERENCES public.profiles(id) ON DELETE SET NULL,
-  region TEXT,
-  year TEXT,
-  quarter TEXT,
-  gregorian_start_date DATE,
-  gregorian_end_date DATE,
-  ethiopian_start_date TEXT,
-  ethiopian_end_date TEXT,
-  data JSONB DEFAULT '{}'::jsonb,
-  status TEXT DEFAULT 'Draft' CHECK (status IN ('Draft', 'Submitted', 'Approved')),
-  chairman_name TEXT,
-  approved_by UUID REFERENCES public.profiles(id),
-  created_at TIMESTAMPTZ DEFAULT timezone('utc', now()) NOT NULL,
-  updated_at TIMESTAMPTZ DEFAULT timezone('utc', now()) NOT NULL
-);
 
-ALTER TABLE public.quarterly_reports ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY "reports_admin_all" ON public.quarterly_reports 
-FOR ALL USING (public.is_admin());
-
-CREATE POLICY "reports_leaders_view_own" ON public.quarterly_reports 
-FOR SELECT USING (auth.uid() = created_by);
-
-CREATE POLICY "reports_leaders_insert" ON public.quarterly_reports 
-FOR INSERT WITH CHECK (auth.uid() = created_by);
-
-CREATE POLICY "reports_leaders_update_own" ON public.quarterly_reports 
-FOR UPDATE USING (auth.uid() = created_by);

@@ -15,9 +15,6 @@ import AdminFinance from "./pages/admin/Finance";
 import AdminBudgets from "./pages/admin/Budgets";
 import AdminMembers from "./pages/admin/Members";
 import AdminGroups from "./pages/admin/Groups";
-import AdminReports from "./pages/admin/Reports";
-import RegionalReports from "./pages/reports/RegionalReports";
-import NewReport from "./pages/reports/NewReport";
 import AdminActivities from "./pages/admin/Programs";
 import LeaderAttendance from "./pages/leader/Attendance";
 import LeaderStudy from "./pages/leader/Study";
@@ -32,7 +29,6 @@ import YouthRoute from "./routes/YouthRoute";
 import ShepherdRoute from "./routes/ShepherdRoute";
 import FinanceDashboard from "./pages/finance/FinanceDashboard";
 import Expenses from "./pages/finance/Expenses";
-import Reports from "./pages/finance/Reports";
 // Management pages
 import ManagementDashboard from "./pages/management/ManagementDashboard";
 import Workers from "./pages/management/Workers";
@@ -45,7 +41,6 @@ import YouthMembers from "./pages/youth/YouthMembers";
 // Shepherd pages
 import ShepherdDashboard from "./pages/shepherd/ShepherdDashboard";
 import ShepherdGroups from "./pages/shepherd/ShepherdGroups";
-import ShepherdReports from "./pages/shepherd/ShepherdReports";
 import ShepherdMinistries from "./pages/shepherd/Ministries";
 // Kids Ministry pages
 import KidsRoute from "./routes/KidsRoute";
@@ -54,7 +49,6 @@ import KidsMembers from "./pages/kids/KidsMembers";
 import KidsClasses from "./pages/kids/KidsClasses";
 import KidsAttendance from "./pages/kids/KidsAttendance";
 import KidsEvents from "./pages/kids/KidsEvents";
-import KidsReports from "./pages/kids/KidsReports";
 
 export default function App() {
   console.log("App component mounted");
@@ -75,9 +69,6 @@ export default function App() {
             <Route index element={<AdminDashboard />} />
             <Route path="members" element={<AdminMembers />} />
             <Route path="groups" element={<AdminGroups />} />
-            <Route path="leaders" element={<AdminLeaders />} />
-            <Route path="reports" element={<AdminReports />} />
-            <Route path="regional-reports" element={<RegionalReports />} />
             <Route path="progress" element={<AdminProgress />} />
             <Route path="events" element={<AdminEvents />} />
             <Route path="evangelism" element={<AdminEvangelism />} />
@@ -93,7 +84,6 @@ export default function App() {
             <Route path="members" element={<LeaderMembers />} />
             <Route path="attendance" element={<LeaderAttendance />} />
             <Route path="study" element={<LeaderStudy />} />
-            <Route path="quarterly-reports/new" element={<NewReport />} />
           </Route>
 
           {/* Finance Routes */}
@@ -102,7 +92,6 @@ export default function App() {
             <Route path="record" element={<RecordGiving />} />
             <Route path="budgets" element={<ApprovedBudgets />} />
             <Route path="expenses" element={<Expenses />} />
-            <Route path="reports" element={<Reports />} />
           </Route>
 
           {/* Management Routes */}
@@ -118,16 +107,13 @@ export default function App() {
             <Route index element={<YouthDashboard />} />
             <Route path="events" element={<YouthEvents />} />
             <Route path="members" element={<YouthMembers />} />
-            <Route path="quarterly-reports/new" element={<NewReport />} />
           </Route>
 
           {/* Shepherd Routes */}
           <Route path="/shepherd" element={<ShepherdRoute><Layout allowedRoles={['shepherd']} /></ShepherdRoute>}>
             <Route index element={<ShepherdDashboard />} />
             <Route path="groups" element={<ShepherdGroups />} />
-            <Route path="reports" element={<ShepherdReports />} />
             <Route path="ministries" element={<ShepherdMinistries />} />
-            <Route path="quarterly-reports/new" element={<NewReport />} />
           </Route>
 
           {/* Kids Ministry Routes */}
@@ -137,7 +123,6 @@ export default function App() {
             <Route path="classes" element={<KidsClasses />} />
             <Route path="attendance" element={<KidsAttendance />} />
             <Route path="events" element={<KidsEvents />} />
-            <Route path="reports" element={<KidsReports />} />
           </Route>
 
           <Route path="/" element={<Landing />} />

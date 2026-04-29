@@ -63,20 +63,17 @@ export default function Sidebar() {
       { name: "Ministries", icon: Heart, path: "/admin/ministries" },
       { name: "Finance", icon: DollarSign, path: "/admin/finance" },
       { name: "Budgets", icon: Wallet, path: "/admin/budgets" },
-      { name: "Regional Reports", icon: FileText, path: "/admin/regional-reports" },
     ],
     bible_leader: [
       { name: "My Group Members", icon: Users, path: "/leader" },
       { name: "Take Attendance", icon: ClipboardList, path: "/leader/attendance" },
       { name: "Record Study Progress", icon: BookOpen, path: "/leader/study" },
-      { name: "Quarterly Report", icon: FileText, path: "/leader/quarterly-reports/new" },
     ],
     finance: [
       { name: "Dashboard", icon: Layers, path: "/finance" },
       { name: "Approved Budgets", icon: Wallet, path: "/finance/budgets" },
       { name: "Record Giving", icon: DollarSign, path: "/finance/record" },
       { name: "Expenses", icon: ArrowDownRight, path: "/finance/expenses" },
-      { name: "Reports", icon: ClipboardList, path: "/finance/reports" },
     ],
     management: [
       { name: "Dashboard", icon: Layers, path: "/management" },
@@ -88,14 +85,11 @@ export default function Sidebar() {
       { name: "Dashboard", icon: Layers, path: "/youth" },
       { name: "Youth Members", icon: Users, path: "/youth/members" },
       { name: "Youth Events", icon: Calendar, path: "/youth/events" },
-      { name: "Quarterly Report", icon: FileText, path: "/youth/quarterly-reports/new" },
     ],
     shepherd: [
       { name: "Overview", icon: Layers, path: "/shepherd" },
       { name: "Ministries", icon: Heart, path: "/shepherd/ministries" },
       { name: "Assigned Groups", icon: Shield, path: "/shepherd/groups" },
-      { name: "Attendance Reports", icon: ClipboardList, path: "/shepherd/reports" },
-      { name: "Quarterly Report", icon: FileText, path: "/shepherd/quarterly-reports/new" },
     ],
     kids_ministry: [
       { name: "Dashboard", icon: Layers, path: "/kids" },
@@ -103,7 +97,6 @@ export default function Sidebar() {
       { name: "Classes", icon: Layers, path: "/kids/classes" },
       { name: "Attendance", icon: ClipboardList, path: "/kids/attendance" },
       { name: "Kids Events", icon: Calendar, path: "/kids/events" },
-      { name: "Reports", icon: Activity, path: "/kids/reports" },
     ],
   };
 

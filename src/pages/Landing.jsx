@@ -188,6 +188,52 @@ export default function Landing() {
         </motion.div>
       </section>
 
+      {/* Role Selection Grid - 7 Roles */}
+      <section id="roles" className="py-32 px-6 bg-surface-container-lowest">
+        <div className="container mx-auto max-w-7xl">
+          <div className="text-center mb-24">
+            <h2 className="display-md text-primary mb-6">Select Your <span className="text-tertiary-fixed-dim italic">Portal</span></h2>
+            <p className="label-sm opacity-60 uppercase tracking-widest">Choose your specialized role to begin your journey</p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {[
+              { id: 'admin', name: 'Administrator', icon: Shield, color: 'text-primary', bg: 'bg-primary/5', desc: 'Full system oversight' },
+              { id: 'bible_leader', name: 'Bible Leader', icon: Users, color: 'text-tertiary-fixed-dim', bg: 'bg-tertiary-fixed-dim/10', desc: 'Group & member tracking' },
+              { id: 'finance', name: 'Finance', icon: DollarSign, color: 'text-primary', bg: 'bg-primary/5', desc: 'Financial stewardship' },
+              { id: 'management', name: 'Management', icon: Briefcase, color: 'text-primary', bg: 'bg-primary/5', desc: 'Operational control' },
+              { id: 'youth_ministry', name: 'Youth', icon: Zap, color: 'text-tertiary-fixed-dim', bg: 'bg-tertiary-fixed-dim/10', desc: 'Engaging the youth' },
+              { id: 'shepherd', name: 'Shepherd', icon: Eye, color: 'text-primary', bg: 'bg-primary/5', desc: 'Supervisory oversight' },
+              { id: 'kids_ministry', name: 'Kids Minister', icon: Baby, color: 'text-tertiary-fixed-dim', bg: 'bg-tertiary-fixed-dim/10', desc: 'Sunday school management' },
+              { id: 'login', name: 'Unified Login', icon: Layers, color: 'text-primary', bg: 'bg-primary/10', desc: 'Existing users sign in' }
+            ].map((r, i) => (
+              <motion.div
+                key={r.id}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.1 }}
+                className="group"
+              >
+                <Link to={r.id === 'login' ? "/login" : "/signup"} state={r.id !== 'login' ? { role: r.id } : undefined}>
+                  <div className={`h-full p-8 rounded-[2.5rem] bg-surface border border-primary/5 shadow-whisper hover:shadow-2xl hover:border-primary/20 transition-all duration-500 flex flex-col items-center text-center`}>
+                    <div className={`w-20 h-20 rounded-3xl ${r.bg} ${r.color} flex items-center justify-center mb-8 group-hover:scale-110 transition-transform duration-500`}>
+                      <r.icon size={36} />
+                    </div>
+                    <h3 className="headline-sm text-primary mb-3">{r.name}</h3>
+                    <p className="text-on-surface-variant text-xs font-medium leading-relaxed mb-8 opacity-60">
+                      {r.desc}
+                    </p>
+                    <div className="mt-auto flex items-center gap-2 text-primary font-black uppercase tracking-widest text-[10px]">
+                      {r.id === 'login' ? 'Sign In' : 'Register'} <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
+                    </div>
+                  </div>
+                </Link>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
 
 
       {/* Feature Section */}

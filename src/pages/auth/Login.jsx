@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { useAuth } from "../../context/AuthContext";
-import { Button, Input, Card } from "../../components/common/UI";
 import { useNavigate, Link } from "react-router-dom";
 import { motion } from "motion/react";
-import { Mail, Lock, ArrowRight, ChevronLeft, Baby } from "lucide-react";
+import { UserCircle, Mail, Lock, Loader2, ChevronLeft, ArrowRight } from "lucide-react";
+import { Button, Input, Card } from "../../components/common/UI";
 
-export default function KidsLogin() {
+export default function Login() {
   const navigate = useNavigate();
   const { login } = useAuth();
 
@@ -17,15 +17,18 @@ export default function KidsLogin() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (loading) return;
+
     setLoading(true);
     setError("");
 
     try {
       const data = await login(email, password);
+
       if (!data?.session) {
         setError("Please verify your email before signing in.");
         return;
       }
+
       const userRole = data.profile?.role || data.user?.user_metadata?.role;
       const routes = {
         admin: "/admin",
@@ -34,10 +37,11 @@ export default function KidsLogin() {
         management: "/management",
         youth_ministry: "/youth",
         shepherd: "/shepherd",
-        kids_ministry: "/kids",
+        kids_ministry: "/kids"
       };
       navigate(routes[userRole] || "/");
     } catch (err) {
+      console.error("Login Error:", err.message);
       setError(err.message || "Invalid credentials.");
     } finally {
       setLoading(false);
@@ -57,7 +61,7 @@ export default function KidsLogin() {
         </Link>
       </div>
 
-      <motion.div
+      <motion.div 
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, ease: "easeOut" }}
@@ -65,38 +69,42 @@ export default function KidsLogin() {
       >
         <div className="text-center mb-16">
           <div className="w-24 h-24 rounded-[3rem] bg-primary grid place-items-center mx-auto mb-8 shadow-xl shadow-primary/10">
-            <Baby size={48} className="text-on-primary" />
+            <UserCircle size={48} className="text-on-primary" />
           </div>
+
           <h1 className="display-sm text-primary mb-4">
-            Kids<span className="text-tertiary-fixed-dim italic"> Ministry</span>
+            Unified<span className="text-tertiary-fixed-dim italic"> Login</span>
           </h1>
+
           <p className="label-sm opacity-60 uppercase tracking-widest">
-            Sunday School & Children Portal
+            Church Management Portal
           </p>
         </div>
 
         <Card className="p-12 md:p-16 shadow-whisper border-none bg-surface-container">
           <form onSubmit={handleSubmit} className="flex flex-col gap-8">
-            <Input
-              label="Kids Ministry Email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              icon={Mail}
-              placeholder="kids@gmkc-church.org"
+            <Input 
+              label="Email Address" 
+              type="email" 
+              value={email} 
+              onChange={(e) => setEmail(e.target.value)} 
+              required 
+              icon={Mail} 
+              placeholder="user@gmkc-church.org"
             />
-            <Input
-              label="Password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              icon={Lock}
+
+            <Input 
+              label="Password" 
+              type="password" 
+              value={password} 
+              onChange={(e) => setPassword(e.target.value)} 
+              required 
+              icon={Lock} 
               placeholder="••••••••"
             />
+
             {error && (
-              <motion.div
+              <motion.div 
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 className="p-4 rounded-xl bg-red-50 text-red-600 text-xs font-bold border border-red-100 text-center"
@@ -104,22 +112,16 @@ export default function KidsLogin() {
                 {error}
               </motion.div>
             )}
-            <Button type="submit" loading={loading} className="h-16 bg-primary hover:opacity-90 text-on-primary border-none shadow-xl shadow-primary/10">
-              Sign In to Kids Ministry <ArrowRight size={20} className="ml-3" />
+
+            <Button type="submit" loading={loading} className="h-16 bg-primary hover:opacity-90 text-on-primary border-none shadow-xl shadow-primary/10 w-full justify-center">
+              Sign In <ArrowRight size={20} className="ml-3" />
             </Button>
           </form>
         </Card>
 
         <div className="mt-12 text-center">
-          <p className="text-primary/40 text-xs font-medium uppercase tracking-widest mb-4 opacity-50">Select Another Portal</p>
-          <div className="flex flex-wrap justify-center gap-4 text-[10px] font-black uppercase tracking-[0.2em]">
-            <Link to="/login/admin" className="text-primary hover:text-tertiary-fixed-dim transition-colors">Admin</Link>
-            <Link to="/login/leader" className="text-primary hover:text-tertiary-fixed-dim transition-colors">Leader</Link>
-            <Link to="/login/finance" className="text-primary hover:text-tertiary-fixed-dim transition-colors">Finance</Link>
-            <Link to="/login/management" className="text-primary hover:text-tertiary-fixed-dim transition-colors">Management</Link>
-            <Link to="/login/youth" className="text-primary hover:text-tertiary-fixed-dim transition-colors">Youth</Link>
-            <Link to="/login/shepherd" className="text-primary hover:text-tertiary-fixed-dim transition-colors">Shepherd</Link>
-          </div>
+          <p className="text-primary/40 text-xs font-medium uppercase tracking-widest mb-4">Don't have an account?</p>
+          <Link to="/signup" className="text-primary font-black uppercase tracking-[0.2em] text-[10px] hover:text-tertiary-fixed-dim transition-colors">Apply for a Role</Link>
         </div>
       </motion.div>
     </div>

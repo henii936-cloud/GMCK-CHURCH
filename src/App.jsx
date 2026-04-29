@@ -2,12 +2,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-d
 import { useEffect } from "react";
 import { AuthProvider } from "./context/AuthContext";
 import Layout from "./components/layout/Layout";
-import AdminLogin from "./pages/auth/AdminLogin";
-import LeaderLogin from "./pages/auth/LeaderLogin";
-import FinanceLogin from "./pages/auth/FinanceLogin";
-import ManagementLogin from "./pages/auth/ManagementLogin";
-import YouthLogin from "./pages/auth/YouthLogin";
-import ShepherdLogin from "./pages/auth/ShepherdLogin";
+import Login from "./pages/auth/Login";
 import Signup from "./pages/auth/signup";
 import Landing from "./pages/Landing";
 import AdminDashboard from "./pages/admin/AdminDashboard";
@@ -51,7 +46,6 @@ import ShepherdGroups from "./pages/shepherd/ShepherdGroups";
 import ShepherdReports from "./pages/shepherd/ShepherdReports";
 import ShepherdMinistries from "./pages/shepherd/Ministries";
 // Kids Ministry pages
-import KidsLogin from "./pages/auth/KidsLogin";
 import KidsRoute from "./routes/KidsRoute";
 import KidsDashboard from "./pages/kids/KidsDashboard";
 import KidsMembers from "./pages/kids/KidsMembers";
@@ -71,14 +65,7 @@ export default function App() {
       <AuthProvider>
         <Routes>
           {/* Auth Routes */}
-          <Route path="/login/admin" element={<AdminLogin />} />
-          <Route path="/login/leader" element={<LeaderLogin />} />
-          <Route path="/login/finance" element={<FinanceLogin />} />
-          <Route path="/login/management" element={<ManagementLogin />} />
-          <Route path="/login/youth" element={<YouthLogin />} />
-          <Route path="/login/shepherd" element={<ShepherdLogin />} />
-          <Route path="/login/kids" element={<KidsLogin />} />
-          <Route path="/login" element={<Navigate to="/login/admin" />} />
+          <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
 
           {/* Admin Routes */}

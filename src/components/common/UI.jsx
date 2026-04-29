@@ -1,4 +1,4 @@
-import { Loader2 } from "lucide-react";
+import { Loader2, ChevronDown } from "lucide-react";
 
 export const Button = ({ children, onClick, type = "button", variant = "primary", icon: Icon, className = "", style, loading, disabled, ...props }) => {
   const getBaseClass = () => {
@@ -73,6 +73,42 @@ export const Input = ({ label, type = "text", placeholder, value, onChange, clas
         />
       </div>
     </div>
+  );
+};
+
+export const Select = ({ label, options, value, onChange, className = "", selectClassName = "", required, icon: Icon }) => {
+  return (
+    <div className={`space-y-3 ${className}`}>
+      {label && <label className="label-sm font-black uppercase tracking-widest text-primary/60">{label}</label>}
+      <div className="relative group">
+        {Icon && (
+          <div className="absolute left-5 top-1/2 -translate-y-1/2 text-primary/40 group-focus-within:text-primary transition-colors pointer-events-none">
+            <Icon size={20} />
+          </div>
+        )}
+        <select 
+          value={value} 
+          onChange={onChange}
+          required={required}
+          className={`flex w-full h-14 rounded-xl bg-surface-container-low border-2 border-transparent focus:border-primary/20 focus:bg-surface px-6 py-4 text-sm text-primary outline-none transition-all duration-500 appearance-none ${Icon ? 'pl-14' : 'pl-6'} ${selectClassName}`}
+        >
+          {options.map((opt) => (
+            <option key={opt.value} value={opt.value}>{opt.label}</option>
+          ))}
+        </select>
+        <div className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-primary/40">
+          <ChevronDown size={20} />
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export const Label = ({ children, className = "" }) => {
+  return (
+    <label className={`label-sm font-black uppercase tracking-widest text-primary/60 block mb-2 ${className}`}>
+      {children}
+    </label>
   );
 };
 

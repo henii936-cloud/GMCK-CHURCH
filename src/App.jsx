@@ -16,6 +16,8 @@ import AdminBudgets from "./pages/admin/Budgets";
 import AdminMembers from "./pages/admin/Members";
 import AdminGroups from "./pages/admin/Groups";
 import AdminReports from "./pages/admin/Reports";
+import RegionalReports from "./pages/reports/RegionalReports";
+import NewReport from "./pages/reports/NewReport";
 import AdminActivities from "./pages/admin/Programs";
 import LeaderAttendance from "./pages/leader/Attendance";
 import LeaderStudy from "./pages/leader/Study";
@@ -75,6 +77,7 @@ export default function App() {
             <Route path="groups" element={<AdminGroups />} />
             <Route path="leaders" element={<AdminLeaders />} />
             <Route path="reports" element={<AdminReports />} />
+            <Route path="regional-reports" element={<RegionalReports />} />
             <Route path="progress" element={<AdminProgress />} />
             <Route path="events" element={<AdminEvents />} />
             <Route path="evangelism" element={<AdminEvangelism />} />
@@ -90,6 +93,7 @@ export default function App() {
             <Route path="members" element={<LeaderMembers />} />
             <Route path="attendance" element={<LeaderAttendance />} />
             <Route path="study" element={<LeaderStudy />} />
+            <Route path="quarterly-reports/new" element={<NewReport />} />
           </Route>
 
           {/* Finance Routes */}
@@ -114,6 +118,7 @@ export default function App() {
             <Route index element={<YouthDashboard />} />
             <Route path="events" element={<YouthEvents />} />
             <Route path="members" element={<YouthMembers />} />
+            <Route path="quarterly-reports/new" element={<NewReport />} />
           </Route>
 
           {/* Shepherd Routes */}
@@ -122,6 +127,7 @@ export default function App() {
             <Route path="groups" element={<ShepherdGroups />} />
             <Route path="reports" element={<ShepherdReports />} />
             <Route path="ministries" element={<ShepherdMinistries />} />
+            <Route path="quarterly-reports/new" element={<NewReport />} />
           </Route>
 
           {/* Kids Ministry Routes */}

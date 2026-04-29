@@ -5,7 +5,7 @@ import { motion } from "motion/react";
 import {
   Users, Layers, DollarSign, Activity, Settings,
   MapPin, BookOpen, ClipboardList, LogOut, ChevronRight, ShieldCheck, Wallet, Heart, ArrowDownRight,
-  Menu, X, Briefcase, Zap, Eye, UserCheck, Calendar, Shield
+  Menu, X, Briefcase, Zap, Eye, UserCheck, Calendar, Shield, FileText
 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import { useState, useEffect } from "react";
@@ -63,11 +63,13 @@ export default function Sidebar() {
       { name: "Ministries", icon: Heart, path: "/admin/ministries" },
       { name: "Finance", icon: DollarSign, path: "/admin/finance" },
       { name: "Budgets", icon: Wallet, path: "/admin/budgets" },
+      { name: "Regional Reports", icon: FileText, path: "/admin/regional-reports" },
     ],
     bible_leader: [
       { name: "My Group Members", icon: Users, path: "/leader" },
       { name: "Take Attendance", icon: ClipboardList, path: "/leader/attendance" },
       { name: "Record Study Progress", icon: BookOpen, path: "/leader/study" },
+      { name: "Quarterly Report", icon: FileText, path: "/leader/quarterly-reports/new" },
     ],
     finance: [
       { name: "Dashboard", icon: Layers, path: "/finance" },
@@ -86,12 +88,14 @@ export default function Sidebar() {
       { name: "Dashboard", icon: Layers, path: "/youth" },
       { name: "Youth Members", icon: Users, path: "/youth/members" },
       { name: "Youth Events", icon: Calendar, path: "/youth/events" },
+      { name: "Quarterly Report", icon: FileText, path: "/youth/quarterly-reports/new" },
     ],
     shepherd: [
       { name: "Overview", icon: Layers, path: "/shepherd" },
       { name: "Ministries", icon: Heart, path: "/shepherd/ministries" },
       { name: "Assigned Groups", icon: Shield, path: "/shepherd/groups" },
       { name: "Attendance Reports", icon: ClipboardList, path: "/shepherd/reports" },
+      { name: "Quarterly Report", icon: FileText, path: "/shepherd/quarterly-reports/new" },
     ],
     kids_ministry: [
       { name: "Dashboard", icon: Layers, path: "/kids" },

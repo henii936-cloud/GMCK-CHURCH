@@ -114,7 +114,7 @@ export default function ReportGeneratorView() {
             </div>
 
             {/* The Actual Report Document */}
-            <Card className="p-12 bg-white text-gray-900 shadow-2xl border-none font-serif print:shadow-none print:p-0">
+            <Card id="report-document" className="p-12 bg-white text-gray-900 shadow-2xl border-none font-serif print:shadow-none print:p-0">
               {/* Report Header (Matching Print Layout) */}
               <div className="border-b-[3px] border-primary pb-8 mb-10 font-serif">
                 {/* Row 1: Org Name */}

@@ -115,29 +115,47 @@ export default function ReportGeneratorView() {
 
             {/* The Actual Report Document */}
             <Card className="p-12 bg-white text-gray-900 shadow-2xl border-none font-serif print:shadow-none print:p-0">
-              {/* Report Header */}
-              <div className="text-center border-b-2 border-primary/20 pb-8 mb-10">
-                <h2 className="text-2xl font-bold uppercase tracking-widest text-primary mb-2">{report.header.organization}</h2>
-                <h3 className="text-xl font-bold mb-4">{report.header.churchName} - {report.header.region}</h3>
+              {/* Report Header (Matching Print Layout) */}
+              <div className="border-b-[3px] border-primary pb-8 mb-10 font-serif">
+                {/* Row 1: Org Name */}
+                <h2 className="text-2xl font-black text-center text-primary mb-3 leading-snug">
+                  {report.header.organization}
+                </h2>
                 
-                {report.header.officialNotice && (
-                  <div className="bg-primary/5 p-6 rounded-2xl border border-primary/10 mb-8">
-                    <p className="text-sm text-primary font-medium leading-relaxed italic">
-                      "{report.header.officialNotice}"
-                    </p>
-                  </div>
+                {/* Row 2: Subtitle */}
+                {report.header.reportFormSubtitle && (
+                  <h3 className="text-lg font-bold text-center text-primary mb-6 leading-snug">
+                    {report.header.reportFormSubtitle}
+                  </h3>
                 )}
-
-                <div className="grid grid-cols-2 gap-4 text-sm mt-6">
-                  <div className="bg-surface-container-lowest p-3 rounded-xl border border-outline-variant/10">
-                    <p className="font-bold text-primary uppercase text-[10px] tracking-widest mb-1">{report.labels.reportingPeriodGreg}</p>
-                    <p>{report.header.reportingPeriod.gregorian}</p>
-                  </div>
-                  <div className="bg-surface-container-lowest p-3 rounded-xl border border-outline-variant/10">
-                    <p className="font-bold text-primary uppercase text-[10px] tracking-widest mb-1">{report.labels.reportingPeriodEth}</p>
-                    <p>{report.header.reportingPeriod.ethiopian}</p>
-                  </div>
+                
+                {/* Row 3: From Church */}
+                <div className="flex items-baseline gap-2 text-base mb-3 text-gray-900">
+                  <span className="font-black text-primary">{report.header.fromChurchLabel || 'From:'}</span>
+                  <span className="font-bold">{report.header.churchName}</span>
+                  <span className="text-gray-500 px-1">&mdash;</span>
+                  <span className="font-bold">{report.header.region}</span>
                 </div>
+                
+                {/* Row 4: Reporting Period */}
+                <div className="flex flex-wrap items-baseline gap-2 text-base mb-6 text-gray-900">
+                  <span className="font-black text-primary">{report.header.reportingPeriodLabel || 'Reporting Period:'}</span>
+                  <span className="font-bold">{report.header.reportingPeriod.ethiopian.split('–')[0] || report.header.reportingPeriod.ethiopian}</span>
+                  {report.header.reportingPeriod.ethiopian.includes('–') && (
+                    <>
+                      <span className="text-gray-600 px-1">{reportLang === 'am' ? 'እስከ' : 'to'}</span>
+                      <span className="font-bold">{report.header.reportingPeriod.ethiopian.split('–')[1] || ''}</span>
+                    </>
+                  )}
+                  <span className="text-gray-500 text-sm pl-2">({report.header.reportingPeriod.gregorian})</span>
+                </div>
+                
+                {/* Row 5: Official Notice */}
+                {report.header.officialNotice && (
+                  <p className="text-[13px] leading-relaxed text-gray-800 text-justify italic">
+                    {report.header.officialNotice}
+                  </p>
+                )}
               </div>
 
               {/* Sections */}

@@ -13,7 +13,7 @@ export default function KidsRoute({ children }) {
     </div>
   );
 
-  if (!user) return <Navigate to="/login/kids" />;
+  if (!user) return <Navigate to="/login" replace />;
 
   const role = user?.role || user?.user_metadata?.role;
   if (role !== "kids_ministry" && role !== "admin") return <Navigate to="/" />;

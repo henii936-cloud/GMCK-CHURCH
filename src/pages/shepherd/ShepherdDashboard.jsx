@@ -15,7 +15,9 @@ export default function ShepherdDashboard() {
     loading: true,
   });
 
-  useEffect(() => { loadData(); }, []);
+  useEffect(() => { 
+    if (user?.id) loadData(); 
+  }, [user?.id]);
 
   const loadData = async () => {
     try {

@@ -13,7 +13,7 @@ export default function YouthRoute({ children }) {
     </div>
   );
 
-  if (!user) return <Navigate to="/login/youth" />;
+  if (!user) return <Navigate to="/login" replace />;
 
   const role = user?.role || user?.user_metadata?.role;
   if (role !== "youth_ministry") return <Navigate to="/" />;

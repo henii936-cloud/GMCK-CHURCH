@@ -13,7 +13,7 @@ export default function ManagementRoute({ children }) {
     </div>
   );
 
-  if (!user) return <Navigate to="/login/management" />;
+  if (!user) return <Navigate to="/login" replace />;
 
   const role = user?.role || user?.user_metadata?.role;
   if (role !== "management") return <Navigate to="/" />;

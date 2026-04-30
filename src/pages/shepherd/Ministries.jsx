@@ -7,8 +7,10 @@ import {
   Mic2, Sparkles, X, Edit3, Save 
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
+import { useAuth } from "../../context/AuthContext";
 
 export default function Ministries({ viewOnly = false }) {
+  const { user } = useAuth();
   const [ministries, setMinistries] = useState([]);
   const [members, setMembers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -21,7 +23,7 @@ export default function Ministries({ viewOnly = false }) {
 
   useEffect(() => {
     loadData();
-  }, []);
+  }, [user?.id]);
 
   const loadData = async () => {
     setLoading(true);

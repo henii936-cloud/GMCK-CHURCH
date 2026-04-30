@@ -8,6 +8,7 @@ import {
   MapPin, User, Eye
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
+import { useAuth } from "../../context/AuthContext";
 
 const STATUS_CONFIG = {
   "Heard Gospel": { color: "#f59e0b", bg: "rgba(245,158,11,0.1)", icon: Heart },
@@ -17,6 +18,7 @@ const STATUS_CONFIG = {
 };
 
 export default function Evangelism({ viewOnly = false }) {
+  const { user } = useAuth();
   const [records, setRecords] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
@@ -42,8 +44,8 @@ export default function Evangelism({ viewOnly = false }) {
   });
 
   useEffect(() => {
-    fetchRecords();
-  }, []);
+    if (user?.id) fetchRecords();
+  }, [user?.id]);
 
   const fetchRecords = async () => {
     try {

@@ -14,9 +14,7 @@ export default function LeaderRoute({ children }) {
   );
 
   // ❌ Not logged in
-  if (!user) {
-    return <Navigate to="/login/leader" />;
-  }
+  if (!user) return <Navigate to="/login" replace />;
 
   const role = user?.role || user?.user_metadata?.role;
 

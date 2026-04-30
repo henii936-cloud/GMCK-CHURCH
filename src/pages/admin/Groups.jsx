@@ -4,9 +4,11 @@ import { groupService, memberService } from "../../services/api";
 import { Card, Button, Input } from "../../components/common/UI";
 import { MapPin, Users, User, Plus, Search, BookOpen, Layers, Activity, Trash2, XCircle, AlertCircle, UsersRound } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useAuth } from "../../context/AuthContext";
 import { supabase } from "../../services/supabaseClient";
 
 export default function Groups({ viewOnly = false }) {
+  const { user } = useAuth();
   const navigate = useNavigate();
   const [groups, setGroups] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -22,8 +24,8 @@ export default function Groups({ viewOnly = false }) {
   const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
-    loadData();
-  }, []);
+    if (user?.id) loadData();
+  }, [user?.id]);
 
   const loadData = async () => {
     try {

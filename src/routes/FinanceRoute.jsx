@@ -16,14 +16,14 @@ export default function FinanceRoute({ children }) {
   }
 
   if (!user) {
-    return <Navigate to="/login/finance" />;
+    return <Navigate to="/login" replace />;
   }
 
   const role = user?.role || user?.user_metadata?.role;
 
   if (role?.toLowerCase() !== "finance") {
     console.warn("FinanceRoute: Unauthorized role access attempt -", role);
-    return <Navigate to="/login/finance" replace />;
+    return <Navigate to="/login" replace />;
   }
 
   return children;

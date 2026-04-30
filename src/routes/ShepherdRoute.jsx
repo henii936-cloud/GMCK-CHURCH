@@ -13,7 +13,7 @@ export default function ShepherdRoute({ children }) {
     </div>
   );
 
-  if (!user) return <Navigate to="/login/shepherd" />;
+  if (!user) return <Navigate to="/login" replace />;
 
   const role = user?.role || user?.user_metadata?.role;
   if (role !== "shepherd") return <Navigate to="/" />;

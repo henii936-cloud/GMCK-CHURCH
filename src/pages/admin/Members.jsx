@@ -48,8 +48,6 @@ export default function Members() {
     leave_status: "Active",
     join_date: new Date().toISOString().split('T')[0],
     join_type: "Baptized Here",
-    baptism_status: false,
-    tithe_participation: false,
     giving_frequency: "Monthly",
     notes: "",
     image_url: "",
@@ -112,15 +110,13 @@ export default function Members() {
         leave_status: member.leave_status || "Active",
         join_date: member.join_date || new Date().toISOString().split('T')[0],
         join_type: member.join_type || "Baptized Here",
-        baptism_status: member.baptism_status || false,
-        tithe_participation: member.tithe_participation || false,
         giving_frequency: member.giving_frequency || "Monthly",
         notes: member.notes || "",
         image_url: member.image_url || "",
         age_group: member.age_group || "Adult",
-        ministries: member.ministries || [],
+        ministries: Array.isArray(member.ministries) ? member.ministries : [],
         relocation_from: member.relocation_from || "",
-        release_letter: member.release_letter || false
+        release_letter: member.release_letter === true
       });
       setNewMinistryName("");
     } else {
@@ -143,8 +139,6 @@ export default function Members() {
         leave_status: "Active",
         join_date: new Date().toISOString().split('T')[0],
         join_type: "Baptized Here",
-        baptism_status: false,
-        tithe_participation: false,
         giving_frequency: "Monthly",
         notes: "",
         image_url: "",
@@ -659,16 +653,8 @@ export default function Members() {
                         </>
                       )}
                       <div>
-                        <p className="text-[10px] text-on-surface-variant uppercase font-bold tracking-wider">Baptism Status</p>
-                        <p className="font-semibold text-on-surface mt-0.5">{viewMember.baptism_status ? 'Baptized' : 'Not Baptized'}</p>
-                      </div>
-                      <div>
                         <p className="text-[10px] text-on-surface-variant uppercase font-bold tracking-wider">Study Unit</p>
                         <p className="font-semibold text-on-surface mt-0.5">{viewMember.bible_study_groups?.group_name || 'Unassigned'}</p>
-                      </div>
-                      <div>
-                        <p className="text-[10px] text-on-surface-variant uppercase font-bold tracking-wider">Tithe Participant</p>
-                        <p className="font-semibold text-on-surface mt-0.5">{viewMember.tithe_participation ? 'Yes' : 'No'}</p>
                       </div>
                       <div>
                         <p className="text-[10px] text-on-surface-variant uppercase font-bold tracking-wider">Giving Frequency</p>
@@ -1042,26 +1028,7 @@ export default function Members() {
                             value={formData.join_date}
                             onChange={e => setFormData({ ...formData, join_date: e.target.value })}
                           />
-                          <div className="flex flex-col justify-center gap-4 border border-outline-variant/10 rounded-2xl p-4 bg-primary/5">
-                            <label className="flex items-center gap-3 cursor-pointer">
-                              <input
-                                type="checkbox"
-                                checked={formData.baptism_status}
-                                onChange={e => setFormData({ ...formData, baptism_status: e.target.checked })}
-                                className="w-5 h-5 accent-primary"
-                              />
-                              <span className="text-sm font-bold text-primary uppercase tracking-widest">Baptized Member</span>
-                            </label>
-                            <label className="flex items-center gap-3 cursor-pointer">
-                              <input
-                                type="checkbox"
-                                checked={formData.tithe_participation}
-                                onChange={e => setFormData({ ...formData, tithe_participation: e.target.checked })}
-                                className="w-5 h-5 accent-primary"
-                              />
-                              <span className="text-sm font-bold text-primary uppercase tracking-widest">Tithe Participant</span>
-                            </label>
-                          </div>
+
                           <div className="space-y-2">
                             <label className="text-sm font-semibold text-on-surface">Giving Frequency</label>
                             <div className="relative">

@@ -54,7 +54,9 @@ export default function Members() {
     notes: "",
     image_url: "",
     age_group: "Adult",
-    ministries: []
+    ministries: [],
+    relocation_from: "",
+    release_letter: false
   });
 
   useEffect(() => {
@@ -116,7 +118,9 @@ export default function Members() {
         notes: member.notes || "",
         image_url: member.image_url || "",
         age_group: member.age_group || "Adult",
-        ministries: member.ministries || []
+        ministries: member.ministries || [],
+        relocation_from: member.relocation_from || "",
+        release_letter: member.release_letter || false
       });
       setNewMinistryName("");
     } else {
@@ -145,7 +149,9 @@ export default function Members() {
         notes: "",
         image_url: "",
         age_group: "Adult",
-        ministries: []
+        ministries: [],
+        relocation_from: "",
+        release_letter: false
       });
       setNewMinistryName("");
     }
@@ -640,6 +646,18 @@ export default function Members() {
                         <p className="text-[10px] text-on-surface-variant uppercase font-bold tracking-wider">Join Date</p>
                         <p className="font-semibold text-on-surface mt-0.5">{viewMember.join_date || '--'}</p>
                       </div>
+                      {viewMember.join_type === 'Relocate' && (
+                        <>
+                          <div>
+                            <p className="text-[10px] text-on-surface-variant uppercase font-bold tracking-wider">Relocated From</p>
+                            <p className="font-semibold text-on-surface mt-0.5">{viewMember.relocation_from || '--'}</p>
+                          </div>
+                          <div>
+                            <p className="text-[10px] text-on-surface-variant uppercase font-bold tracking-wider">Release Letter</p>
+                            <p className="font-semibold text-on-surface mt-0.5">{viewMember.release_letter ? 'Yes' : 'No'}</p>
+                          </div>
+                        </>
+                      )}
                       <div>
                         <p className="text-[10px] text-on-surface-variant uppercase font-bold tracking-wider">Baptism Status</p>
                         <p className="font-semibold text-on-surface mt-0.5">{viewMember.baptism_status ? 'Baptized' : 'Not Baptized'}</p>
@@ -993,6 +1011,31 @@ export default function Members() {
                               <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none" size={18} />
                             </div>
                           </div>
+
+                          {formData.join_type === 'Relocate' && (
+                            <>
+                              <Input
+                                label="From Where (Relocating From)"
+                                placeholder="Previous church or location"
+                                value={formData.relocation_from}
+                                onChange={e => setFormData({ ...formData, relocation_from: e.target.value })}
+                              />
+                              <div className="space-y-2">
+                                <label className="text-sm font-semibold text-on-surface">Release Letter</label>
+                                <div className="relative">
+                                  <select
+                                    className="w-full h-12 px-4 rounded-xl border border-outline-variant/20 bg-surface text-on-surface focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all appearance-none"
+                                    value={formData.release_letter}
+                                    onChange={e => setFormData({ ...formData, release_letter: e.target.value === 'true' })}
+                                  >
+                                    <option value="false">No</option>
+                                    <option value="true">Yes</option>
+                                  </select>
+                                  <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none" size={18} />
+                                </div>
+                              </div>
+                            </>
+                          )}
                           <Input
                             label="Join Date"
                             type="date"

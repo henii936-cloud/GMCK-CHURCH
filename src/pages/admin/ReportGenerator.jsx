@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ChurchReportGenerator } from '../../services/reportGenerator';
 import { reportFetcher } from '../../services/reportFetcher';
 import { Button, Card } from '../../components/common/UI';
@@ -13,7 +13,12 @@ export default function ReportGeneratorView() {
   const [report, setReport] = useState(null);
   const [selectedQuarter, setSelectedQuarter] = useState(1);
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
-  const [reportLang, setReportLang] = useState(i18n.language || 'en');
+  const [reportLang, setReportLang] = useState(i18n.language?.slice(0, 2) || 'en');
+
+  // Clear generated report when language changes so user must re-generate in new language
+  useEffect(() => {
+    setReport(null);
+  }, [reportLang]);
 
   const handleGenerate = async () => {
     setLoading(true);
@@ -36,7 +41,7 @@ export default function ReportGeneratorView() {
 
   const handleExportPDF = () => {
     if (!report) return;
-    openReportPrintWindow(report, selectedQuarter, selectedYear);
+    openReportPrintWindow(report, selectedQuarter, selectedYear, reportLang);
   };
 
   return (

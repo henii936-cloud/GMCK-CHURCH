@@ -1,12 +1,18 @@
 /**
  * Generates a self-contained, print-ready HTML document from a report data object.
  * Opens in a new window so the user can print / Save as PDF.
+ * @param {object} report - The full report object from ChurchReportGenerator.generate()
+ * @param {number} quarter - The selected quarter (1-4)
+ * @param {number} year - The selected Gregorian year
+ * @param {string} lang - Explicit language code: 'en' | 'am' (overrides report.lang)
  */
-export function openReportPrintWindow(report, quarter, year) {
+export function openReportPrintWindow(report, quarter, year, lang) {
+  // Use explicit lang param first, fall back to report.lang, then default to 'en'
+  const activeLang = (lang || report.lang || 'en').slice(0, 2);
   const L = report.labels;
   const H = report.header;
   const F = report.footer;
-  const isAmharic = report.lang === 'am';
+  const isAmharic = activeLang === 'am';
 
   // ---------- helpers ----------
   const esc = (s) => String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');

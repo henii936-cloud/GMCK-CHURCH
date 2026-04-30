@@ -28,18 +28,31 @@ export default function Members() {
   const [availableMinistries, setAvailableMinistries] = useState([]);
   const [newMinistryName, setNewMinistryName] = useState("");
   const [isAddingMinistry, setIsAddingMinistry] = useState(false);
+  const [currentStep, setCurrentStep] = useState(1);
 
   const [formData, setFormData] = useState({
     full_name: "",
     phone: "",
     email: "",
     gender: "Male",
-    group_id: "",
     address: "",
+    date_of_birth: "",
+    emergency_contact: "",
+    
     marital_status: "Unmarried",
+    spouse_name: "",
+    children_count: 0,
+    family_id: "",
+    
+    group_id: "",
     leave_status: "Active",
-    image_url: "",
     join_date: new Date().toISOString().split('T')[0],
+    join_type: "Baptized Here",
+    baptism_status: false,
+    tithe_participation: false,
+    giving_frequency: "Monthly",
+    notes: "",
+    image_url: "",
     age_group: "Adult",
     ministries: []
   });
@@ -68,19 +81,32 @@ export default function Members() {
   };
 
   const handleOpenModal = (member = null) => {
+    setCurrentStep(1);
     if (member) {
       setEditingMember(member);
       setFormData({
-        full_name: member.full_name,
+        full_name: member.full_name || "",
         phone: member.phone || "",
         email: member.email || "",
         gender: member.gender || "Male",
-        group_id: member.group_id || "",
         address: member.address || "",
+        date_of_birth: member.date_of_birth || "",
+        emergency_contact: member.emergency_contact || "",
+        
         marital_status: member.marital_status || "Unmarried",
+        spouse_name: member.spouse_name || "",
+        children_count: member.children_count || 0,
+        family_id: member.family_id || "",
+        
+        group_id: member.group_id || "",
         leave_status: member.leave_status || "Active",
-        image_url: member.image_url || "",
         join_date: member.join_date || new Date().toISOString().split('T')[0],
+        join_type: member.join_type || "Baptized Here",
+        baptism_status: member.baptism_status || false,
+        tithe_participation: member.tithe_participation || false,
+        giving_frequency: member.giving_frequency || "Monthly",
+        notes: member.notes || "",
+        image_url: member.image_url || "",
         age_group: member.age_group || "Adult",
         ministries: member.ministries || []
       });
@@ -92,12 +118,24 @@ export default function Members() {
         phone: "",
         email: "",
         gender: "Male",
-        group_id: "",
         address: "",
+        date_of_birth: "",
+        emergency_contact: "",
+        
         marital_status: "Unmarried",
+        spouse_name: "",
+        children_count: 0,
+        family_id: "",
+        
+        group_id: "",
         leave_status: "Active",
-        image_url: "",
         join_date: new Date().toISOString().split('T')[0],
+        join_type: "Baptized Here",
+        baptism_status: false,
+        tithe_participation: false,
+        giving_frequency: "Monthly",
+        notes: "",
+        image_url: "",
         age_group: "Adult",
         ministries: []
       });
@@ -544,30 +582,36 @@ export default function Members() {
                     <p className="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest mb-3 flex items-center gap-2">
                       <Heart size={12} /> Personal Details
                     </p>
-                    <div className="grid grid-cols-2 gap-4 pl-1">
+                    <div className="grid grid-cols-2 gap-4 pl-1 text-xs">
                       <div>
                         <p className="text-[10px] text-on-surface-variant uppercase font-bold tracking-wider">Gender</p>
-                        <p className="text-sm font-semibold text-on-surface mt-0.5">{viewMember.gender || '--'}</p>
+                        <p className="font-semibold text-on-surface mt-0.5">{viewMember.gender || '--'}</p>
+                      </div>
+                      <div>
+                        <p className="text-[10px] text-on-surface-variant uppercase font-bold tracking-wider">Birth Date</p>
+                        <p className="font-semibold text-on-surface mt-0.5">{viewMember.date_of_birth || '--'}</p>
+                      </div>
+                      <div>
+                        <p className="text-[10px] text-on-surface-variant uppercase font-bold tracking-wider">Emergency Contact</p>
+                        <p className="font-semibold text-on-surface mt-0.5">{viewMember.emergency_contact || '--'}</p>
                       </div>
                       <div>
                         <p className="text-[10px] text-on-surface-variant uppercase font-bold tracking-wider">Marital Status</p>
-                        <p className="text-sm font-semibold text-on-surface mt-0.5">
-                          {(() => {
-                            const colors = { Married: '#10b981', Unmarried: '#f43f5e', Widow: '#8b5cf6' };
-                            const c = colors[viewMember.marital_status] || '#6b7280';
-                            return <span style={{ color: c }}>{viewMember.marital_status || '--'}</span>;
-                          })()}
-                        </p>
+                        <p className="font-semibold text-on-surface mt-0.5">{viewMember.marital_status || '--'}</p>
+                      </div>
+                      {viewMember.marital_status === 'Married' && (
+                        <div className="col-span-2">
+                          <p className="text-[10px] text-on-surface-variant uppercase font-bold tracking-wider">Spouse Name</p>
+                          <p className="font-semibold text-on-surface mt-0.5">{viewMember.spouse_name || '--'}</p>
+                        </div>
+                      )}
+                      <div>
+                        <p className="text-[10px] text-on-surface-variant uppercase font-bold tracking-wider">Children</p>
+                        <p className="font-semibold text-on-surface mt-0.5">{viewMember.children_count || 0}</p>
                       </div>
                       <div>
-                        <p className="text-[10px] text-on-surface-variant uppercase font-bold tracking-wider">Age Group</p>
-                        <p className="text-sm font-semibold text-on-surface mt-0.5">{viewMember.age_group || '--'}</p>
-                      </div>
-                      <div>
-                        <p className="text-[10px] text-on-surface-variant uppercase font-bold tracking-wider">Join Date</p>
-                        <p className="text-sm font-semibold text-on-surface mt-0.5">
-                          {viewMember.join_date ? new Date(viewMember.join_date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : '--'}
-                        </p>
+                        <p className="text-[10px] text-on-surface-variant uppercase font-bold tracking-wider">Family ID</p>
+                        <p className="font-semibold text-on-surface mt-0.5">{viewMember.family_id || '--'}</p>
                       </div>
                     </div>
                   </div>
@@ -577,19 +621,47 @@ export default function Members() {
                   {/* Church Details */}
                   <div>
                     <p className="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest mb-3 flex items-center gap-2">
-                      <BookOpen size={12} /> Church Details
+                      <BookOpen size={12} /> Church & Ministry
                     </p>
-                    <div className="grid grid-cols-2 gap-4 pl-1">
+                    <div className="grid grid-cols-2 gap-4 pl-1 text-xs">
                       <div>
-                        <p className="text-[10px] text-on-surface-variant uppercase font-bold tracking-wider">Bible Study Unit</p>
-                        <p className="text-sm font-semibold text-on-surface mt-0.5">{viewMember.bible_study_groups?.group_name || 'Unassigned'}</p>
+                        <p className="text-[10px] text-on-surface-variant uppercase font-bold tracking-wider">Join Type</p>
+                        <p className="font-semibold text-on-surface mt-0.5">{viewMember.join_type || '--'}</p>
                       </div>
                       <div>
-                        <p className="text-[10px] text-on-surface-variant uppercase font-bold tracking-wider">Leave Status</p>
-                        <p className="text-sm font-semibold text-on-surface mt-0.5">{viewMember.leave_status || 'Active'}</p>
+                        <p className="text-[10px] text-on-surface-variant uppercase font-bold tracking-wider">Join Date</p>
+                        <p className="font-semibold text-on-surface mt-0.5">{viewMember.join_date || '--'}</p>
+                      </div>
+                      <div>
+                        <p className="text-[10px] text-on-surface-variant uppercase font-bold tracking-wider">Baptism Status</p>
+                        <p className="font-semibold text-on-surface mt-0.5">{viewMember.baptism_status ? 'Baptized' : 'Not Baptized'}</p>
+                      </div>
+                      <div>
+                        <p className="text-[10px] text-on-surface-variant uppercase font-bold tracking-wider">Study Unit</p>
+                        <p className="font-semibold text-on-surface mt-0.5">{viewMember.bible_study_groups?.group_name || 'Unassigned'}</p>
+                      </div>
+                      <div>
+                        <p className="text-[10px] text-on-surface-variant uppercase font-bold tracking-wider">Tithe Participant</p>
+                        <p className="font-semibold text-on-surface mt-0.5">{viewMember.tithe_participation ? 'Yes' : 'No'}</p>
+                      </div>
+                      <div>
+                        <p className="text-[10px] text-on-surface-variant uppercase font-bold tracking-wider">Giving Frequency</p>
+                        <p className="font-semibold text-on-surface mt-0.5">{viewMember.giving_frequency || '--'}</p>
                       </div>
                     </div>
                   </div>
+
+                  {viewMember.notes && (
+                    <>
+                      <hr className="border-outline-variant/10" />
+                      <div>
+                        <p className="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest mb-2">Notes</p>
+                        <p className="text-sm text-on-surface bg-surface-container-low p-3 rounded-xl border border-outline-variant/10 whitespace-pre-wrap">
+                          {viewMember.notes}
+                        </p>
+                      </div>
+                    </>
+                  )}
 
                   {/* Ministries */}
                   {viewMember.ministries && viewMember.ministries.length > 0 && (
@@ -709,12 +781,19 @@ export default function Members() {
               <div className="md:w-2/3 flex flex-col bg-surface">
                 <div className="px-8 py-6 border-b border-outline-variant/10 hidden md:flex justify-between items-center sticky top-0 z-10 bg-surface/80 backdrop-blur-md">
                   <div>
+                    <div className="flex items-center gap-2 mb-1">
+                      <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold ${currentStep === 1 ? 'bg-primary text-on-primary' : 'bg-primary/20 text-primary'}`}>1</div>
+                      <div className={`w-8 h-0.5 rounded-full ${currentStep >= 2 ? 'bg-primary' : 'bg-outline-variant/20'}`}></div>
+                      <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold ${currentStep === 2 ? 'bg-primary text-on-primary' : 'bg-primary/20 text-primary'}`}>2</div>
+                      <div className={`w-8 h-0.5 rounded-full ${currentStep >= 3 ? 'bg-primary' : 'bg-outline-variant/20'}`}></div>
+                      <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold ${currentStep === 3 ? 'bg-primary text-on-primary' : 'bg-primary/20 text-primary'}`}>3</div>
+                    </div>
                     <h2 className="text-2xl font-bold text-primary">
                       {editingMember ? 'Update Profile' : 'New Registration'}
+                      <span className="text-sm font-medium text-on-surface-variant ml-2 opacity-60">
+                        Step {currentStep} of 3
+                      </span>
                     </h2>
-                    <p className="text-sm text-on-surface-variant mt-1">
-                      Maintain accurate records for church planning and outreach.
-                    </p>
                   </div>
                   <button
                     onClick={() => setShowModal(false)}
@@ -726,233 +805,235 @@ export default function Members() {
 
                 <div className="p-8 overflow-y-auto custom-scrollbar flex-1">
                   <form id="member-form" onSubmit={handleSaveMember} className="space-y-8">
-
-                    {/* Personal Information Section */}
-                    <div>
-                      <h3 className="text-sm font-bold text-primary uppercase tracking-widest mb-6 flex items-center gap-2">
-                        <UserCheck size={16} />
-                        Personal Information
-                      </h3>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div className="md:col-span-2">
+                    {currentStep === 1 && (
+                      <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-6">
+                        <h3 className="text-sm font-bold text-primary uppercase tracking-widest flex items-center gap-2">
+                          <UserCheck size={16} /> Basic Information
+                        </h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                          <div className="md:col-span-2">
+                            <Input
+                              label="Full Legal Name"
+                              placeholder="e.g. Johnathan Doe"
+                              value={formData.full_name}
+                              onChange={e => setFormData({ ...formData, full_name: e.target.value })}
+                              required
+                            />
+                          </div>
                           <Input
-                            label="Full Legal Name"
-                            placeholder="e.g. Johnathan Doe"
-                            value={formData.full_name}
-                            onChange={e => setFormData({ ...formData, full_name: e.target.value })}
-                            required
+                            label="Email Address"
+                            placeholder="member@domain.com"
+                            value={formData.email}
+                            onChange={e => setFormData({ ...formData, email: e.target.value })}
+                            icon={Mail}
                           />
-                        </div>
-
-                        <Input
-                          label="Email Address"
-                          placeholder="member@domain.com"
-                          value={formData.email}
-                          onChange={e => setFormData({ ...formData, email: e.target.value })}
-                          icon={Mail}
-                        />
-                        <Input
-                          label="Phone Number"
-                          placeholder="+1 (555) 000-0000"
-                          value={formData.phone}
-                          onChange={e => setFormData({ ...formData, phone: e.target.value })}
-                          icon={Phone}
-                        />
-
-                        <div className="space-y-2">
-                          <label className="text-sm font-semibold text-on-surface">Gender</label>
-                          <div className="relative">
-                            <select
-                              className="w-full h-12 px-4 rounded-xl border border-outline-variant/20 bg-surface text-on-surface focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all appearance-none"
-                              value={formData.gender}
-                              onChange={e => setFormData({ ...formData, gender: e.target.value })}
-                            >
-                              {['Male', 'Female', 'Other'].map(s => <option key={s} value={s}>{s}</option>)}
-                            </select>
-                            <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none" size={18} />
-                          </div>
-                        </div>
-
-                        <div className="space-y-2">
-                          <label className="text-sm font-semibold text-on-surface">Marital Status</label>
-                          <div className="relative">
-                            <select
-                              className="w-full h-12 px-4 rounded-xl border border-outline-variant/20 bg-surface text-on-surface focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all appearance-none"
-                              value={formData.marital_status}
-                              onChange={e => setFormData({ ...formData, marital_status: e.target.value })}
-                            >
-                              {['Unmarried', 'Married', 'Widow'].map(s => <option key={s} value={s}>{s}</option>)}
-                            </select>
-                            <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none" size={18} />
-                          </div>
-                        </div>
-
-                        <div className="space-y-2">
-                          <label className="text-sm font-semibold text-on-surface">Age Group</label>
-                          <div className="relative">
-                            <select
-                              className="w-full h-12 px-4 rounded-xl border border-outline-variant/20 bg-surface text-on-surface focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all appearance-none"
-                              value={formData.age_group}
-                              onChange={e => setFormData({ ...formData, age_group: e.target.value })}
-                            >
-                              {['Kids', 'Teenage', 'Youth', 'Adult', 'Senior'].map(s => <option key={s} value={s}>{s}</option>)}
-                            </select>
-                            <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none" size={18} />
-                          </div>
-                        </div>
-
-                        <div className="space-y-2">
-                          <label className="text-sm font-semibold text-on-surface">Leave Status</label>
-                          <div className="relative">
-                            <select
-                              className="w-full h-12 px-4 rounded-xl border border-outline-variant/20 bg-surface text-on-surface focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all appearance-none"
-                              value={formData.leave_status}
-                              onChange={e => setFormData({ ...formData, leave_status: e.target.value })}
-                            >
-                              {['Active', 'Inactive', 'Moved'].map(s => <option key={s} value={s}>{s}</option>)}
-                            </select>
-                            <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none" size={18} />
-                          </div>
-                        </div>
-
-                        <div className="md:col-span-2">
                           <Input
-                            label="Residential Address"
-                            placeholder="Home address details"
-                            value={formData.address}
-                            onChange={e => setFormData({ ...formData, address: e.target.value })}
-                            icon={MapPin}
+                            label="Phone Number"
+                            placeholder="+1 (555) 000-0000"
+                            value={formData.phone}
+                            onChange={e => setFormData({ ...formData, phone: e.target.value })}
+                            icon={Phone}
                           />
-                        </div>
-                      </div>
-                    </div>
-
-                    <hr className="border-outline-variant/10" />
-
-                    {/* Church Details Section */}
-                    <div>
-                      <h3 className="text-sm font-bold text-primary uppercase tracking-widest mb-6 flex items-center gap-2">
-                        <BookOpen size={16} />
-                        Church Details
-                      </h3>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div className="space-y-2">
-                          <label className="text-sm font-semibold text-on-surface">Bible Study Unit</label>
-                          <div className="relative">
-                            <select
-                              className="w-full h-12 px-4 rounded-xl border border-outline-variant/20 bg-surface text-on-surface focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all appearance-none"
-                              value={formData.group_id}
-                              onChange={e => setFormData({ ...formData, group_id: e.target.value })}
-                            >
-                              <option value="">Unassigned (General Pool)</option>
-                              {groups.map(g => <option key={g.id} value={g.id}>{g.group_name}</option>)}
-                            </select>
-                            <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none" size={18} />
-                          </div>
-                        </div>
-
-                        <Input
-                          label="Join Date"
-                          type="date"
-                          value={formData.join_date}
-                          onChange={e => setFormData({ ...formData, join_date: e.target.value })}
-                          icon={Calendar}
-                        />
-                      </div>
-
-                        {/* Ministry Selection Section */}
-                        <div className="md:col-span-2 space-y-4">
-                          <div className="flex justify-between items-center">
-                            <label className="text-sm font-bold text-on-surface flex items-center gap-2">
-                              <Heart size={16} className="text-primary" /> Ministries & Teams
-                            </label>
-                            <button 
-                              type="button"
-                              onClick={() => setIsAddingMinistry(!isAddingMinistry)}
-                              className="text-[10px] font-black uppercase tracking-widest text-primary hover:text-tertiary-fixed-dim transition-colors flex items-center gap-1"
-                            >
-                              {isAddingMinistry ? <X size={12} /> : <Plus size={12} />} 
-                              {isAddingMinistry ? 'Cancel' : 'Add New Team'}
-                            </button>
-                          </div>
-
-                          {isAddingMinistry && (
-                            <motion.div 
-                              initial={{ opacity: 0, y: -10 }}
-                              animate={{ opacity: 1, y: 0 }}
-                              className="flex gap-2 p-4 bg-primary/5 rounded-2xl border border-primary/10"
-                            >
-                              <input 
-                                type="text"
-                                placeholder="New ministry name..."
-                                value={newMinistryName}
-                                onChange={e => setNewMinistryName(e.target.value)}
-                                className="flex-1 bg-surface border-none rounded-xl px-4 py-2 text-sm focus:ring-1 focus:ring-primary"
-                              />
-                              <Button 
-                                type="button"
-                                size="sm" 
-                                onClick={async () => {
-                                  if (!newMinistryName.trim()) return;
-                                  try {
-                                    const newMin = await ministryService.createMinistry(newMinistryName);
-                                    setAvailableMinistries([...availableMinistries, newMin].sort((a,b) => a.name.localeCompare(b.name)));
-                                    setNewMinistryName("");
-                                    setIsAddingMinistry(false);
-                                  } catch (err) {
-                                    setError("Ministry already exists or error occurred.");
-                                  }
-                                }}
+                          <div className="space-y-2">
+                            <label className="text-sm font-semibold text-on-surface">Gender</label>
+                            <div className="relative">
+                              <select
+                                className="w-full h-12 px-4 rounded-xl border border-outline-variant/20 bg-surface text-on-surface focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all appearance-none"
+                                value={formData.gender}
+                                onChange={e => setFormData({ ...formData, gender: e.target.value })}
                               >
-                                Create
-                              </Button>
-                            </motion.div>
-                          )}
+                                {['Male', 'Female', 'Other'].map(s => <option key={s} value={s}>{s}</option>)}
+                              </select>
+                              <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none" size={18} />
+                            </div>
+                          </div>
+                          <Input
+                            label="Date of Birth"
+                            type="date"
+                            value={formData.date_of_birth}
+                            onChange={e => setFormData({ ...formData, date_of_birth: e.target.value })}
+                          />
+                          <Input
+                            label="Emergency Contact"
+                            placeholder="Name & Phone"
+                            value={formData.emergency_contact}
+                            onChange={e => setFormData({ ...formData, emergency_contact: e.target.value })}
+                          />
+                          <div className="md:col-span-2">
+                            <Input
+                              label="Residential Address"
+                              placeholder="Home address details"
+                              value={formData.address}
+                              onChange={e => setFormData({ ...formData, address: e.target.value })}
+                              icon={MapPin}
+                            />
+                          </div>
+                        </div>
+                      </motion.div>
+                    )}
 
-                          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                            {availableMinistries.map((min) => {
-                              const isSelected = formData.ministries.includes(min.name);
-                              return (
-                                <button
-                                  key={min.id}
-                                  type="button"
-                                  onClick={() => {
-                                    const newSelected = isSelected 
-                                      ? formData.ministries.filter(m => m !== min.name)
-                                      : [...formData.ministries, min.name];
-                                    setFormData({ ...formData, ministries: newSelected });
-                                  }}
-                                  className={`flex items-center gap-2 p-3 rounded-xl border text-left transition-all duration-300
-                                    ${isSelected 
-                                      ? 'bg-primary/10 border-primary shadow-sm' 
-                                      : 'bg-surface border-outline-variant/10 hover:border-primary/30 opacity-70'}`}
-                                >
-                                  <div className={`w-4 h-4 rounded border flex items-center justify-center transition-colors
-                                    ${isSelected ? 'bg-primary border-primary' : 'bg-transparent border-on-surface-variant'}`}>
-                                    {isSelected && <Plus size={12} className="text-on-primary rotate-45" />}
-                                  </div>
-                                  <span className={`text-[11px] font-bold uppercase tracking-wider ${isSelected ? 'text-primary' : 'text-on-surface-variant'}`}>
-                                    {min.name}
-                                  </span>
-                                </button>
-                              );
-                            })}
+                    {currentStep === 2 && (
+                      <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-6">
+                        <h3 className="text-sm font-bold text-primary uppercase tracking-widest flex items-center gap-2">
+                          <Heart size={16} /> Family & Relationships
+                        </h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                          <div className="space-y-2">
+                            <label className="text-sm font-semibold text-on-surface">Marital Status</label>
+                            <div className="relative">
+                              <select
+                                className="w-full h-12 px-4 rounded-xl border border-outline-variant/20 bg-surface text-on-surface focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all appearance-none"
+                                value={formData.marital_status}
+                                onChange={e => setFormData({ ...formData, marital_status: e.target.value })}
+                              >
+                                {['Unmarried', 'Married', 'Widow', 'Divorced'].map(s => <option key={s} value={s}>{s}</option>)}
+                              </select>
+                              <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none" size={18} />
+                            </div>
+                          </div>
+                          <Input
+                            label="Spouse Name"
+                            placeholder="If married"
+                            value={formData.spouse_name}
+                            onChange={e => setFormData({ ...formData, spouse_name: e.target.value })}
+                            disabled={formData.marital_status !== 'Married'}
+                          />
+                          <Input
+                            label="Number of Children"
+                            type="number"
+                            value={formData.children_count}
+                            onChange={e => setFormData({ ...formData, children_count: parseInt(e.target.value) || 0 })}
+                          />
+                          <Input
+                            label="Family ID"
+                            placeholder="Group identifier"
+                            value={formData.family_id}
+                            onChange={e => setFormData({ ...formData, family_id: e.target.value })}
+                          />
+                        </div>
+                      </motion.div>
+                    )}
+
+                    {currentStep === 3 && (
+                      <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-6">
+                        <h3 className="text-sm font-bold text-primary uppercase tracking-widest flex items-center gap-2">
+                          <BookOpen size={16} /> Ministry & Church
+                        </h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                          <div className="space-y-2">
+                            <label className="text-sm font-semibold text-on-surface">Bible Study Unit</label>
+                            <div className="relative">
+                              <select
+                                className="w-full h-12 px-4 rounded-xl border border-outline-variant/20 bg-surface text-on-surface focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all appearance-none"
+                                value={formData.group_id}
+                                onChange={e => setFormData({ ...formData, group_id: e.target.value })}
+                              >
+                                <option value="">Unassigned</option>
+                                {groups.map(g => <option key={g.id} value={g.id}>{g.group_name}</option>)}
+                              </select>
+                              <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none" size={18} />
+                            </div>
+                          </div>
+                          <div className="space-y-2">
+                            <label className="text-sm font-semibold text-on-surface">Join Type</label>
+                            <div className="relative">
+                              <select
+                                className="w-full h-12 px-4 rounded-xl border border-outline-variant/20 bg-surface text-on-surface focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all appearance-none"
+                                value={formData.join_type}
+                                onChange={e => setFormData({ ...formData, join_type: e.target.value })}
+                              >
+                                {['Relocate', 'Baptized Here'].map(s => <option key={s} value={s}>{s}</option>)}
+                              </select>
+                              <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none" size={18} />
+                            </div>
+                          </div>
+                          <Input
+                            label="Join Date"
+                            type="date"
+                            value={formData.join_date}
+                            onChange={e => setFormData({ ...formData, join_date: e.target.value })}
+                          />
+                          <div className="flex flex-col justify-center gap-4 border border-outline-variant/10 rounded-2xl p-4 bg-primary/5">
+                            <label className="flex items-center gap-3 cursor-pointer">
+                              <input
+                                type="checkbox"
+                                checked={formData.baptism_status}
+                                onChange={e => setFormData({ ...formData, baptism_status: e.target.checked })}
+                                className="w-5 h-5 accent-primary"
+                              />
+                              <span className="text-sm font-bold text-primary uppercase tracking-widest">Baptized Member</span>
+                            </label>
+                            <label className="flex items-center gap-3 cursor-pointer">
+                              <input
+                                type="checkbox"
+                                checked={formData.tithe_participation}
+                                onChange={e => setFormData({ ...formData, tithe_participation: e.target.checked })}
+                                className="w-5 h-5 accent-primary"
+                              />
+                              <span className="text-sm font-bold text-primary uppercase tracking-widest">Tithe Participant</span>
+                            </label>
+                          </div>
+                          <div className="space-y-2">
+                            <label className="text-sm font-semibold text-on-surface">Giving Frequency</label>
+                            <div className="relative">
+                              <select
+                                className="w-full h-12 px-4 rounded-xl border border-outline-variant/20 bg-surface text-on-surface focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all appearance-none"
+                                value={formData.giving_frequency}
+                                onChange={e => setFormData({ ...formData, giving_frequency: e.target.value })}
+                              >
+                                {['Monthly', 'Weekly', 'Occasional', 'Not Active'].map(s => <option key={s} value={s}>{s}</option>)}
+                              </select>
+                              <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none" size={18} />
+                            </div>
+                          </div>
+                          <div className="md:col-span-2">
+                            <label className="text-sm font-semibold text-on-surface mb-2 block">Personal Notes / Background</label>
+                            <textarea
+                              rows={3}
+                              className="w-full p-4 rounded-2xl border border-outline-variant/20 bg-surface text-sm focus:ring-2 focus:ring-primary/20"
+                              value={formData.notes}
+                              onChange={e => setFormData({ ...formData, notes: e.target.value })}
+                              placeholder="Add any specific details for church leaders..."
+                            />
                           </div>
 
-                          {formData.ministries.length > 0 && (
-                            <div className="flex flex-wrap gap-2 pt-2">
-                              {formData.ministries.map((m, i) => (
-                                <span key={i} className="px-3 py-1 bg-primary text-on-primary rounded-full text-[10px] font-bold uppercase tracking-wider flex items-center gap-2">
-                                  {m}
-                                  <button type="button" onClick={() => setFormData({ ...formData, ministries: formData.ministries.filter(sm => sm !== m) })}>
-                                    <X size={10} />
-                                  </button>
-                                </span>
-                              ))}
+                          <div className="md:col-span-2 space-y-4">
+                            <div className="flex justify-between items-center">
+                              <label className="text-sm font-bold text-on-surface flex items-center gap-2">
+                                <Heart size={16} className="text-primary" /> Ministries & Teams
+                              </label>
                             </div>
-                          )}
+                            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                              {availableMinistries.map((min) => {
+                                const isSelected = formData.ministries.includes(min.name);
+                                return (
+                                  <button
+                                    key={min.id}
+                                    type="button"
+                                    onClick={() => {
+                                      const newSelected = isSelected 
+                                        ? formData.ministries.filter(m => m !== min.name)
+                                        : [...formData.ministries, min.name];
+                                      setFormData({ ...formData, ministries: newSelected });
+                                    }}
+                                    className={`flex items-center gap-2 p-3 rounded-xl border text-left transition-all
+                                      ${isSelected ? 'bg-primary/10 border-primary shadow-sm' : 'bg-surface border-outline-variant/10 opacity-70'}`}
+                                  >
+                                    <div className={`w-4 h-4 rounded border flex items-center justify-center transition-colors
+                                      ${isSelected ? 'bg-primary border-primary' : 'bg-transparent border-on-surface-variant'}`}>
+                                      {isSelected && <Plus size={12} className="text-on-primary rotate-45" />}
+                                    </div>
+                                    <span className={`text-[11px] font-bold uppercase tracking-wider ${isSelected ? 'text-primary' : 'text-on-surface-variant'}`}>
+                                      {min.name}
+                                    </span>
+                                  </button>
+                                );
+                              })}
+                            </div>
+                          </div>
                         </div>
-                    </div>
+                      </motion.div>
+                    )}
                   </form>
 
                   {error && (
@@ -963,23 +1044,43 @@ export default function Members() {
                   )}
                 </div>
 
-                <div className="px-8 py-6 border-t border-outline-variant/10 bg-surface-container-lowest flex gap-4 justify-end sticky bottom-0 z-10">
-                  <Button
-                    variant="secondary"
-                    onClick={() => setShowModal(false)}
-                    className="px-8"
-                    disabled={isSaving}
-                  >
-                    Cancel
-                  </Button>
-                  <Button
-                    type="submit"
-                    form="member-form"
-                    className="px-8"
-                    loading={isSaving}
-                  >
-                    {editingMember ? 'Save Changes' : 'Register Member'}
-                  </Button>
+                <div className="px-8 py-6 border-t border-outline-variant/10 bg-surface-container-lowest flex gap-4 justify-between sticky bottom-0 z-10">
+                  <div className="flex gap-4">
+                    {currentStep > 1 && (
+                      <Button
+                        variant="secondary"
+                        onClick={() => setCurrentStep(currentStep - 1)}
+                        className="px-8"
+                      >
+                        Back
+                      </Button>
+                    )}
+                    <Button
+                      variant="outline"
+                      onClick={() => setShowModal(false)}
+                      className="px-8 border-outline-variant/20"
+                    >
+                      Cancel
+                    </Button>
+                  </div>
+                  
+                  {currentStep < 3 ? (
+                    <Button
+                      onClick={() => setCurrentStep(currentStep + 1)}
+                      className="px-8"
+                    >
+                      Next
+                    </Button>
+                  ) : (
+                    <Button
+                      type="submit"
+                      form="member-form"
+                      className="px-8"
+                      loading={isSaving}
+                    >
+                      {editingMember ? 'Save Changes' : 'Register Member'}
+                    </Button>
+                  )}
                 </div>
               </div>
             </motion.div>

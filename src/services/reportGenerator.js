@@ -118,7 +118,7 @@ function buildTeachingSection(bibleStudyData = {}) {
       "2.1": { label: "People without small groups added to a group this quarter", ...genderBreakdown(newMembersAddedToGroups.men, newMembersAddedToGroups.women) },
       "2.2": { label: "Total active small groups", count: totalActiveGroups },
       "2.3": { label: "Small groups added this quarter", count: groupsAddedThisQuarter },
-      "2.4": { label: "Total number of small groups (quarter end)", count: totalActiveGroups },
+
     },
   };
 }

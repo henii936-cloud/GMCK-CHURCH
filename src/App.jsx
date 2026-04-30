@@ -7,7 +7,7 @@ import Signup from "./pages/auth/signup";
 import Landing from "./pages/Landing";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import LeaderDashboard from "./pages/leader/LeaderDashboard";
-import AdminLeaders from "./pages/admin/Leaders";
+
 import AdminProgress from "./pages/admin/Progress";
 import AdminEvents from "./pages/admin/Events";
 import AdminEvangelism from "./pages/admin/Evangelism";

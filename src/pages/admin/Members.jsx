@@ -899,6 +899,13 @@ export default function Members() {
                         <h3 className="text-sm font-bold text-primary uppercase tracking-widest flex items-center gap-2">
                           <UserCheck size={16} /> Basic Information
                         </h3>
+                        {/* Step 1 Identification Header */}
+                        <div className="bg-primary/5 p-4 rounded-xl border border-primary/10 mb-2">
+                          <h4 className="text-primary font-bold flex items-center gap-2">
+                            <User size={16} /> Step 1: Personal Details
+                          </h4>
+                          <p className="text-[10px] text-on-surface-variant opacity-70">Enter the member's basic contact and personal information</p>
+                        </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                           <div className="md:col-span-2">
                             <Input
@@ -936,6 +943,19 @@ export default function Members() {
                               <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none" size={18} />
                             </div>
                           </div>
+                          <div className="space-y-2">
+                            <label className="text-sm font-semibold text-on-surface">Age Group</label>
+                            <div className="relative">
+                              <select
+                                className="w-full h-12 px-4 rounded-xl border border-outline-variant/20 bg-surface text-on-surface focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all appearance-none"
+                                value={formData.age_group}
+                                onChange={e => setFormData({ ...formData, age_group: e.target.value })}
+                              >
+                                {['Kids', 'Teenage', 'Youth', 'Adult', 'Senior'].map(s => <option key={s} value={s}>{s}</option>)}
+                              </select>
+                              <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none" size={18} />
+                            </div>
+                          </div>
                           <Input
                             label="Date of Birth"
                             type="date"
@@ -948,6 +968,19 @@ export default function Members() {
                             value={formData.emergency_contact}
                             onChange={e => setFormData({ ...formData, emergency_contact: e.target.value })}
                           />
+                          <div className="space-y-2">
+                            <label className="text-sm font-semibold text-on-surface">Member Status</label>
+                            <div className="relative">
+                              <select
+                                className="w-full h-12 px-4 rounded-xl border border-outline-variant/20 bg-surface text-on-surface focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all appearance-none"
+                                value={formData.leave_status}
+                                onChange={e => setFormData({ ...formData, leave_status: e.target.value })}
+                              >
+                                {['Active', 'Inactive', 'Moved'].map(s => <option key={s} value={s}>{s}</option>)}
+                              </select>
+                              <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none" size={18} />
+                            </div>
+                          </div>
                           <div className="md:col-span-2">
                             <Input
                               label="Residential Address"
@@ -972,6 +1005,13 @@ export default function Members() {
                         <h3 className="text-sm font-bold text-primary uppercase tracking-widest flex items-center gap-2">
                           <Heart size={16} /> Family & Relationships
                         </h3>
+                        {/* Step 2 Identification Header */}
+                        <div className="bg-primary/5 p-4 rounded-xl border border-primary/10 mb-2">
+                          <h4 className="text-primary font-bold flex items-center gap-2">
+                            <Heart size={16} /> Step 2: Family Details
+                          </h4>
+                          <p className="text-[10px] text-on-surface-variant opacity-70">Record marital status, spouse linkage, children, and family grouping</p>
+                        </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                           <div className="space-y-2">
                             <label className="text-sm font-semibold text-on-surface">Marital Status</label>
@@ -986,9 +1026,10 @@ export default function Members() {
                               <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none" size={18} />
                             </div>
                           </div>
-                          {formData.marital_status === "Married" && (
+
+                          {formData.marital_status === "Married" ? (
                             <div className="space-y-2">
-                              <label className="text-sm font-semibold text-on-surface">Spouse Name (Select from Members)</label>
+                              <label className="text-sm font-semibold text-on-surface">Spouse (Select from Members)</label>
                               <div className="relative">
                                 <select
                                   className="w-full h-12 px-4 rounded-xl border border-outline-variant/20 bg-surface text-on-surface focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all appearance-none"
@@ -1017,6 +1058,16 @@ export default function Members() {
                                 <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none" size={18} />
                               </div>
                             </div>
+                          ) : (
+                            <div className="space-y-2">
+                              <label className="text-sm font-semibold text-on-surface">Spouse Name</label>
+                              <input
+                                type="text"
+                                disabled
+                                placeholder="N/A — not married"
+                                className="w-full h-12 px-4 rounded-xl border border-outline-variant/10 bg-surface-container-low text-on-surface-variant text-sm opacity-50 cursor-not-allowed"
+                              />
+                            </div>
                           )}
 
                           <div className="space-y-2">
@@ -1034,45 +1085,56 @@ export default function Members() {
                             </div>
                           </div>
 
-                          {formData.has_children && (
-                            <>
-                              <Input
-                                label="Number of Children"
-                                type="number"
-                                value={formData.children_count}
-                                onChange={e => setFormData({ ...formData, children_count: parseInt(e.target.value) || 0 })}
+                          {formData.has_children ? (
+                            <Input
+                              label="Number of Children"
+                              type="number"
+                              value={formData.children_count}
+                              onChange={e => setFormData({ ...formData, children_count: parseInt(e.target.value) || 0 })}
+                            />
+                          ) : (
+                            <div className="space-y-2">
+                              <label className="text-sm font-semibold text-on-surface">Number of Children</label>
+                              <input
+                                type="text"
+                                disabled
+                                placeholder="N/A"
+                                className="w-full h-12 px-4 rounded-xl border border-outline-variant/10 bg-surface-container-low text-on-surface-variant text-sm opacity-50 cursor-not-allowed"
                               />
-                              <div className="md:col-span-2 space-y-3">
-                                <label className="text-sm font-semibold text-on-surface">Select Children from Members</label>
-                                <div className="max-h-48 overflow-y-auto border border-outline-variant/20 rounded-xl p-3 bg-surface shadow-inner">
-                                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                                    {(members || [])
-                                      .filter(m => !editingMember || m.id !== editingMember.id)
-                                      .map(m => (
-                                      <label key={m.id} className="flex items-center gap-3 p-2.5 hover:bg-primary/5 rounded-lg transition-colors cursor-pointer border border-transparent hover:border-primary/20">
-                                        <input
-                                          type="checkbox"
-                                          className="w-5 h-5 rounded border-outline-variant text-primary focus:ring-primary/20 transition-all cursor-pointer"
-                                          checked={Array.isArray(formData.children_ids) && formData.children_ids.includes(m.id)}
-                                          onChange={e => {
-                                            const currentIds = Array.isArray(formData.children_ids) ? formData.children_ids : [];
-                                            const newIds = e.target.checked 
-                                              ? [...currentIds, m.id]
-                                              : currentIds.filter(id => id !== m.id);
-                                            setFormData({ ...formData, children_ids: newIds });
-                                          }}
-                                        />
-                                        <div className="flex flex-col min-w-0">
-                                          <span className="text-sm font-medium text-on-surface truncate">{m.full_name}</span>
-                                          <span className="text-[10px] text-on-surface-variant/70">{m.email || 'No email'}</span>
-                                        </div>
-                                      </label>
-                                    ))}
-                                  </div>
+                            </div>
+                          )}
+
+                          {formData.has_children && (
+                            <div className="md:col-span-2 space-y-3">
+                              <label className="text-sm font-semibold text-on-surface">Select Children from Members</label>
+                              <div className="max-h-48 overflow-y-auto border border-outline-variant/20 rounded-xl p-3 bg-surface shadow-inner">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                  {(members || [])
+                                    .filter(m => !editingMember || m.id !== editingMember.id)
+                                    .map(m => (
+                                    <label key={m.id} className="flex items-center gap-3 p-2.5 hover:bg-primary/5 rounded-lg transition-colors cursor-pointer border border-transparent hover:border-primary/20">
+                                      <input
+                                        type="checkbox"
+                                        className="w-5 h-5 rounded border-outline-variant text-primary focus:ring-primary/20 transition-all cursor-pointer"
+                                        checked={Array.isArray(formData.children_ids) && formData.children_ids.includes(m.id)}
+                                        onChange={e => {
+                                          const currentIds = Array.isArray(formData.children_ids) ? formData.children_ids : [];
+                                          const newIds = e.target.checked 
+                                            ? [...currentIds, m.id]
+                                            : currentIds.filter(id => id !== m.id);
+                                          setFormData({ ...formData, children_ids: newIds });
+                                        }}
+                                      />
+                                      <div className="flex flex-col min-w-0">
+                                        <span className="text-sm font-medium text-on-surface truncate">{m.full_name}</span>
+                                        <span className="text-[10px] text-on-surface-variant/70">{m.email || 'No email'}</span>
+                                      </div>
+                                    </label>
+                                  ))}
                                 </div>
-                                <p className="text-[10px] text-on-surface-variant italic">Tip: You can select multiple children from the list of existing members.</p>
                               </div>
-                            </>
+                              <p className="text-[10px] text-on-surface-variant italic">Tip: You can select multiple children from the list of existing members.</p>
+                            </div>
                           )}
 
                           <Input
@@ -1268,6 +1330,7 @@ export default function Members() {
                   <div className="flex gap-4">
                     {currentStep > 1 && (
                       <Button
+                        type="button"
                         variant="secondary"
                         onClick={() => setCurrentStep(currentStep - 1)}
                         className="px-8"
@@ -1286,6 +1349,7 @@ export default function Members() {
                   
                   {currentStep < 3 ? (
                     <Button
+                      type="button"
                       onClick={() => setCurrentStep(currentStep + 1)}
                       className="px-8"
                     >

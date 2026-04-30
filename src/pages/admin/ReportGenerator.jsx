@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import { ChurchReportGenerator } from '../../services/reportGenerator';
 import { reportFetcher } from '../../services/reportFetcher';
 import { Button, Card } from '../../components/common/UI';
-import { Download, FileText, Printer, CheckCircle, ChevronRight, Layout } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { Download, FileText, Printer, CheckCircle, ChevronRight } from 'lucide-react';
+import { motion, AnimatePresence } from 'motion/react';
 
 export default function ReportGeneratorView() {
   const [loading, setLoading] = useState(false);
@@ -103,6 +103,15 @@ export default function ReportGeneratorView() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pl-14">
                       {Object.entries(section.items).map(([key, item]) => {
                         if (key === 'ministryVisits') return null; // Handle separately
+                        // Guard: skip non-object items (e.g. plain string 'rating' in sections 8-10)
+                        if (typeof item !== 'object' || item === null) {
+                          return (
+                            <div key={key} className="p-4 bg-surface-container-lowest rounded-2xl border border-outline-variant/5">
+                              <span className="text-[10px] font-black text-primary opacity-40 uppercase tracking-widest">{key}</span>
+                              <p className="text-xl font-black text-primary mt-2 uppercase">{String(item)}</p>
+                            </div>
+                          );
+                        }
                         
                         return (
                           <div key={key} className="p-4 bg-surface-container-lowest rounded-2xl border border-outline-variant/5">
@@ -212,7 +221,7 @@ export default function ReportGeneratorView() {
         ) : (
           <div className="flex flex-col items-center justify-center py-32 text-center">
             <div className="w-24 h-24 rounded-[40px] bg-surface-container-low grid place-items-center mb-8 shadow-whisper">
-              <Layout size={40} className="text-primary/20" />
+              <FileText size={40} className="text-primary/20" />
             </div>
             <h2 className="text-2xl font-black text-primary mb-4 uppercase tracking-tighter">Ready to Generate</h2>
             <p className="text-on-surface-variant max-w-sm font-medium leading-relaxed">Select a reporting period and click generate to compile all church activities into the official regional office format.</p>

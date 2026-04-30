@@ -41,7 +41,10 @@ export default function Members() {
     
     marital_status: "Unmarried",
     spouse_name: "",
+    spouse_id: "",
     children_count: 0,
+    has_children: false,
+    children_ids: [],
     family_id: "",
     
     group_id: "",
@@ -103,7 +106,10 @@ export default function Members() {
         
         marital_status: member.marital_status || "Unmarried",
         spouse_name: member.spouse_name || "",
+        spouse_id: member.spouse_id || "",
         children_count: member.children_count || 0,
+        has_children: member.has_children || false,
+        children_ids: member.children_ids || [],
         family_id: member.family_id || "",
         
         group_id: member.group_id || "",
@@ -132,7 +138,10 @@ export default function Members() {
         
         marital_status: "Unmarried",
         spouse_name: "",
+        spouse_id: "",
         children_count: 0,
+        has_children: false,
+        children_ids: [],
         family_id: "",
         
         group_id: "",
@@ -187,8 +196,13 @@ export default function Members() {
     setSuccess(null);
 
     try {
-      const payload = { ...formData };
-      if (!payload.group_id) payload.group_id = null;
+      const payload = { 
+        ...formData,
+        group_id: formData.group_id || null,
+        spouse_id: formData.spouse_id || null,
+        children_ids: formData.children_ids || [],
+        has_children: formData.has_children === true
+      };
 
       // If there's a new image file selected, try to upload it to Storage
       if (imageFile) {
@@ -613,9 +627,24 @@ export default function Members() {
                           <p className="font-semibold text-on-surface mt-0.5">{viewMember.spouse_name || '--'}</p>
                         </div>
                       )}
-                      <div>
-                        <p className="text-[10px] text-on-surface-variant uppercase font-bold tracking-wider">Children</p>
-                        <p className="font-semibold text-on-surface mt-0.5">{viewMember.children_count || 0}</p>
+                      <div className={viewMember.has_children && viewMember.children_ids?.length > 0 ? "col-span-2" : ""}>
+                        <p className="text-[10px] text-on-surface-variant uppercase font-bold tracking-wider">
+                          Children {viewMember.children_count > 0 ? `(${viewMember.children_count})` : ''}
+                        </p>
+                        {viewMember.has_children && viewMember.children_ids?.length > 0 ? (
+                          <div className="flex flex-wrap gap-1.5 mt-1.5">
+                            {viewMember.children_ids.map(childId => {
+                              const child = (members || []).find(m => m.id === childId);
+                              return child ? (
+                                <span key={childId} className="px-2 py-0.5 bg-secondary/5 text-secondary border border-secondary/10 rounded-full text-[10px] font-medium">
+                                  {child.full_name}
+                                </span>
+                              ) : null;
+                            })}
+                          </div>
+                        ) : (
+                          <p className="font-semibold text-on-surface mt-0.5">{viewMember.children_count || 0}</p>
+                        )}
                       </div>
                       <div>
                         <p className="text-[10px] text-on-surface-variant uppercase font-bold tracking-wider">Family ID</p>
@@ -926,19 +955,95 @@ export default function Members() {
                               <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none" size={18} />
                             </div>
                           </div>
-                          <Input
-                            label="Spouse Name"
-                            placeholder="If married"
-                            value={formData.spouse_name}
-                            onChange={e => setFormData({ ...formData, spouse_name: e.target.value })}
-                            disabled={formData.marital_status !== 'Married'}
-                          />
-                          <Input
-                            label="Number of Children"
-                            type="number"
-                            value={formData.children_count}
-                            onChange={e => setFormData({ ...formData, children_count: parseInt(e.target.value) || 0 })}
-                          />
+                          {formData.marital_status === "Married" && (
+                            <div className="space-y-2">
+                              <label className="text-sm font-semibold text-on-surface">Spouse Name (Select from Members)</label>
+                              <div className="relative">
+                                <select
+                                  className="w-full h-12 px-4 rounded-xl border border-outline-variant/20 bg-surface text-on-surface focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all appearance-none"
+                                  value={formData.spouse_id}
+                                  onChange={e => {
+                                    const selectedSpouse = (members || []).find(m => m.id === e.target.value);
+                                    setFormData({ 
+                                      ...formData, 
+                                      spouse_id: e.target.value,
+                                      spouse_name: selectedSpouse ? selectedSpouse.full_name : ""
+                                    });
+                                  }}
+                                >
+                                  <option value="">Select Spouse</option>
+                                  {(members || [])
+                                    .filter(m => {
+                                      if (formData.gender === 'Female') return m.gender === 'Male';
+                                      if (formData.gender === 'Male') return m.gender === 'Female';
+                                      return true;
+                                    })
+                                    .map(m => (
+                                      <option key={m.id} value={m.id}>{m.full_name}</option>
+                                    ))
+                                  }
+                                </select>
+                                <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none" size={18} />
+                              </div>
+                            </div>
+                          )}
+
+                          <div className="space-y-2">
+                            <label className="text-sm font-semibold text-on-surface">Have Children?</label>
+                            <div className="relative">
+                              <select
+                                className="w-full h-12 px-4 rounded-xl border border-outline-variant/20 bg-surface text-on-surface focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all appearance-none"
+                                value={formData.has_children}
+                                onChange={e => setFormData({ ...formData, has_children: e.target.value === 'true' })}
+                              >
+                                <option value="false">No</option>
+                                <option value="true">Yes</option>
+                              </select>
+                              <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none" size={18} />
+                            </div>
+                          </div>
+
+                          {formData.has_children && (
+                            <>
+                              <Input
+                                label="Number of Children"
+                                type="number"
+                                value={formData.children_count}
+                                onChange={e => setFormData({ ...formData, children_count: parseInt(e.target.value) || 0 })}
+                              />
+                              <div className="md:col-span-2 space-y-3">
+                                <label className="text-sm font-semibold text-on-surface">Select Children from Members</label>
+                                <div className="max-h-48 overflow-y-auto border border-outline-variant/20 rounded-xl p-3 bg-surface shadow-inner">
+                                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                    {(members || [])
+                                      .filter(m => !editingMember || m.id !== editingMember.id)
+                                      .map(m => (
+                                      <label key={m.id} className="flex items-center gap-3 p-2.5 hover:bg-primary/5 rounded-lg transition-colors cursor-pointer border border-transparent hover:border-primary/20">
+                                        <input
+                                          type="checkbox"
+                                          className="w-5 h-5 rounded border-outline-variant text-primary"
+                                          checked={formData.children_ids?.includes(m.id)}
+                                          onChange={e => {
+                                            const currentIds = Array.isArray(formData.children_ids) ? formData.children_ids : [];
+                                            const newIds = e.target.checked 
+                                              ? [...currentIds, m.id]
+                                              : currentIds.filter(id => id !== m.id);
+                                            setFormData({ ...formData, children_ids: newIds });
+                                          }}
+                                        />
+                                        <div className="flex flex-col min-w-0">
+                                          <span className="text-sm font-medium text-on-surface truncate">{m.full_name}</span>
+                                          <span className="text-[10px] text-on-surface-variant/70">{m.email || 'No email'}</span>
+                                        </div>
+                                      </label>
+                                    ))}
+                                  </div>
+                                </div>
+                                <p className="text-[10px] text-on-surface-variant italic">Tip: You can select multiple children from the list of existing members.</p>
+                              </div>
+                            </>
+                          )}
+
                           <Input
                             label="Family ID"
                             placeholder="Group identifier"

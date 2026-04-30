@@ -15,6 +15,7 @@ import AdminFinance from "./pages/admin/Finance";
 import AdminBudgets from "./pages/admin/Budgets";
 import AdminMembers from "./pages/admin/Members";
 import AdminGroups from "./pages/admin/Groups";
+import AdminReports from "./pages/admin/ReportGenerator";
 import AdminActivities from "./pages/admin/Programs";
 import LeaderAttendance from "./pages/leader/Attendance";
 import LeaderStudy from "./pages/leader/Study";
@@ -69,6 +70,7 @@ export default function App() {
             <Route index element={<AdminDashboard />} />
             <Route path="members" element={<AdminMembers />} />
             <Route path="groups" element={<AdminGroups />} />
+            <Route path="reports" element={<AdminReports />} />
             <Route path="progress" element={<AdminProgress />} />
             <Route path="events" element={<AdminEvents />} />
             <Route path="evangelism" element={<AdminEvangelism />} />

@@ -63,6 +63,7 @@ export default function Sidebar() {
       { name: "Ministries", icon: Heart, path: "/admin/ministries" },
       { name: "Finance", icon: DollarSign, path: "/admin/finance" },
       { name: "Budgets", icon: Wallet, path: "/admin/budgets" },
+      { name: "Reports", icon: ClipboardList, path: "/admin/reports" },
     ],
     bible_leader: [
       { name: "My Group Members", icon: Users, path: "/leader" },

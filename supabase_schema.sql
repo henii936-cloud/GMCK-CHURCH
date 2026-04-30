@@ -9,11 +9,10 @@ CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 -- 1. TABLES DEFINITION (Idempotent)
 -- =====================================================
 
--- PROFILES: Linked to Supabase Auth
 CREATE TABLE IF NOT EXISTS public.profiles (
   id UUID REFERENCES auth.users ON DELETE CASCADE PRIMARY KEY,
   full_name TEXT,
-  role TEXT CHECK (role IN ('admin', 'bible_leader', 'finance')),
+  role TEXT CHECK (role IN ('admin', 'bible_leader', 'finance', 'management', 'youth_ministry', 'shepherd', 'kids_ministry')),
   created_at TIMESTAMPTZ DEFAULT timezone('utc', now()) NOT NULL
 );
 

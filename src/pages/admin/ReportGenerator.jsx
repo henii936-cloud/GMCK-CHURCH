@@ -119,6 +119,15 @@ export default function ReportGeneratorView() {
               <div className="text-center border-b-2 border-primary/20 pb-8 mb-10">
                 <h2 className="text-2xl font-bold uppercase tracking-widest text-primary mb-2">{report.header.organization}</h2>
                 <h3 className="text-xl font-bold mb-4">{report.header.churchName} - {report.header.region}</h3>
+                
+                {report.header.officialNotice && (
+                  <div className="bg-primary/5 p-6 rounded-2xl border border-primary/10 mb-8">
+                    <p className="text-sm text-primary font-medium leading-relaxed italic">
+                      "{report.header.officialNotice}"
+                    </p>
+                  </div>
+                )}
+
                 <div className="grid grid-cols-2 gap-4 text-sm mt-6">
                   <div className="bg-surface-container-lowest p-3 rounded-xl border border-outline-variant/10">
                     <p className="font-bold text-primary uppercase text-[10px] tracking-widest mb-1">{report.labels.reportingPeriodGreg}</p>

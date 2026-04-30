@@ -175,6 +175,13 @@ ${isAmharic ? '<link rel="preconnect" href="https://fonts.googleapis.com"><link 
   <div class="org-name">${esc(H.organization)}</div>
   <div class="church-name">${esc(H.churchName)} &mdash; ${esc(H.region)}</div>
   <div style="font-size:11pt;font-weight:700;color:#555">${esc(H.quarter)}</div>
+  
+  ${H.officialNotice ? `
+    <div style="background:#f8f9ff; border:1px solid #e4e8ff; border-radius:12px; padding:16px; margin:20px 48px; text-align:left; font-size:9.5pt; color:#3b4fd8; font-style:italic; line-height:1.5;">
+      "${esc(H.officialNotice)}"
+    </div>
+  ` : ''}
+
   <div class="period-grid">
     <div class="period-box">
       <div class="period-lbl">${esc(L.reportingPeriodGreg)}</div>

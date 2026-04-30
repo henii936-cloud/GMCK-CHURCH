@@ -38,6 +38,9 @@ export const TRANSLATIONS = {
       encVisits: "Encouragement Visits",
       reportingPeriodGreg: "Reporting Period (Gregorian)",
       reportingPeriodEth: "Reporting Period (Ethiopian)",
+      reportFormSubtitle: "Quarterly Report Form Submitted by Local Ministry Coordinators to the Regional General Secretary",
+      fromChurch: "From",
+      reportingPeriodLabel: "Reporting Period",
       officialNotice: "This report is prepared based on the local ministry coordinators' service job descriptions and the Meserete Kristos Church's strategic plan. Therefore, local ministry coordinators are expected to serve by planning their activities in line with these job descriptions and the strategic plan. Consequently, local ministry coordinators must fill out accurate information on this report form and bring it during their joint quarterly meeting with the regional general secretary."
     },
     ministries: {
@@ -83,8 +86,10 @@ export const TRANSLATIONS = {
       reason: "ምክንያት",
       ministryDept: "የአገልግሎት ክፍል",
       encVisits: "የማበረታቻ ጉብኝት",
-      reportingPeriodGreg: "የሪፖርት ዘመን (ፈረንጆች)",
       reportingPeriodEth: "የሪፖርት ዘመን (ኢትዮጵያ)",
+      reportFormSubtitle: "የአጥቢያ አገልግሎት ተጠሪዎች ለክልሉ ዋና ጸሐፊ በየሩብ ዓመቱ ሪፖርት የሚያደርጉበት ቅጽ",
+      fromChurch: "ከ:-",
+      reportingPeriodLabel: "ሪፖርት የሚሸፍነው ጊዜ ከ",
       officialNotice: "ይህ የሪፖርት የተዘጋጀው የአጥቢያ የአገልግሎት ተጠሪዎችን የአገልግሎት የሥራ መዘርዝርና የመሰረተ ክርስቶስ ቤተክርስቲያንን ስልታዊ ዕቅድ መሰረት ባደረገ መልኩ ነው። ስለዚህ የአጥቢያ የአገልግሎት ተጠሪዎች በአጥቢያው የሚከናወኑትን ተግባር ከዚህ የአገልግሎት የሥራ መዘርዝር እና ከስልታዊ ዕቅዱ አኳያ እቅድ በማውጣት ማገልገል ይጠበቅባቸዋል። ስለዚህ የአጥቢያ አገልግሎት ተጠሪዎች ከክልሉ ዋና ጸሐፊ ጋር በየሶስት ወሩ በሚኖራቸው የጋራ ስብሰባ ወቅት በዚህ የሪፖርት ቅጽ ላይ ትክክለኛውን መረጃ ሞልተው ይዘው መምጣት ይገባቸዋል።"
     },
     ministries: {
@@ -510,9 +515,12 @@ export class ChurchReportGenerator {
       labels: t.labels,
       header: {
         organization: t.org,
+        reportFormSubtitle: t.labels.reportFormSubtitle,
         churchName: meta.name,
         region: meta.region,
         quarter: quarterDates.label,
+        fromChurchLabel: t.labels.fromChurch,
+        reportingPeriodLabel: t.labels.reportingPeriodLabel,
         officialNotice: t.labels.officialNotice,
         reportingPeriod: {
           gregorian: `${quarterDates.gregorian.start} – ${quarterDates.gregorian.end}`,

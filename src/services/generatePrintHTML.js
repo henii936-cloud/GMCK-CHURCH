@@ -113,13 +113,67 @@ ${isAmharic ? '<link rel="preconnect" href="https://fonts.googleapis.com"><link 
   body { font-family: ${fontFamily}; color: #1a1a2e; background: #fff; padding: 20mm 15mm; font-size: 11pt; line-height: 1.6; }
 
   /* ── Header ── */
-  .doc-header { text-align: center; border-bottom: 3px solid #3b4fd8; padding-bottom: 24px; margin-bottom: 32px; }
-  .org-name   { font-size: 15pt; font-weight: 900; text-transform: uppercase; letter-spacing: 0.08em; color: #3b4fd8; margin-bottom: 6px; }
-  .church-name{ font-size: 13pt; font-weight: 700; margin-bottom: 16px; }
+  .doc-header { border-bottom: 3px solid #1a1a6e; padding-bottom: 28px; margin-bottom: 32px; font-family: ${fontFamily}; }
+
+  /* Row 1 – Main org title */
+  .org-name {
+    font-size: 17pt;
+    font-weight: 900;
+    text-align: center;
+    color: #1a1a6e;
+    margin-bottom: 10px;
+    line-height: 1.3;
+  }
+
+  /* Row 2 – Report form subtitle */
+  .report-subtitle {
+    font-size: 13pt;
+    font-weight: 700;
+    text-align: center;
+    color: #1a1a6e;
+    margin-bottom: 20px;
+    line-height: 1.4;
+  }
+
+  /* Row 3 – From church */
+  .from-church-row {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    font-size: 11pt;
+    margin-bottom: 8px;
+  }
+  .from-church-label { font-weight: 900; color: #1a1a6e; white-space: nowrap; }
+  .from-church-value { font-weight: 700; }
+
+  /* Row 4 – Reporting period */
+  .period-row {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    font-size: 11pt;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+  }
+  .period-row-label { font-weight: 900; color: #1a1a6e; white-space: nowrap; }
+  .period-row-start { font-weight: 700; }
+  .period-row-sep   { font-weight: 400; color: #555; padding: 0 6px; }
+  .period-row-end   { font-weight: 700; }
+
+  /* Row 5 – Official notice */
+  .official-notice {
+    font-size: 10pt;
+    line-height: 1.8;
+    color: #1a1a1a;
+    text-align: justify;
+    font-style: italic;
+  }
+
   .period-grid{ display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 16px; }
   .period-box { background: #f4f6ff; border: 1px solid #c7cef7; border-radius: 8px; padding: 10px 14px; }
   .period-lbl { font-size: 7.5pt; font-weight: 900; text-transform: uppercase; letter-spacing: 0.12em; color: #3b4fd8; margin-bottom: 3px; }
   .period-val { font-size: 10.5pt; font-weight: 600; }
+
 
   /* ── Sections ── */
   .section { margin-bottom: 36px; page-break-inside: avoid; }
@@ -172,26 +226,35 @@ ${isAmharic ? '<link rel="preconnect" href="https://fonts.googleapis.com"><link 
 <body>
 
 <div class="doc-header">
-  <div class="org-name">${esc(H.organization)}</div>
-  <div class="church-name">${esc(H.churchName)} &mdash; ${esc(H.region)}</div>
-  <div style="font-size:11pt;font-weight:700;color:#555">${esc(H.quarter)}</div>
-  
-  ${H.officialNotice ? `
-    <div style="background:#f8f9ff; border:1px solid #e4e8ff; border-radius:12px; padding:16px; margin:20px 48px; text-align:left; font-size:9.5pt; color:#3b4fd8; font-style:italic; line-height:1.5;">
-      "${esc(H.officialNotice)}"
-    </div>
-  ` : ''}
 
-  <div class="period-grid">
-    <div class="period-box">
-      <div class="period-lbl">${esc(L.reportingPeriodGreg)}</div>
-      <div class="period-val">${esc(H.reportingPeriod.gregorian)}</div>
-    </div>
-    <div class="period-box">
-      <div class="period-lbl">${esc(L.reportingPeriodEth)}</div>
-      <div class="period-val">${esc(H.reportingPeriod.ethiopian)}</div>
-    </div>
+  <!-- Row 1: Organisation name (bold, centred, large) -->
+  <div class="org-name">${esc(H.organization)}</div>
+
+  <!-- Row 2: Report form subtitle (bold, centred) -->
+  ${H.reportFormSubtitle ? `<div class="report-subtitle">${esc(H.reportFormSubtitle)}</div>` : ''}
+
+  <!-- Row 3: From [church name] — [region] -->
+  <div class="from-church-row">
+    <span class="from-church-label">${esc(H.fromChurchLabel || 'From:')}</span>
+    <span class="from-church-value">${esc(H.churchName)}</span>
+    <span style="color:#555; padding:0 4px;">&mdash;</span>
+    <span class="from-church-value">${esc(H.region)}</span>
   </div>
+
+  <!-- Row 4: Reporting period (Ethiopian calendar) -->
+  <div class="period-row">
+    <span class="period-row-label">${esc(H.reportingPeriodLabel || 'Reporting Period:')}</span>
+    <span class="period-row-start">${esc(H.reportingPeriod.ethiopian.split('–')[0] || H.reportingPeriod.ethiopian)}</span>
+    ${H.reportingPeriod.ethiopian.includes('–') ? `
+      <span class="period-row-sep">${isAmharic ? 'እስከ' : 'to'}</span>
+      <span class="period-row-end">${esc(H.reportingPeriod.ethiopian.split('–')[1] || '')}</span>
+    ` : ''}
+    <span style="color:#555; font-size:9pt; padding-left:6px;">(${esc(H.reportingPeriod.gregorian)})</span>
+  </div>
+
+  <!-- Row 5: Official notice paragraph -->
+  ${H.officialNotice ? `<p class="official-notice">${esc(H.officialNotice)}</p>` : ''}
+
 </div>
 
 ${sectionsHTML}

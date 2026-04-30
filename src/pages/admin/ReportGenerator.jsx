@@ -124,16 +124,25 @@ export default function ReportGeneratorView() {
                 
                 {/* Row 2: Subtitle */}
                 {report.header.reportFormSubtitle && (
-                  <h3 className="text-lg font-bold text-center text-primary mb-6 leading-snug">
+                  <h3 className="text-lg font-bold text-center text-primary mb-2 leading-snug">
                     {report.header.reportFormSubtitle}
                   </h3>
+                )}
+                
+                {/* Quarter Display */}
+                {report.header.quarter && (
+                  <div className="text-center mb-6">
+                    <span className="inline-block px-4 py-1 bg-primary/10 text-primary font-bold rounded-full text-sm underline decoration-primary/30 underline-offset-4">
+                      {report.header.quarter}
+                    </span>
+                  </div>
                 )}
                 
                 {/* Row 3: From Church */}
                 <div className="flex items-baseline gap-2 text-base mb-3 text-gray-900">
                   <span className="font-black text-primary">{report.header.fromChurchLabel || 'From:'}</span>
                   <span className="font-bold">{report.header.churchName}</span>
-                  <span className="text-gray-500 px-1">&mdash;</span>
+                  <span className="text-gray-500 px-1">-</span>
                   <span className="font-bold">{report.header.region}</span>
                 </div>
                 

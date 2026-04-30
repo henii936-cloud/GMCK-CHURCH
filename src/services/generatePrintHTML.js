@@ -232,12 +232,17 @@ ${isAmharic ? '<link rel="preconnect" href="https://fonts.googleapis.com"><link 
 
   <!-- Row 2: Report form subtitle (bold, centred) -->
   ${H.reportFormSubtitle ? `<div class="report-subtitle">${esc(H.reportFormSubtitle)}</div>` : ''}
+  
+  <!-- Quarter Display -->
+  <div style="text-align: center; font-weight: bold; font-size: 12pt; margin-bottom: 16px; text-decoration: underline;">
+    ${esc(H.quarter)}
+  </div>
 
   <!-- Row 3: From [church name] — [region] -->
   <div class="from-church-row">
     <span class="from-church-label">${esc(H.fromChurchLabel || 'From:')}</span>
     <span class="from-church-value">${esc(H.churchName)}</span>
-    <span style="color:#555; padding:0 4px;">&mdash;</span>
+    <span style="color:#555; padding:0 4px;">-</span>
     <span class="from-church-value">${esc(H.region)}</span>
   </div>
 

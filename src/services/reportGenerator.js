@@ -88,7 +88,7 @@ export const TRANSLATIONS = {
       encVisits: "የማበረታቻ ጉብኝት",
       reportingPeriodEth: "የሪፖርት ዘመን (ኢትዮጵያ)",
       reportFormSubtitle: "የአጥቢያ አገልግሎት ተጠሪዎች ለክልሉ ዋና ጸሐፊ በየሩብ ዓመቱ ሪፖርት የሚያደርጉበት ቅጽ",
-      fromChurch: "ከ:-",
+      fromChurch: "ከ፦",
       reportingPeriodLabel: "ሪፖርት የሚሸፍነው ጊዜ ከ",
       officialNotice: "ይህ የሪፖርት የተዘጋጀው የአጥቢያ የአገልግሎት ተጠሪዎችን የአገልግሎት የሥራ መዘርዝርና የመሰረተ ክርስቶስ ቤተክርስቲያንን ስልታዊ ዕቅድ መሰረት ባደረገ መልኩ ነው። ስለዚህ የአጥቢያ የአገልግሎት ተጠሪዎች በአጥቢያው የሚከናወኑትን ተግባር ከዚህ የአገልግሎት የሥራ መዘርዝር እና ከስልታዊ ዕቅዱ አኳያ እቅድ በማውጣት ማገልገል ይጠበቅባቸዋል። ስለዚህ የአጥቢያ አገልግሎት ተጠሪዎች ከክልሉ ዋና ጸሐፊ ጋር በየሶስት ወሩ በሚኖራቸው የጋራ ስብሰባ ወቅት በዚህ የሪፖርት ቅጽ ላይ ትክክለኛውን መረጃ ሞልተው ይዘው መምጣት ይገባቸዋል።"
     },
@@ -516,8 +516,8 @@ export class ChurchReportGenerator {
       header: {
         organization: t.org,
         reportFormSubtitle: t.labels.reportFormSubtitle,
-        churchName: meta.name,
-        region: meta.region,
+        churchName: lang === 'am' ? 'ጉለሌ መሰረተ ክርስቶስ ቤተክርስቲያን' : meta.name,
+        region: lang === 'am' ? 'አዲስ አበባ' : meta.region,
         quarter: quarterDates.label,
         fromChurchLabel: t.labels.fromChurch,
         reportingPeriodLabel: t.labels.reportingPeriodLabel,

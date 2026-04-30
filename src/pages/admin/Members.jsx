@@ -806,7 +806,13 @@ export default function Members() {
                 <div className="p-8 overflow-y-auto custom-scrollbar flex-1">
                   <form id="member-form" onSubmit={handleSaveMember} className="space-y-8">
                     {currentStep === 1 && (
-                      <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-6">
+                      <motion.div 
+                        key="step-1"
+                        initial={{ opacity: 0, x: 20 }} 
+                        animate={{ opacity: 1, x: 0 }} 
+                        exit={{ opacity: 0, x: -20 }}
+                        className="space-y-6"
+                      >
                         <h3 className="text-sm font-bold text-primary uppercase tracking-widest flex items-center gap-2">
                           <UserCheck size={16} /> Basic Information
                         </h3>
@@ -873,7 +879,13 @@ export default function Members() {
                     )}
 
                     {currentStep === 2 && (
-                      <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-6">
+                      <motion.div 
+                        key="step-2"
+                        initial={{ opacity: 0, x: 20 }} 
+                        animate={{ opacity: 1, x: 0 }} 
+                        exit={{ opacity: 0, x: -20 }}
+                        className="space-y-6"
+                      >
                         <h3 className="text-sm font-bold text-primary uppercase tracking-widest flex items-center gap-2">
                           <Heart size={16} /> Family & Relationships
                         </h3>
@@ -915,9 +927,15 @@ export default function Members() {
                     )}
 
                     {currentStep === 3 && (
-                      <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-6">
+                      <motion.div 
+                        key="step-3"
+                        initial={{ opacity: 0, x: 20 }} 
+                        animate={{ opacity: 1, x: 0 }} 
+                        exit={{ opacity: 0, x: -20 }}
+                        className="space-y-6"
+                      >
                         <h3 className="text-sm font-bold text-primary uppercase tracking-widest flex items-center gap-2">
-                          <BookOpen size={16} /> Ministry & Church
+                          <BookOpen size={16} /> Ministry & Stewardship
                         </h3>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                           <div className="space-y-2">
@@ -929,7 +947,9 @@ export default function Members() {
                                 onChange={e => setFormData({ ...formData, group_id: e.target.value })}
                               >
                                 <option value="">Unassigned</option>
-                                {groups.map(g => <option key={g.id} value={g.id}>{g.group_name}</option>)}
+                                {(groups || []).map(g => (
+                                  <option key={g?.id} value={g?.id}>{g?.group_name}</option>
+                                ))}
                               </select>
                               <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none" size={18} />
                             </div>
@@ -1004,8 +1024,9 @@ export default function Members() {
                               </label>
                             </div>
                             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                              {availableMinistries.map((min) => {
-                                const isSelected = formData.ministries.includes(min.name);
+                              {(availableMinistries || []).map((min) => {
+                                if (!min) return null;
+                                const isSelected = formData.ministries?.includes(min.name);
                                 return (
                                   <button
                                     key={min.id}
@@ -1013,7 +1034,7 @@ export default function Members() {
                                     onClick={() => {
                                       const newSelected = isSelected 
                                         ? formData.ministries.filter(m => m !== min.name)
-                                        : [...formData.ministries, min.name];
+                                        : [...(formData.ministries || []), min.name];
                                       setFormData({ ...formData, ministries: newSelected });
                                     }}
                                     className={`flex items-center gap-2 p-3 rounded-xl border text-left transition-all

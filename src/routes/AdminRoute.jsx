@@ -13,7 +13,7 @@ export default function AdminRoute({ children }) {
     </div>
   );
 
-  if (!user) return <Navigate to="/login/admin" />;
+  if (!user) return <Navigate to="/login" />;
 
   const role = user?.role || user?.user_metadata?.role;
 

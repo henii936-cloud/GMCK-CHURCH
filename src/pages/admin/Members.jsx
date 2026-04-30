@@ -61,6 +61,14 @@ export default function Members() {
     loadData();
   }, []);
 
+  // Scroll to top of modal content when step changes
+  useEffect(() => {
+    const modalContent = document.getElementById('registration-modal-content');
+    if (modalContent) {
+      modalContent.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }, [currentStep]);
+
   const loadData = async () => {
     setLoading(true);
     try {
@@ -803,8 +811,19 @@ export default function Members() {
                   </button>
                 </div>
 
-                <div className="p-8 overflow-y-auto custom-scrollbar flex-1">
+                <div id="registration-modal-content" className="p-8 overflow-y-auto custom-scrollbar flex-1">
+                  {/* Step Progress Indicator */}
+                  <div className="flex items-center gap-2 mb-8 px-2">
+                    {[1, 2, 3].map((step) => (
+                      <div key={step} className="flex-1 flex items-center gap-2">
+                        <div className={`h-1.5 flex-1 rounded-full transition-all duration-500 ${step <= currentStep ? 'bg-primary' : 'bg-surface-container-highest opacity-30'}`} />
+                        {step < 3 && <div className="w-1 h-1 rounded-full bg-surface-container-highest" />}
+                      </div>
+                    ))}
+                  </div>
+
                   <form id="member-form" onSubmit={handleSaveMember} className="space-y-8">
+                    <AnimatePresence mode="wait">
                     {currentStep === 1 && (
                       <motion.div 
                         key="step-1"
@@ -937,6 +956,13 @@ export default function Members() {
                         <h3 className="text-sm font-bold text-primary uppercase tracking-widest flex items-center gap-2">
                           <BookOpen size={16} /> Ministry & Stewardship
                         </h3>
+                        {/* Step 3 Identification Header */}
+                        <div className="bg-primary/5 p-4 rounded-xl border border-primary/10 mb-2">
+                          <h4 className="text-primary font-bold flex items-center gap-2">
+                            <Plus size={16} /> Step 3: Service & Giving
+                          </h4>
+                          <p className="text-[10px] text-on-surface-variant opacity-70">Configure active roles and financial participation</p>
+                        </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                           <div className="space-y-2">
                             <label className="text-sm font-semibold text-on-surface">Bible Study Unit</label>
@@ -1024,7 +1050,7 @@ export default function Members() {
                               </label>
                             </div>
                             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                              {(availableMinistries || []).map((min) => {
+                              {(availableMinistries || []).length > 0 ? (availableMinistries || []).map((min) => {
                                 if (!min) return null;
                                 const isSelected = formData.ministries?.includes(min.name);
                                 return (
@@ -1032,9 +1058,10 @@ export default function Members() {
                                     key={min.id}
                                     type="button"
                                     onClick={() => {
+                                      const currentMins = formData.ministries || [];
                                       const newSelected = isSelected 
-                                        ? formData.ministries.filter(m => m !== min.name)
-                                        : [...(formData.ministries || []), min.name];
+                                        ? currentMins.filter(m => m !== min.name)
+                                        : [...currentMins, min.name];
                                       setFormData({ ...formData, ministries: newSelected });
                                     }}
                                     className={`flex items-center gap-2 p-3 rounded-xl border text-left transition-all
@@ -1049,15 +1076,20 @@ export default function Members() {
                                     </span>
                                   </button>
                                 );
-                              })}
+                              }) : (
+                                <div className="col-span-full py-8 text-center bg-surface rounded-2xl border border-dashed border-outline-variant/30">
+                                  <p className="text-xs text-on-surface-variant italic opacity-60">No active ministries found. Use the 'Ministries' section to add roles.</p>
+                                </div>
+                              )}
                             </div>
                           </div>
                         </div>
                       </motion.div>
                     )}
-                  </form>
+                  </AnimatePresence>
+                </form>
 
-                  {error && (
+                {error && (
                     <div className="mt-6 p-4 rounded-xl bg-error/10 text-error flex items-center gap-3 border border-error/20">
                       <XCircle size={20} />
                       <span className="text-sm font-medium">{error}</span>

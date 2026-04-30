@@ -39,7 +39,7 @@ export default function Members() {
     address: "",
     date_of_birth: "",
     emergency_contact: "",
-    
+
     marital_status: "Unmarried",
     spouse_name: "",
     spouse_id: "",
@@ -47,7 +47,7 @@ export default function Members() {
     has_children: false,
     children_ids: [],
     family_id: "",
-    
+
     group_id: "",
     leave_status: "Active",
     join_date: new Date().toISOString().split('T')[0],
@@ -104,7 +104,7 @@ export default function Members() {
         address: member.address || "",
         date_of_birth: member.date_of_birth || "",
         emergency_contact: member.emergency_contact || "",
-        
+
         marital_status: member.marital_status || "Unmarried",
         spouse_name: member.spouse_name || "",
         spouse_id: member.spouse_id || "",
@@ -112,7 +112,7 @@ export default function Members() {
         has_children: member.has_children === true,
         children_ids: Array.isArray(member.children_ids) ? member.children_ids : [],
         family_id: member.family_id || "",
-        
+
         group_id: member.group_id || "",
         leave_status: member.leave_status || "Active",
         join_date: member.join_date || new Date().toISOString().split('T')[0],
@@ -136,7 +136,7 @@ export default function Members() {
         address: "",
         date_of_birth: "",
         emergency_contact: "",
-        
+
         marital_status: "Unmarried",
         spouse_name: "",
         spouse_id: "",
@@ -144,7 +144,7 @@ export default function Members() {
         has_children: false,
         children_ids: [],
         family_id: "",
-        
+
         group_id: "",
         leave_status: "Active",
         join_date: new Date().toISOString().split('T')[0],
@@ -191,8 +191,14 @@ export default function Members() {
 
   const handleSaveMember = async (e) => {
     if (e) e.preventDefault();
-    
+
     if (isSaving) return;
+
+    if (currentStep < 3) {
+      setCurrentStep(prev => prev + 1);
+      setIsSaving(false);
+      return;
+    }
 
     // Require confirmation only for new member registration, not updates
     if (!editingMember && !showConfirmModal) {
@@ -206,7 +212,7 @@ export default function Members() {
     setSuccess(null);
 
     try {
-      const payload = { 
+      const payload = {
         ...formData,
         group_id: formData.group_id || null,
         spouse_id: formData.spouse_id || null,
@@ -851,17 +857,13 @@ export default function Members() {
                       <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold ${currentStep === 1 ? 'bg-primary text-on-primary' : 'bg-primary/20 text-primary'}`}>1</div>
                       <div className={`w-8 h-0.5 rounded-full ${currentStep >= 2 ? 'bg-primary' : 'bg-outline-variant/20'}`}></div>
                       <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold ${currentStep === 2 ? 'bg-primary text-on-primary' : 'bg-primary/20 text-primary'}`}>2</div>
-                      {formData.age_group !== 'Kids' && (
-                        <>
-                          <div className={`w-8 h-0.5 rounded-full ${currentStep >= 3 ? 'bg-primary' : 'bg-outline-variant/20'}`}></div>
-                          <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold ${currentStep === 3 ? 'bg-primary text-on-primary' : 'bg-primary/20 text-primary'}`}>3</div>
-                        </>
-                      )}
+                      <div className={`w-8 h-0.5 rounded-full ${currentStep >= 3 ? 'bg-primary' : 'bg-outline-variant/20'}`}></div>
+                      <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold ${currentStep === 3 ? 'bg-primary text-on-primary' : 'bg-primary/20 text-primary'}`}>3</div>
                     </div>
                     <h2 className="text-2xl font-bold text-primary">
                       {editingMember ? 'Update Profile' : 'New Registration'}
                       <span className="text-sm font-medium text-on-surface-variant ml-2 opacity-60">
-                        Step {currentStep} of {formData.age_group === 'Kids' ? 2 : 3}
+                        Step {currentStep} of 3
                       </span>
                     </h2>
                   </div>
@@ -876,447 +878,385 @@ export default function Members() {
                 <div id="registration-modal-content" className="p-8 overflow-y-auto custom-scrollbar flex-1">
                   {/* Step Progress Indicator */}
                   <div className="flex items-center gap-2 mb-8 px-2">
-                    {(formData.age_group === 'Kids' ? [1, 2] : [1, 2, 3]).map((step, idx, arr) => (
+                    {[1, 2, 3].map((step) => (
                       <div key={step} className="flex-1 flex items-center gap-2">
                         <div className={`h-1.5 flex-1 rounded-full transition-all duration-500 ${step <= currentStep ? 'bg-primary' : 'bg-surface-container-highest opacity-30'}`} />
-                        {idx < arr.length - 1 && <div className="w-1 h-1 rounded-full bg-surface-container-highest" />}
+                        {step < 3 && <div className="w-1 h-1 rounded-full bg-surface-container-highest" />}
                       </div>
                     ))}
                   </div>
 
                   <form id="member-form" onSubmit={handleSaveMember} className="space-y-8">
                     <AnimatePresence mode="wait">
-                    {currentStep === 1 && (
-                      <motion.div 
-                        key="step-1"
-                        initial={{ opacity: 0, x: 20 }} 
-                        animate={{ opacity: 1, x: 0 }} 
-                        exit={{ opacity: 0, x: -20 }}
-                        className="space-y-6"
-                      >
-                        <h3 className="text-sm font-bold text-primary uppercase tracking-widest flex items-center gap-2">
-                          <UserCheck size={16} /> Basic Information
-                        </h3>
-                        {/* Step 1 Identification Header */}
-                        <div className="bg-primary/5 p-4 rounded-xl border border-primary/10 mb-2">
-                          <h4 className="text-primary font-bold flex items-center gap-2">
-                            <User size={16} /> Step 1: Personal Details
-                          </h4>
-                          <p className="text-[10px] text-on-surface-variant opacity-70">Enter the member's basic contact and personal information</p>
-                        </div>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                          <div className="md:col-span-2">
+                      {currentStep === 1 && (
+                        <motion.div
+                          key="step-1"
+                          initial={{ opacity: 0, x: 20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          exit={{ opacity: 0, x: -20 }}
+                          className="space-y-6"
+                        >
+                          <h3 className="text-sm font-bold text-primary uppercase tracking-widest flex items-center gap-2">
+                            <UserCheck size={16} /> Basic Information
+                          </h3>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div className="md:col-span-2">
+                              <Input
+                                label="Full Legal Name"
+                                placeholder="e.g. Johnathan Doe"
+                                value={formData.full_name}
+                                onChange={e => setFormData({ ...formData, full_name: e.target.value })}
+                                required
+                              />
+                            </div>
                             <Input
-                              label="Full Legal Name"
-                              placeholder="e.g. Johnathan Doe"
-                              value={formData.full_name}
-                              onChange={e => setFormData({ ...formData, full_name: e.target.value })}
-                              required
+                              label="Email Address"
+                              placeholder="member@domain.com"
+                              value={formData.email}
+                              onChange={e => setFormData({ ...formData, email: e.target.value })}
+                              icon={Mail}
                             />
-                          </div>
-                          <Input
-                            label="Email Address"
-                            placeholder="member@domain.com"
-                            value={formData.email}
-                            onChange={e => setFormData({ ...formData, email: e.target.value })}
-                            icon={Mail}
-                          />
-                          <Input
-                            label="Phone Number"
-                            placeholder="+1 (555) 000-0000"
-                            value={formData.phone}
-                            onChange={e => setFormData({ ...formData, phone: e.target.value })}
-                            icon={Phone}
-                          />
-                          <div className="space-y-2">
-                            <label className="text-sm font-semibold text-on-surface">Gender</label>
-                            <div className="relative">
-                              <select
-                                className="w-full h-12 px-4 rounded-xl border border-outline-variant/20 bg-surface text-on-surface focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all appearance-none"
-                                value={formData.gender}
-                                onChange={e => setFormData({ ...formData, gender: e.target.value })}
-                              >
-                                {['Male', 'Female', 'Other'].map(s => <option key={s} value={s}>{s}</option>)}
-                              </select>
-                              <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none" size={18} />
-                            </div>
-                          </div>
-                          <div className="space-y-2">
-                            <label className="text-sm font-semibold text-on-surface">Age Group</label>
-                            <div className="relative">
-                              <select
-                                className="w-full h-12 px-4 rounded-xl border border-outline-variant/20 bg-surface text-on-surface focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all appearance-none"
-                                value={formData.age_group}
-                                onChange={e => setFormData({ ...formData, age_group: e.target.value })}
-                              >
-                                {['Kids', 'Teenage', 'Youth', 'Adult', 'Senior'].map(s => <option key={s} value={s}>{s}</option>)}
-                              </select>
-                              <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none" size={18} />
-                            </div>
-                          </div>
-                          <Input
-                            label="Date of Birth"
-                            type="date"
-                            value={formData.date_of_birth}
-                            onChange={e => setFormData({ ...formData, date_of_birth: e.target.value })}
-                          />
-                          <Input
-                            label="Emergency Contact"
-                            placeholder="Name & Phone"
-                            value={formData.emergency_contact}
-                            onChange={e => setFormData({ ...formData, emergency_contact: e.target.value })}
-                          />
-                          <div className="space-y-2">
-                            <label className="text-sm font-semibold text-on-surface">Member Status</label>
-                            <div className="relative">
-                              <select
-                                className="w-full h-12 px-4 rounded-xl border border-outline-variant/20 bg-surface text-on-surface focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all appearance-none"
-                                value={formData.leave_status}
-                                onChange={e => setFormData({ ...formData, leave_status: e.target.value })}
-                              >
-                                {['Active', 'Inactive', 'Moved'].map(s => <option key={s} value={s}>{s}</option>)}
-                              </select>
-                              <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none" size={18} />
-                            </div>
-                          </div>
-                          <div className="md:col-span-2">
                             <Input
-                              label="Residential Address"
-                              placeholder="Home address details"
-                              value={formData.address}
-                              onChange={e => setFormData({ ...formData, address: e.target.value })}
-                              icon={MapPin}
+                              label="Phone Number"
+                              placeholder="+1 (555) 000-0000"
+                              value={formData.phone}
+                              onChange={e => setFormData({ ...formData, phone: e.target.value })}
+                              icon={Phone}
                             />
-                          </div>
-                        </div>
-                      </motion.div>
-                    )}
-
-                    {currentStep === 2 && (
-                      <motion.div 
-                        key="step-2"
-                        initial={{ opacity: 0, x: 20 }} 
-                        animate={{ opacity: 1, x: 0 }} 
-                        exit={{ opacity: 0, x: -20 }}
-                        className="space-y-6"
-                      >
-                        <h3 className="text-sm font-bold text-primary uppercase tracking-widest flex items-center gap-2">
-                          <Heart size={16} /> Family & Relationships
-                        </h3>
-                        {/* Step 2 Identification Header */}
-                        <div className="bg-primary/5 p-4 rounded-xl border border-primary/10 mb-2">
-                          <h4 className="text-primary font-bold flex items-center gap-2">
-                            <Heart size={16} /> Step 2: Family Details
-                          </h4>
-                          <p className="text-[10px] text-on-surface-variant opacity-70">Record marital status, spouse linkage, children, and family grouping</p>
-                        </div>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                          <div className="space-y-2">
-                            <label className="text-sm font-semibold text-on-surface">Marital Status</label>
-                            <div className="relative">
-                              <select
-                                className="w-full h-12 px-4 rounded-xl border border-outline-variant/20 bg-surface text-on-surface focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all appearance-none"
-                                value={formData.marital_status}
-                                onChange={e => setFormData({ ...formData, marital_status: e.target.value })}
-                              >
-                                {['Unmarried', 'Married', 'Widow', 'Divorced'].map(s => <option key={s} value={s}>{s}</option>)}
-                              </select>
-                              <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none" size={18} />
-                            </div>
-                          </div>
-
-                          {formData.marital_status === "Married" ? (
                             <div className="space-y-2">
-                              <label className="text-sm font-semibold text-on-surface">Spouse (Select from Members)</label>
+                              <label className="text-sm font-semibold text-on-surface">Gender</label>
                               <div className="relative">
                                 <select
                                   className="w-full h-12 px-4 rounded-xl border border-outline-variant/20 bg-surface text-on-surface focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all appearance-none"
-                                  value={formData.spouse_id}
-                                  onChange={e => {
-                                    const selectedSpouse = (members || []).find(m => m.id === e.target.value);
-                                    setFormData({ 
-                                      ...formData, 
-                                      spouse_id: e.target.value,
-                                      spouse_name: selectedSpouse ? selectedSpouse.full_name : ""
-                                    });
-                                  }}
+                                  value={formData.gender}
+                                  onChange={e => setFormData({ ...formData, gender: e.target.value })}
                                 >
-                                  <option value="">Select Spouse</option>
-                                  {(members || [])
-                                    .filter(m => {
-                                      if (formData.gender === 'Female') return m.gender === 'Male';
-                                      if (formData.gender === 'Male') return m.gender === 'Female';
-                                      return true;
-                                    })
-                                    .map(m => (
-                                      <option key={m.id} value={m.id}>{m.full_name}</option>
-                                    ))
-                                  }
+                                  {['Male', 'Female', 'Other'].map(s => <option key={s} value={s}>{s}</option>)}
                                 </select>
                                 <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none" size={18} />
                               </div>
                             </div>
-                          ) : (
-                            <div className="space-y-2">
-                              <label className="text-sm font-semibold text-on-surface">Spouse Name</label>
-                              <input
-                                type="text"
-                                disabled
-                                placeholder="N/A — not married"
-                                className="w-full h-12 px-4 rounded-xl border border-outline-variant/10 bg-surface-container-low text-on-surface-variant text-sm opacity-50 cursor-not-allowed"
-                              />
-                            </div>
-                          )}
-
-                          <div className="space-y-2">
-                            <label className="text-sm font-semibold text-on-surface">Have Children?</label>
-                            <div className="relative">
-                              <select
-                                className="w-full h-12 px-4 rounded-xl border border-outline-variant/20 bg-surface text-on-surface focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all appearance-none"
-                                value={formData.has_children}
-                                onChange={e => setFormData({ ...formData, has_children: e.target.value === 'true' })}
-                              >
-                                <option value="false">No</option>
-                                <option value="true">Yes</option>
-                              </select>
-                              <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none" size={18} />
-                            </div>
-                          </div>
-
-                          {formData.has_children ? (
                             <Input
-                              label="Number of Children"
-                              type="number"
-                              value={formData.children_count}
-                              onChange={e => setFormData({ ...formData, children_count: parseInt(e.target.value) || 0 })}
+                              label="Date of Birth"
+                              type="date"
+                              value={formData.date_of_birth}
+                              onChange={e => setFormData({ ...formData, date_of_birth: e.target.value })}
                             />
-                          ) : (
-                            <div className="space-y-2">
-                              <label className="text-sm font-semibold text-on-surface">Number of Children</label>
-                              <input
-                                type="text"
-                                disabled
-                                placeholder="N/A"
-                                className="w-full h-12 px-4 rounded-xl border border-outline-variant/10 bg-surface-container-low text-on-surface-variant text-sm opacity-50 cursor-not-allowed"
-                              />
-                            </div>
-                          )}
-
-                          {formData.has_children && (
-                            <div className="md:col-span-2 space-y-3">
-                              <label className="text-sm font-semibold text-on-surface">Select Children from Members</label>
-                              <div className="max-h-48 overflow-y-auto border border-outline-variant/20 rounded-xl p-3 bg-surface shadow-inner">
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                                  {(members || [])
-                                    .filter(m => !editingMember || m.id !== editingMember.id)
-                                    .map(m => (
-                                    <label key={m.id} className="flex items-center gap-3 p-2.5 hover:bg-primary/5 rounded-lg transition-colors cursor-pointer border border-transparent hover:border-primary/20">
-                                      <input
-                                        type="checkbox"
-                                        className="w-5 h-5 rounded border-outline-variant text-primary focus:ring-primary/20 transition-all cursor-pointer"
-                                        checked={Array.isArray(formData.children_ids) && formData.children_ids.includes(m.id)}
-                                        onChange={e => {
-                                          const currentIds = Array.isArray(formData.children_ids) ? formData.children_ids : [];
-                                          const newIds = e.target.checked 
-                                            ? [...currentIds, m.id]
-                                            : currentIds.filter(id => id !== m.id);
-                                          setFormData({ ...formData, children_ids: newIds });
-                                        }}
-                                      />
-                                      <div className="flex flex-col min-w-0">
-                                        <span className="text-sm font-medium text-on-surface truncate">{m.full_name}</span>
-                                        <span className="text-[10px] text-on-surface-variant/70">{m.email || 'No email'}</span>
-                                      </div>
-                                    </label>
-                                  ))}
-                                </div>
-                              </div>
-                              <p className="text-[10px] text-on-surface-variant italic">Tip: You can select multiple children from the list of existing members.</p>
-                            </div>
-                          )}
-
-                          <Input
-                            label="Family ID"
-                            placeholder="Group identifier"
-                            value={formData.family_id}
-                            onChange={e => setFormData({ ...formData, family_id: e.target.value })}
-                          />
-                        </div>
-                      </motion.div>
-                    )}
-
-                    {currentStep === 3 && (
-                      <motion.div 
-                        key="step-3"
-                        initial={{ opacity: 0, x: 20 }} 
-                        animate={{ opacity: 1, x: 0 }} 
-                        exit={{ opacity: 0, x: -20 }}
-                        className="space-y-6"
-                      >
-                        <h3 className="text-sm font-bold text-primary uppercase tracking-widest flex items-center gap-2">
-                          <BookOpen size={16} /> Ministry & Stewardship
-                        </h3>
-                        {/* Step 3 Identification Header */}
-                        <div className="bg-primary/5 p-4 rounded-xl border border-primary/10 mb-2">
-                          <h4 className="text-primary font-bold flex items-center gap-2">
-                            <Plus size={16} /> Step 3: Service & Giving
-                          </h4>
-                          <p className="text-[10px] text-on-surface-variant opacity-70">Configure active roles and financial participation</p>
-                        </div>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                          <div className="space-y-2">
-                            <label className="text-sm font-semibold text-on-surface">Bible Study Unit</label>
-                            <div className="relative">
-                              <select
-                                className="w-full h-12 px-4 rounded-xl border border-outline-variant/20 bg-surface text-on-surface focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all appearance-none"
-                                value={formData.group_id}
-                                onChange={e => {
-                                  const val = e.target.value;
-                                  setFormData({ ...formData, group_id: val });
-                                  autoSaveField({ group_id: val || null });
-                                }}
-                              >
-                                <option value="">Unassigned</option>
-                                {(groups || []).map(g => (
-                                  <option key={g?.id} value={g?.id}>{g?.group_name}</option>
-                                ))}
-                              </select>
-                              <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none" size={18} />
-                            </div>
-                          </div>
-                          <div className="space-y-2">
-                            <label className="text-sm font-semibold text-on-surface">Join Type</label>
-                            <div className="relative">
-                              <select
-                                className="w-full h-12 px-4 rounded-xl border border-outline-variant/20 bg-surface text-on-surface focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all appearance-none"
-                                value={formData.join_type}
-                                onChange={e => {
-                                  const val = e.target.value;
-                                  setFormData({ ...formData, join_type: val });
-                                  autoSaveField({ join_type: val });
-                                }}
-                              >
-                                {['Relocate', 'Baptized Here'].map(s => <option key={s} value={s}>{s}</option>)}
-                              </select>
-                              <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none" size={18} />
-                            </div>
-                          </div>
-
-                          {formData.join_type === 'Relocate' && (
-                            <>
+                            <Input
+                              label="Emergency Contact"
+                              placeholder="Name & Phone"
+                              value={formData.emergency_contact}
+                              onChange={e => setFormData({ ...formData, emergency_contact: e.target.value })}
+                            />
+                            <div className="md:col-span-2">
                               <Input
-                                label="From Where (Relocating From)"
-                                placeholder="Previous church or location"
-                                value={formData.relocation_from}
-                                onChange={e => setFormData({ ...formData, relocation_from: e.target.value })}
+                                label="Residential Address"
+                                placeholder="Home address details"
+                                value={formData.address}
+                                onChange={e => setFormData({ ...formData, address: e.target.value })}
+                                icon={MapPin}
                               />
+                            </div>
+                          </div>
+                        </motion.div>
+                      )}
+
+                      {currentStep === 2 && (
+                        <motion.div
+                          key="step-2"
+                          initial={{ opacity: 0, x: 20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          exit={{ opacity: 0, x: -20 }}
+                          className="space-y-6"
+                        >
+                          <h3 className="text-sm font-bold text-primary uppercase tracking-widest flex items-center gap-2">
+                            <Heart size={16} /> Family & Relationships
+                          </h3>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div className="space-y-2">
+                              <label className="text-sm font-semibold text-on-surface">Marital Status</label>
+                              <div className="relative">
+                                <select
+                                  className="w-full h-12 px-4 rounded-xl border border-outline-variant/20 bg-surface text-on-surface focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all appearance-none"
+                                  value={formData.marital_status}
+                                  onChange={e => setFormData({ ...formData, marital_status: e.target.value })}
+                                >
+                                  {['Unmarried', 'Married', 'Widow', 'Divorced'].map(s => <option key={s} value={s}>{s}</option>)}
+                                </select>
+                                <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none" size={18} />
+                              </div>
+                            </div>
+                            {formData.marital_status === "Married" && (
                               <div className="space-y-2">
-                                <label className="text-sm font-semibold text-on-surface">Release Letter</label>
+                                <label className="text-sm font-semibold text-on-surface">Spouse Name (Select from Members)</label>
                                 <div className="relative">
                                   <select
                                     className="w-full h-12 px-4 rounded-xl border border-outline-variant/20 bg-surface text-on-surface focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all appearance-none"
-                                    value={formData.release_letter}
+                                    value={formData.spouse_id}
                                     onChange={e => {
-                                      const val = e.target.value === 'true';
-                                      setFormData({ ...formData, release_letter: val });
-                                      autoSaveField({ release_letter: val });
+                                      const selectedSpouse = (members || []).find(m => m.id === e.target.value);
+                                      setFormData({
+                                        ...formData,
+                                        spouse_id: e.target.value,
+                                        spouse_name: selectedSpouse ? selectedSpouse.full_name : ""
+                                      });
                                     }}
                                   >
-                                    <option value="false">No</option>
-                                    <option value="true">Yes</option>
+                                    <option value="">Select Spouse</option>
+                                    {(members || [])
+                                      .filter(m => {
+                                        if (formData.gender === 'Female') return m.gender === 'Male';
+                                        if (formData.gender === 'Male') return m.gender === 'Female';
+                                        return true;
+                                      })
+                                      .map(m => (
+                                        <option key={m.id} value={m.id}>{m.full_name}</option>
+                                      ))
+                                    }
                                   </select>
                                   <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none" size={18} />
                                 </div>
                               </div>
-                            </>
-                          )}
-                          <Input
-                            label="Join Date"
-                            type="date"
-                            value={formData.join_date}
-                            onChange={e => {
-                              const val = e.target.value;
-                              setFormData({ ...formData, join_date: val });
-                              autoSaveField({ join_date: val || null });
-                            }}
-                          />
+                            )}
 
-                          <div className="space-y-2">
-                            <label className="text-sm font-semibold text-on-surface">Giving Frequency</label>
-                            <div className="relative">
-                              <select
-                                className="w-full h-12 px-4 rounded-xl border border-outline-variant/20 bg-surface text-on-surface focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all appearance-none"
-                                value={formData.giving_frequency}
-                                onChange={e => {
-                                  const val = e.target.value;
-                                  setFormData({ ...formData, giving_frequency: val });
-                                  autoSaveField({ giving_frequency: val });
-                                }}
-                              >
-                                {['Monthly', 'Weekly', 'Occasional', 'Not Active'].map(s => <option key={s} value={s}>{s}</option>)}
-                              </select>
-                              <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none" size={18} />
+                            <div className="space-y-2">
+                              <label className="text-sm font-semibold text-on-surface">Have Children?</label>
+                              <div className="relative">
+                                <select
+                                  className="w-full h-12 px-4 rounded-xl border border-outline-variant/20 bg-surface text-on-surface focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all appearance-none"
+                                  value={formData.has_children}
+                                  onChange={e => setFormData({ ...formData, has_children: e.target.value === 'true' })}
+                                >
+                                  <option value="false">No</option>
+                                  <option value="true">Yes</option>
+                                </select>
+                                <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none" size={18} />
+                              </div>
                             </div>
-                          </div>
-                          <div className="md:col-span-2">
-                            <label className="text-sm font-semibold text-on-surface mb-2 block">Personal Notes / Background</label>
-                            <textarea
-                              rows={3}
-                              className="w-full p-4 rounded-2xl border border-outline-variant/20 bg-surface text-sm focus:ring-2 focus:ring-primary/20"
-                              value={formData.notes}
-                              onChange={e => setFormData({ ...formData, notes: e.target.value })}
-                              placeholder="Add any specific details for church leaders..."
+
+                            {formData.has_children && (
+                              <>
+                                <Input
+                                  label="Number of Children"
+                                  type="number"
+                                  value={formData.children_count}
+                                  onChange={e => setFormData({ ...formData, children_count: parseInt(e.target.value) || 0 })}
+                                />
+                                <div className="md:col-span-2 space-y-3">
+                                  <label className="text-sm font-semibold text-on-surface">Select Children from Members</label>
+                                  <div className="max-h-48 overflow-y-auto border border-outline-variant/20 rounded-xl p-3 bg-surface shadow-inner">
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                      {(members || [])
+                                        .filter(m => !editingMember || m.id !== editingMember.id)
+                                        .map(m => (
+                                          <label key={m.id} className="flex items-center gap-3 p-2.5 hover:bg-primary/5 rounded-lg transition-colors cursor-pointer border border-transparent hover:border-primary/20">
+                                            <input
+                                              type="checkbox"
+                                              className="w-5 h-5 rounded border-outline-variant text-primary focus:ring-primary/20 transition-all cursor-pointer"
+                                              checked={Array.isArray(formData.children_ids) && formData.children_ids.includes(m.id)}
+                                              onChange={e => {
+                                                const currentIds = Array.isArray(formData.children_ids) ? formData.children_ids : [];
+                                                const newIds = e.target.checked
+                                                  ? [...currentIds, m.id]
+                                                  : currentIds.filter(id => id !== m.id);
+                                                setFormData({ ...formData, children_ids: newIds });
+                                              }}
+                                            />
+                                            <div className="flex flex-col min-w-0">
+                                              <span className="text-sm font-medium text-on-surface truncate">{m.full_name}</span>
+                                              <span className="text-[10px] text-on-surface-variant/70">{m.email || 'No email'}</span>
+                                            </div>
+                                          </label>
+                                        ))}
+                                    </div>
+                                  </div>
+                                  <p className="text-[10px] text-on-surface-variant italic">Tip: You can select multiple children from the list of existing members.</p>
+                                </div>
+                              </>
+                            )}
+
+                            <Input
+                              label="Family ID"
+                              placeholder="Group identifier"
+                              value={formData.family_id}
+                              onChange={e => setFormData({ ...formData, family_id: e.target.value })}
                             />
                           </div>
+                        </motion.div>
+                      )}
 
-                          <div className="md:col-span-2 space-y-4">
-                            <div className="flex justify-between items-center">
-                              <label className="text-sm font-bold text-on-surface flex items-center gap-2">
-                                <Heart size={16} className="text-primary" /> Ministries & Teams
-                              </label>
+                      {currentStep === 3 && (
+                        <motion.div
+                          key="step-3"
+                          initial={{ opacity: 0, x: 20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          exit={{ opacity: 0, x: -20 }}
+                          className="space-y-6"
+                        >
+                          <h3 className="text-sm font-bold text-primary uppercase tracking-widest flex items-center gap-2">
+                            <BookOpen size={16} /> Ministry & Stewardship
+                          </h3>
+                          {/* Step 3 Identification Header */}
+                          <div className="bg-primary/5 p-4 rounded-xl border border-primary/10 mb-2">
+                            <h4 className="text-primary font-bold flex items-center gap-2">
+                              <Plus size={16} /> Step 3: Service & Giving
+                            </h4>
+                            <p className="text-[10px] text-on-surface-variant opacity-70">Configure active roles and financial participation</p>
+                          </div>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div className="space-y-2">
+                              <label className="text-sm font-semibold text-on-surface">Bible Study Unit</label>
+                              <div className="relative">
+                                <select
+                                  className="w-full h-12 px-4 rounded-xl border border-outline-variant/20 bg-surface text-on-surface focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all appearance-none"
+                                  value={formData.group_id}
+                                  onChange={e => {
+                                    const val = e.target.value;
+                                    setFormData({ ...formData, group_id: val });
+                                    autoSaveField({ group_id: val || null });
+                                  }}
+                                >
+                                  <option value="">Unassigned</option>
+                                  {(groups || []).map(g => (
+                                    <option key={g?.id} value={g?.id}>{g?.group_name}</option>
+                                  ))}
+                                </select>
+                                <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none" size={18} />
+                              </div>
                             </div>
-                            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                              {(availableMinistries || []).length > 0 ? (availableMinistries || []).map((min) => {
-                                if (!min) return null;
-                                const isSelected = formData.ministries?.includes(min.name);
-                                return (
-                                  <button
-                                    key={min.id}
-                                    type="button"
-                                    onClick={() => {
-                                      const currentMins = formData.ministries || [];
-                                      const newSelected = isSelected 
-                                        ? currentMins.filter(m => m !== min.name)
-                                        : [...currentMins, min.name];
-                                      setFormData({ ...formData, ministries: newSelected });
-                                      autoSaveField({ ministries: newSelected });
-                                    }}
-                                    className={`flex items-center gap-2 p-3 rounded-xl border text-left transition-all
-                                      ${isSelected ? 'bg-primary/10 border-primary shadow-sm' : 'bg-surface border-outline-variant/10 opacity-70'}`}
-                                  >
-                                    <div className={`w-4 h-4 rounded border flex items-center justify-center transition-colors
-                                      ${isSelected ? 'bg-primary border-primary' : 'bg-transparent border-on-surface-variant'}`}>
-                                      {isSelected && <Plus size={12} className="text-on-primary rotate-45" />}
-                                    </div>
-                                    <span className={`text-[11px] font-bold uppercase tracking-wider ${isSelected ? 'text-primary' : 'text-on-surface-variant'}`}>
-                                      {min.name}
-                                    </span>
-                                  </button>
-                                );
-                              }) : (
-                                <div className="col-span-full py-8 text-center bg-surface rounded-2xl border border-dashed border-outline-variant/30">
-                                  <p className="text-xs text-on-surface-variant italic opacity-60">No active ministries found. Use the 'Ministries' section to add roles.</p>
+                            <div className="space-y-2">
+                              <label className="text-sm font-semibold text-on-surface">Join Type</label>
+                              <div className="relative">
+                                <select
+                                  className="w-full h-12 px-4 rounded-xl border border-outline-variant/20 bg-surface text-on-surface focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all appearance-none"
+                                  value={formData.join_type}
+                                  onChange={e => {
+                                    const val = e.target.value;
+                                    setFormData({ ...formData, join_type: val });
+                                    autoSaveField({ join_type: val });
+                                  }}
+                                >
+                                  {['Relocate', 'Baptized Here'].map(s => <option key={s} value={s}>{s}</option>)}
+                                </select>
+                                <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none" size={18} />
+                              </div>
+                            </div>
+
+                            {formData.join_type === 'Relocate' && (
+                              <>
+                                <Input
+                                  label="From Where (Relocating From)"
+                                  placeholder="Previous church or location"
+                                  value={formData.relocation_from}
+                                  onChange={e => setFormData({ ...formData, relocation_from: e.target.value })}
+                                />
+                                <div className="space-y-2">
+                                  <label className="text-sm font-semibold text-on-surface">Release Letter</label>
+                                  <div className="relative">
+                                    <select
+                                      className="w-full h-12 px-4 rounded-xl border border-outline-variant/20 bg-surface text-on-surface focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all appearance-none"
+                                      value={formData.release_letter}
+                                      onChange={e => {
+                                        const val = e.target.value === 'true';
+                                        setFormData({ ...formData, release_letter: val });
+                                        autoSaveField({ release_letter: val });
+                                      }}
+                                    >
+                                      <option value="false">No</option>
+                                      <option value="true">Yes</option>
+                                    </select>
+                                    <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none" size={18} />
+                                  </div>
                                 </div>
-                              )}
+                              </>
+                            )}
+                            <Input
+                              label="Join Date"
+                              type="date"
+                              value={formData.join_date}
+                              onChange={e => {
+                                const val = e.target.value;
+                                setFormData({ ...formData, join_date: val });
+                                autoSaveField({ join_date: val || null });
+                              }}
+                            />
+
+                            <div className="space-y-2">
+                              <label className="text-sm font-semibold text-on-surface">Giving Frequency</label>
+                              <div className="relative">
+                                <select
+                                  className="w-full h-12 px-4 rounded-xl border border-outline-variant/20 bg-surface text-on-surface focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all appearance-none"
+                                  value={formData.giving_frequency}
+                                  onChange={e => {
+                                    const val = e.target.value;
+                                    setFormData({ ...formData, giving_frequency: val });
+                                    autoSaveField({ giving_frequency: val });
+                                  }}
+                                >
+                                  {['Monthly', 'Weekly', 'Occasional', 'Not Active'].map(s => <option key={s} value={s}>{s}</option>)}
+                                </select>
+                                <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none" size={18} />
+                              </div>
+                            </div>
+                            <div className="md:col-span-2">
+                              <label className="text-sm font-semibold text-on-surface mb-2 block">Personal Notes / Background</label>
+                              <textarea
+                                rows={3}
+                                className="w-full p-4 rounded-2xl border border-outline-variant/20 bg-surface text-sm focus:ring-2 focus:ring-primary/20"
+                                value={formData.notes}
+                                onChange={e => setFormData({ ...formData, notes: e.target.value })}
+                                placeholder="Add any specific details for church leaders..."
+                              />
+                            </div>
+
+                            <div className="md:col-span-2 space-y-4">
+                              <div className="flex justify-between items-center">
+                                <label className="text-sm font-bold text-on-surface flex items-center gap-2">
+                                  <Heart size={16} className="text-primary" /> Ministries & Teams
+                                </label>
+                              </div>
+                              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                                {(availableMinistries || []).length > 0 ? (availableMinistries || []).map((min) => {
+                                  if (!min) return null;
+                                  const isSelected = formData.ministries?.includes(min.name);
+                                  return (
+                                    <button
+                                      key={min.id}
+                                      type="button"
+                                      onClick={() => {
+                                        const currentMins = formData.ministries || [];
+                                        const newSelected = isSelected
+                                          ? currentMins.filter(m => m !== min.name)
+                                          : [...currentMins, min.name];
+                                        setFormData({ ...formData, ministries: newSelected });
+                                        autoSaveField({ ministries: newSelected });
+                                      }}
+                                      className={`flex items-center gap-2 p-3 rounded-xl border text-left transition-all
+                                      ${isSelected ? 'bg-primary/10 border-primary shadow-sm' : 'bg-surface border-outline-variant/10 opacity-70'}`}
+                                    >
+                                      <div className={`w-4 h-4 rounded border flex items-center justify-center transition-colors
+                                      ${isSelected ? 'bg-primary border-primary' : 'bg-transparent border-on-surface-variant'}`}>
+                                        {isSelected && <Plus size={12} className="text-on-primary rotate-45" />}
+                                      </div>
+                                      <span className={`text-[11px] font-bold uppercase tracking-wider ${isSelected ? 'text-primary' : 'text-on-surface-variant'}`}>
+                                        {min.name}
+                                      </span>
+                                    </button>
+                                  );
+                                }) : (
+                                  <div className="col-span-full py-8 text-center bg-surface rounded-2xl border border-dashed border-outline-variant/30">
+                                    <p className="text-xs text-on-surface-variant italic opacity-60">No active ministries found. Use the 'Ministries' section to add roles.</p>
+                                  </div>
+                                )}
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </form>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </form>
 
-                {error && (
+                  {error && (
                     <div className="mt-6 p-4 rounded-xl bg-error/10 text-error flex items-center gap-3 border border-error/20">
                       <XCircle size={20} />
                       <span className="text-sm font-medium">{error}</span>
@@ -1328,7 +1268,6 @@ export default function Members() {
                   <div className="flex gap-4">
                     {currentStep > 1 && (
                       <Button
-                        type="button"
                         variant="secondary"
                         onClick={() => setCurrentStep(currentStep - 1)}
                         className="px-8"
@@ -1344,37 +1283,13 @@ export default function Members() {
                       Cancel
                     </Button>
                   </div>
-                  
-                  {currentStep === 1 ? (
+
+                  {currentStep < 3 ? (
                     <Button
-                      type="button"
-                      onClick={() => setCurrentStep(2)}
+                      onClick={() => setCurrentStep(currentStep + 1)}
                       className="px-8"
                     >
                       Next
-                    </Button>
-                  ) : currentStep === 2 && formData.age_group !== 'Kids' ? (
-                    <Button
-                      type="button"
-                      onClick={() => setCurrentStep(3)}
-                      className="px-8"
-                    >
-                      Next
-                    </Button>
-                  ) : currentStep === 2 && formData.age_group === 'Kids' ? (
-                    <Button
-                      type="button"
-                      onClick={() => {
-                        if (editingMember) {
-                          handleSaveMember();
-                        } else {
-                          setShowConfirmModal(true);
-                        }
-                      }}
-                      className="px-8"
-                      loading={isSaving}
-                    >
-                      {editingMember ? 'Save Changes' : 'Register Member'}
                     </Button>
                   ) : (
                     <Button
@@ -1411,16 +1326,16 @@ export default function Members() {
                 Are you sure you want to {editingMember ? 'update this profile' : 'register this new member'}? All information will be securely saved to the database.
               </p>
               <div className="flex gap-3">
-                <Button 
-                  variant="secondary" 
-                  onClick={() => setShowConfirmModal(false)} 
+                <Button
+                  variant="secondary"
+                  onClick={() => setShowConfirmModal(false)}
                   className="flex-1"
                 >
                   Review
                 </Button>
-                <Button 
-                  onClick={handleSaveMember} 
-                  loading={isSaving} 
+                <Button
+                  onClick={handleSaveMember}
+                  loading={isSaving}
                   className="flex-1"
                 >
                   Yes, Save

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { ChurchReportGenerator } from '../../services/reportGenerator';
 import { reportFetcher } from '../../services/reportFetcher';
 import { Button, Card } from '../../components/common/UI';
-import { Download, FileText, Printer, CheckCircle, Globe } from 'lucide-react';
+import { Download, FileText, Printer, CheckCircle, Globe, ChevronDown } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useTranslation } from 'react-i18next';
 import { openReportPrintWindow } from '../../services/generatePrintHTML';
@@ -45,49 +45,54 @@ export default function ReportGeneratorView() {
   };
 
   return (
-    <div className="max-w-5xl mx-auto p-4 md:p-8 animate-fade-in">
+    <div className="animate-fade-in" style={{ paddingBottom: '60px' }}>
       {/* Header */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 gap-6 no-print">
-        <div className="max-w-2xl">
-          <p className="label-sm text-tertiary-fixed-dim mb-2 tracking-[0.3em] uppercase">
-            {reportLang === 'am' ? 'ይፋዊ ሰነድ' : 'Official Documentation'}
-          </p>
-          <h1 className="display-sm text-primary mb-2">
-            {reportLang === 'am' ? 'የሩብ ዓመት ሪፖርት' : 'Quarterly Report'}{' '}
-            <span className="text-tertiary-fixed-dim italic">{reportLang === 'am' ? 'ማመንጫ' : 'Generator'}</span>
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8 no-print">
+        <div>
+          <h1 className="text-4xl font-black tracking-tight text-on-surface">
+            {reportLang === 'am' ? 'የሩብ ዓመት' : 'Quarterly'}{' '}
+            <span className="text-primary">{reportLang === 'am' ? 'ሪፖርት ማመንጫ' : 'Report Generator'}</span>
           </h1>
-          <p className="text-on-surface-variant font-medium text-sm">
+          <p className="text-on-surface-variant font-medium mt-1">
             {reportLang === 'am' 
               ? 'እንደ ቀጣና ጽሕፈት ቤት ደረጃዎች የተሟላ የአገልግሎት ሪፖርቶችን ያመነጩ።' 
               : 'Generate comprehensive ministry reports based on regional office standards.'}
           </p>
         </div>
-        <div className="flex flex-wrap gap-3">
-          <div className="flex items-center gap-2 bg-surface-container-low px-3 rounded-xl border border-outline-variant/10">
-            <Globe size={14} className="text-primary/40" />
-            <select 
-              value={reportLang} 
-              onChange={(e) => setReportLang(e.target.value)}
-              className="editorial-input border-none bg-transparent py-2 pl-0 focus:ring-0 text-xs font-bold uppercase cursor-pointer"
-            >
-              <option value="en">English</option>
-              <option value="am">አማርኛ</option>
-            </select>
-          </div>
+      </div>
+
+      {/* Control Bar */}
+      <div className="flex flex-col md:flex-row gap-4 mb-8 no-print">
+        <div className="relative md:w-48">
+          <select 
+            value={reportLang} 
+            onChange={(e) => setReportLang(e.target.value)}
+            className="w-full h-14 pl-12 pr-10 rounded-2xl border border-[#0e0d0d] bg-surface text-on-surface focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all appearance-none cursor-pointer font-bold"
+          >
+            <option value="en">ENGLISH</option>
+            <option value="am">አማርኛ</option>
+          </select>
+          <Globe className="absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none" size={20} />
+          <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none" size={18} />
+        </div>
+
+        <div className="relative md:w-64">
           <select 
             value={selectedQuarter} 
             onChange={(e) => setSelectedQuarter(parseInt(e.target.value))}
-            className="editorial-input w-32 bg-surface-container-low font-bold text-xs uppercase cursor-pointer"
+            className="w-full h-14 pl-4 pr-10 rounded-2xl border border-[#0e0d0d] bg-surface text-on-surface focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all appearance-none cursor-pointer font-bold"
           >
             <option value={1}>{reportLang === 'am' ? '1ኛው ሩብ ዓመት' : '1st Quarter'}</option>
             <option value={2}>{reportLang === 'am' ? '2ኛው ሩብ ዓመት' : '2nd Quarter'}</option>
             <option value={3}>{reportLang === 'am' ? '3ኛው ሩብ ዓመት' : '3rd Quarter'}</option>
             <option value={4}>{reportLang === 'am' ? '4ኛው ሩብ ዓመት' : '4th Quarter'}</option>
           </select>
-          <Button onClick={handleGenerate} loading={loading} icon={FileText}>
-            {reportLang === 'am' ? 'አመንጭ' : 'Generate'}
-          </Button>
+          <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none" size={18} />
         </div>
+
+        <Button onClick={handleGenerate} loading={loading} icon={FileText} className="h-14 rounded-2xl px-8 shadow-lg shadow-primary/20 pulse-animation">
+          {reportLang === 'am' ? 'አመንጭ' : 'Generate Report'}
+        </Button>
       </div>
 
       <AnimatePresence mode="wait">
@@ -101,13 +106,13 @@ export default function ReportGeneratorView() {
           >
             {/* Actions for the report */}
             <div className="flex justify-end gap-4 no-print">
-              <Button variant="secondary" onClick={handlePrint} icon={Printer}>
+              <Button variant="secondary" onClick={handlePrint} icon={Printer} className="h-12 rounded-xl px-6">
                 {reportLang === 'am' ? 'ሪፖርቱን አትም' : 'Print Report'}
               </Button>
               <Button 
                 onClick={handleExportPDF} 
                 icon={Download}
-                variant="primary"
+                className="h-12 rounded-xl px-6 shadow-lg shadow-primary/20"
               >
                 {reportLang === 'am' ? 'PDF አውርድ' : 'Export PDF'}
               </Button>
@@ -312,7 +317,7 @@ export default function ReportGeneratorView() {
             </Card>
           </motion.div>
         ) : (
-          <div className="flex flex-col items-center justify-center py-32 text-center">
+          <Card className="flex flex-col items-center justify-center py-32 text-center border-dashed border-2 border-outline-variant/20 bg-surface/50">
             <div className="w-24 h-24 rounded-[40px] bg-surface-container-low grid place-items-center mb-8 shadow-whisper">
               <FileText size={40} className="text-primary/20" />
             </div>
@@ -324,7 +329,7 @@ export default function ReportGeneratorView() {
                 ? 'የሪፖርት ዘመኑን ይምረጡ እና ሁሉንም የቤተ ክርስቲያን እንቅስቃሴዎች ወደ ይፋዊ የሪፖርት ፎርማት ለመቀየር አመንጭ የሚለውን ይጫኑ።' 
                 : 'Select a reporting period and click generate to compile all church activities into the official regional office format.'}
             </p>
-          </div>
+          </Card>
         )}
       </AnimatePresence>
     </div>

@@ -1,22 +1,19 @@
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import { ChurchReportGenerator } from '../../services/reportGenerator';
 import { reportFetcher } from '../../services/reportFetcher';
 import { Button, Card } from '../../components/common/UI';
 import { Download, FileText, Printer, CheckCircle, Globe } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useTranslation } from 'react-i18next';
-import jsPDF from 'jspdf';
-import html2canvas from 'html2canvas';
+import { openReportPrintWindow } from '../../services/generatePrintHTML';
 
 export default function ReportGeneratorView() {
   const { t, i18n } = useTranslation();
   const [loading, setLoading] = useState(false);
-  const [exporting, setExporting] = useState(false);
   const [report, setReport] = useState(null);
   const [selectedQuarter, setSelectedQuarter] = useState(1);
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   const [reportLang, setReportLang] = useState(i18n.language || 'en');
-  const reportRef = useRef(null);
 
   const handleGenerate = async () => {
     setLoading(true);
@@ -37,41 +34,9 @@ export default function ReportGeneratorView() {
     window.print();
   };
 
-  const handleExportPDF = async () => {
-    if (!reportRef.current) return;
-    setExporting(true);
-    
-    try {
-      const element = reportRef.current;
-      const canvas = await html2canvas(element, {
-        scale: 2, // Higher resolution
-        useCORS: true,
-        logging: false,
-        backgroundColor: '#ffffff'
-      });
-      
-      const imgData = canvas.toDataURL('image/png');
-      const pdf = new jsPDF({
-        orientation: 'portrait',
-        unit: 'mm',
-        format: 'a4'
-      });
-      
-      const imgProps = pdf.getImageProperties(imgData);
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
-      
-      // Handle multi-page if needed, though for a dashboard a single page is often preferred
-      // or we can just scale it to fit.
-      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-      
-      const fileName = `Church_Report_Q${selectedQuarter}_${selectedYear}_${reportLang}.pdf`;
-      pdf.save(fileName);
-    } catch (error) {
-      console.error("Error exporting PDF:", error);
-    } finally {
-      setExporting(false);
-    }
+  const handleExportPDF = () => {
+    if (!report) return;
+    openReportPrintWindow(report, selectedQuarter, selectedYear);
   };
 
   return (
@@ -136,7 +101,6 @@ export default function ReportGeneratorView() {
               </Button>
               <Button 
                 onClick={handleExportPDF} 
-                loading={exporting} 
                 icon={Download}
                 variant="primary"
               >
@@ -145,8 +109,7 @@ export default function ReportGeneratorView() {
             </div>
 
             {/* The Actual Report Document */}
-            <div ref={reportRef}>
-              <Card className="p-12 bg-white text-gray-900 shadow-2xl border-none font-serif print:shadow-none print:p-0">
+            <Card className="p-12 bg-white text-gray-900 shadow-2xl border-none font-serif print:shadow-none print:p-0">
               {/* Report Header */}
               <div className="text-center border-b-2 border-primary/20 pb-8 mb-10">
                 <h2 className="text-2xl font-bold uppercase tracking-widest text-primary mb-2">{report.header.organization}</h2>
@@ -306,7 +269,6 @@ export default function ReportGeneratorView() {
                 </p>
               </div>
             </Card>
-            </div>
           </motion.div>
         ) : (
           <div className="flex flex-col items-center justify-center py-32 text-center">

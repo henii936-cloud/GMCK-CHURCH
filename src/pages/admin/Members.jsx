@@ -201,7 +201,9 @@ export default function Members() {
         group_id: formData.group_id || null,
         spouse_id: formData.spouse_id || null,
         children_ids: formData.children_ids || [],
-        has_children: formData.has_children === true
+        has_children: formData.has_children === true,
+        date_of_birth: formData.date_of_birth || null,
+        join_date: formData.join_date || null
       };
 
       // If there's a new image file selected, try to upload it to Storage

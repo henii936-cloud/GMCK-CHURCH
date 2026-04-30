@@ -194,12 +194,6 @@ export default function Members() {
     
     if (isSaving) return;
 
-    if (currentStep < 3) {
-      setCurrentStep(prev => prev + 1);
-      setIsSaving(false);
-      return;
-    }
-
     // Require confirmation only for new member registration, not updates
     if (!editingMember && !showConfirmModal) {
       setShowConfirmModal(true);
@@ -857,13 +851,17 @@ export default function Members() {
                       <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold ${currentStep === 1 ? 'bg-primary text-on-primary' : 'bg-primary/20 text-primary'}`}>1</div>
                       <div className={`w-8 h-0.5 rounded-full ${currentStep >= 2 ? 'bg-primary' : 'bg-outline-variant/20'}`}></div>
                       <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold ${currentStep === 2 ? 'bg-primary text-on-primary' : 'bg-primary/20 text-primary'}`}>2</div>
-                      <div className={`w-8 h-0.5 rounded-full ${currentStep >= 3 ? 'bg-primary' : 'bg-outline-variant/20'}`}></div>
-                      <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold ${currentStep === 3 ? 'bg-primary text-on-primary' : 'bg-primary/20 text-primary'}`}>3</div>
+                      {formData.age_group !== 'Kids' && (
+                        <>
+                          <div className={`w-8 h-0.5 rounded-full ${currentStep >= 3 ? 'bg-primary' : 'bg-outline-variant/20'}`}></div>
+                          <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold ${currentStep === 3 ? 'bg-primary text-on-primary' : 'bg-primary/20 text-primary'}`}>3</div>
+                        </>
+                      )}
                     </div>
                     <h2 className="text-2xl font-bold text-primary">
                       {editingMember ? 'Update Profile' : 'New Registration'}
                       <span className="text-sm font-medium text-on-surface-variant ml-2 opacity-60">
-                        Step {currentStep} of 3
+                        Step {currentStep} of {formData.age_group === 'Kids' ? 2 : 3}
                       </span>
                     </h2>
                   </div>
@@ -878,10 +876,10 @@ export default function Members() {
                 <div id="registration-modal-content" className="p-8 overflow-y-auto custom-scrollbar flex-1">
                   {/* Step Progress Indicator */}
                   <div className="flex items-center gap-2 mb-8 px-2">
-                    {[1, 2, 3].map((step) => (
+                    {(formData.age_group === 'Kids' ? [1, 2] : [1, 2, 3]).map((step, idx, arr) => (
                       <div key={step} className="flex-1 flex items-center gap-2">
                         <div className={`h-1.5 flex-1 rounded-full transition-all duration-500 ${step <= currentStep ? 'bg-primary' : 'bg-surface-container-highest opacity-30'}`} />
-                        {step < 3 && <div className="w-1 h-1 rounded-full bg-surface-container-highest" />}
+                        {idx < arr.length - 1 && <div className="w-1 h-1 rounded-full bg-surface-container-highest" />}
                       </div>
                     ))}
                   </div>
@@ -1347,13 +1345,36 @@ export default function Members() {
                     </Button>
                   </div>
                   
-                  {currentStep < 3 ? (
+                  {currentStep === 1 ? (
                     <Button
                       type="button"
-                      onClick={() => setCurrentStep(currentStep + 1)}
+                      onClick={() => setCurrentStep(2)}
                       className="px-8"
                     >
                       Next
+                    </Button>
+                  ) : currentStep === 2 && formData.age_group !== 'Kids' ? (
+                    <Button
+                      type="button"
+                      onClick={() => setCurrentStep(3)}
+                      className="px-8"
+                    >
+                      Next
+                    </Button>
+                  ) : currentStep === 2 && formData.age_group === 'Kids' ? (
+                    <Button
+                      type="button"
+                      onClick={() => {
+                        if (editingMember) {
+                          handleSaveMember();
+                        } else {
+                          setShowConfirmModal(true);
+                        }
+                      }}
+                      className="px-8"
+                      loading={isSaving}
+                    >
+                      {editingMember ? 'Save Changes' : 'Register Member'}
                     </Button>
                   ) : (
                     <Button

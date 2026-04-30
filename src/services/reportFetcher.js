@@ -106,7 +106,7 @@ export const reportFetcher = {
 
   async fetchChurchMeta() {
     return {
-      name: "Meserete Kristos Church – Addis Ababa",
+      name: "Meserete Kristos Church",
       region: "Addis Ababa",
       chairman: "Elder Tadesse",
       systemName: "GMCK-CHURCH ERP"

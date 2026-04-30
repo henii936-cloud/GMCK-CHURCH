@@ -29,6 +29,7 @@ export default function Members() {
   const [newMinistryName, setNewMinistryName] = useState("");
   const [isAddingMinistry, setIsAddingMinistry] = useState(false);
   const [currentStep, setCurrentStep] = useState(1);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
 
   const [formData, setFormData] = useState({
     full_name: "",
@@ -189,8 +190,23 @@ export default function Members() {
   };
 
   const handleSaveMember = async (e) => {
-    e.preventDefault();
+    if (e) e.preventDefault();
+    
     if (isSaving) return;
+
+    if (currentStep < 3) {
+      setCurrentStep(prev => prev + 1);
+      setIsSaving(false);
+      return;
+    }
+
+    // Require confirmation before final save
+    if (!showConfirmModal) {
+      setShowConfirmModal(true);
+      setIsSaving(false);
+      return;
+    }
+
     setIsSaving(true);
     setError(null);
     setSuccess(null);
@@ -232,6 +248,7 @@ export default function Members() {
       }
 
       setShowModal(false);
+      setShowConfirmModal(false);
       loadData();
 
       setTimeout(() => setSuccess(null), 3000);
@@ -1252,6 +1269,44 @@ export default function Members() {
                     </Button>
                   )}
                 </div>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* Final Confirmation Modal */}
+      <AnimatePresence>
+        {showConfirmModal && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-md">
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="bg-surface border border-outline-variant/20 p-8 rounded-[2rem] shadow-2xl max-w-sm w-full text-center"
+            >
+              <div className="w-16 h-16 bg-primary/10 text-primary rounded-full flex items-center justify-center mx-auto mb-6">
+                <CheckCircle2 size={32} />
+              </div>
+              <h3 className="text-xl font-bold text-on-surface mb-2">Final Confirmation</h3>
+              <p className="text-sm text-on-surface-variant mb-8">
+                Are you sure you want to {editingMember ? 'update this profile' : 'register this new member'}? All information will be securely saved to the database.
+              </p>
+              <div className="flex gap-3">
+                <Button 
+                  variant="secondary" 
+                  onClick={() => setShowConfirmModal(false)} 
+                  className="flex-1"
+                >
+                  Review
+                </Button>
+                <Button 
+                  onClick={handleSaveMember} 
+                  loading={isSaving} 
+                  className="flex-1"
+                >
+                  Yes, Save
+                </Button>
               </div>
             </motion.div>
           </div>

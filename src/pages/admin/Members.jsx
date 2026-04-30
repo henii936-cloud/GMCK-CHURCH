@@ -108,8 +108,8 @@ export default function Members() {
         spouse_name: member.spouse_name || "",
         spouse_id: member.spouse_id || "",
         children_count: member.children_count || 0,
-        has_children: member.has_children || false,
-        children_ids: member.children_ids || [],
+        has_children: member.has_children === true,
+        children_ids: Array.isArray(member.children_ids) ? member.children_ids : [],
         family_id: member.family_id || "",
         
         group_id: member.group_id || "",
@@ -1021,8 +1021,8 @@ export default function Members() {
                                       <label key={m.id} className="flex items-center gap-3 p-2.5 hover:bg-primary/5 rounded-lg transition-colors cursor-pointer border border-transparent hover:border-primary/20">
                                         <input
                                           type="checkbox"
-                                          className="w-5 h-5 rounded border-outline-variant text-primary"
-                                          checked={formData.children_ids?.includes(m.id)}
+                                          className="w-5 h-5 rounded border-outline-variant text-primary focus:ring-primary/20 transition-all cursor-pointer"
+                                          checked={Array.isArray(formData.children_ids) && formData.children_ids.includes(m.id)}
                                           onChange={e => {
                                             const currentIds = Array.isArray(formData.children_ids) ? formData.children_ids : [];
                                             const newIds = e.target.checked 

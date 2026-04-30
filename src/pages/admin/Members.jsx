@@ -200,8 +200,8 @@ export default function Members() {
       return;
     }
 
-    // Require confirmation before final save
-    if (!showConfirmModal) {
+    // Require confirmation only for new member registration, not updates
+    if (!editingMember && !showConfirmModal) {
       setShowConfirmModal(true);
       setIsSaving(false);
       return;
@@ -269,6 +269,18 @@ export default function Members() {
       setTimeout(() => setSuccess(null), 3000);
     } catch (err) {
       setError("Failed to delete. Restricted row.");
+    }
+  };
+
+  // Auto-save specific fields instantly when editing (used by Ministry & Stewardship step)
+  const autoSaveField = async (updatedData) => {
+    if (!editingMember) return;
+    try {
+      await memberService.updateMember(editingMember.id, updatedData);
+      setSuccess("Saved");
+      setTimeout(() => setSuccess(null), 1500);
+    } catch (err) {
+      console.error("Auto-save error:", err);
     }
   };
 
@@ -1098,7 +1110,11 @@ export default function Members() {
                               <select
                                 className="w-full h-12 px-4 rounded-xl border border-outline-variant/20 bg-surface text-on-surface focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all appearance-none"
                                 value={formData.group_id}
-                                onChange={e => setFormData({ ...formData, group_id: e.target.value })}
+                                onChange={e => {
+                                  const val = e.target.value;
+                                  setFormData({ ...formData, group_id: val });
+                                  autoSaveField({ group_id: val || null });
+                                }}
                               >
                                 <option value="">Unassigned</option>
                                 {(groups || []).map(g => (
@@ -1114,7 +1130,11 @@ export default function Members() {
                               <select
                                 className="w-full h-12 px-4 rounded-xl border border-outline-variant/20 bg-surface text-on-surface focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all appearance-none"
                                 value={formData.join_type}
-                                onChange={e => setFormData({ ...formData, join_type: e.target.value })}
+                                onChange={e => {
+                                  const val = e.target.value;
+                                  setFormData({ ...formData, join_type: val });
+                                  autoSaveField({ join_type: val });
+                                }}
                               >
                                 {['Relocate', 'Baptized Here'].map(s => <option key={s} value={s}>{s}</option>)}
                               </select>
@@ -1136,7 +1156,11 @@ export default function Members() {
                                   <select
                                     className="w-full h-12 px-4 rounded-xl border border-outline-variant/20 bg-surface text-on-surface focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all appearance-none"
                                     value={formData.release_letter}
-                                    onChange={e => setFormData({ ...formData, release_letter: e.target.value === 'true' })}
+                                    onChange={e => {
+                                      const val = e.target.value === 'true';
+                                      setFormData({ ...formData, release_letter: val });
+                                      autoSaveField({ release_letter: val });
+                                    }}
                                   >
                                     <option value="false">No</option>
                                     <option value="true">Yes</option>
@@ -1150,7 +1174,11 @@ export default function Members() {
                             label="Join Date"
                             type="date"
                             value={formData.join_date}
-                            onChange={e => setFormData({ ...formData, join_date: e.target.value })}
+                            onChange={e => {
+                              const val = e.target.value;
+                              setFormData({ ...formData, join_date: val });
+                              autoSaveField({ join_date: val || null });
+                            }}
                           />
 
                           <div className="space-y-2">
@@ -1159,7 +1187,11 @@ export default function Members() {
                               <select
                                 className="w-full h-12 px-4 rounded-xl border border-outline-variant/20 bg-surface text-on-surface focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all appearance-none"
                                 value={formData.giving_frequency}
-                                onChange={e => setFormData({ ...formData, giving_frequency: e.target.value })}
+                                onChange={e => {
+                                  const val = e.target.value;
+                                  setFormData({ ...formData, giving_frequency: val });
+                                  autoSaveField({ giving_frequency: val });
+                                }}
                               >
                                 {['Monthly', 'Weekly', 'Occasional', 'Not Active'].map(s => <option key={s} value={s}>{s}</option>)}
                               </select>
@@ -1197,6 +1229,7 @@ export default function Members() {
                                         ? currentMins.filter(m => m !== min.name)
                                         : [...currentMins, min.name];
                                       setFormData({ ...formData, ministries: newSelected });
+                                      autoSaveField({ ministries: newSelected });
                                     }}
                                     className={`flex items-center gap-2 p-3 rounded-xl border text-left transition-all
                                       ${isSelected ? 'bg-primary/10 border-primary shadow-sm' : 'bg-surface border-outline-variant/10 opacity-70'}`}

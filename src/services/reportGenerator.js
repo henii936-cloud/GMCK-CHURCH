@@ -5,7 +5,7 @@
 
 export const TRANSLATIONS = {
   en: {
-    org: "Meserete Kristos Church – Addis Ababa Regional Office",
+    org: "Meserete Kristos Church – Addis Ababa",
     quarters: {
       1: "1st Quarter",
       2: "2nd Quarter",
@@ -38,7 +38,7 @@ export const TRANSLATIONS = {
       encVisits: "Encouragement Visits",
       reportingPeriodGreg: "Reporting Period (Gregorian)",
       reportingPeriodEth: "Reporting Period (Ethiopian)",
-      officialNotice: "This report is prepared based on the local ministry coordinators' service job descriptions and the Meserete Kristos Church's strategic plan. Therefore, local ministry coordinators are expected to serve by planning their activities in line with these job descriptions and the strategic plan. Consequently, local ministry coordinators must fill out accurate information on this report form and bring it during their joint quarterly meeting with the regional general secretary."
+      officialNotice: "Meserete Kristos Church – Addis Ababa"
     },
     ministries: {
       "Evangelism Ministry": "Evangelism Ministry",
@@ -52,7 +52,7 @@ export const TRANSLATIONS = {
     }
   },
   am: {
-    org: "መሠረተ ክርስቶስ ቤተ ክርስቲያን - አዲስ አበባ ቀጣና ጽሕፈት ቤት",
+    org: "መሰረተ ክርስቶስ ቤተክርስቲያን - አዲስ አበባ",
     quarters: {
       1: "1ኛው ሩብ ዓመት",
       2: "2ኛው ሩብ ዓመት",
@@ -85,7 +85,7 @@ export const TRANSLATIONS = {
       encVisits: "የማበረታቻ ጉብኝት",
       reportingPeriodGreg: "የሪፖርት ዘመን (ፈረንጆች)",
       reportingPeriodEth: "የሪፖርት ዘመን (ኢትዮጵያ)",
-      officialNotice: "ይህ የሪፖርት የተዘጋጀው የአጥቢያ የአገልግሎት ተጠሪዎችን የአገልግሎት የሥራ መዘርዝርና የመሰረተ ክርስቶስ ቤተክርስቲያንን ስልታዊ ዕቅድ መሰረት ባደረገ መልኩ ነው። ስለዚህ የአጥቢያ የአገልግሎት ተጠሪዎች በአጥቢያው የሚከናወኑትን ተግባር ከዚህ የአገልግሎት የሥራ መዘርዝር እና ከስልታዊ ዕቅዱ አኳያ እቅድ በማውጣት ማገልገል ይጠበቅባቸዋል። ስለዚህ የአጥቢያ አገልግሎት ተጠሪዎች ከክልሉ ዋና ጸሐፊ ጋር በየሶስት ወሩ በሚኖራቸው የጋራ ስብሰባ ወቅት በዚህ የሪፖርት ቅጽ ላይ ትክክለኛውን መረጃ ሞልተው ይዘው መምጣት ይገባቸዋል።"
+      officialNotice: "መሰረተ ክርስቶስ ቤተክርስቲያን - አዲስ አበባ"
     },
     ministries: {
       "Evangelism Ministry": "የወንጌላዊነት አገልግሎት",

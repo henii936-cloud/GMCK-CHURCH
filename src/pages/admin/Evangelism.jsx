@@ -16,7 +16,7 @@ const STATUS_CONFIG = {
   "Baptized": { color: "#06b6d4", bg: "rgba(6,182,212,0.1)", icon: Handshake },
 };
 
-export default function Evangelism() {
+export default function Evangelism({ viewOnly = false }) {
   const [records, setRecords] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
@@ -173,13 +173,15 @@ export default function Evangelism() {
           </h1>
           <p className="text-on-surface-variant font-medium mt-1">Track souls reached, converts, and discipleship progress</p>
         </div>
-        <Button
-          onClick={() => openModal()}
-          icon={Plus}
-          className="rounded-full px-6 shadow-lg shadow-primary/20"
-        >
-          Add Person
-        </Button>
+        {!viewOnly && (
+          <Button
+            onClick={() => openModal()}
+            icon={Plus}
+            className="rounded-full px-6 shadow-lg shadow-primary/20"
+          >
+            Add Person
+          </Button>
+        )}
       </div>
 
       {/* Stats Row */}
@@ -392,27 +394,34 @@ export default function Evangelism() {
                       </td>
                       <td style={{ padding: '16px 24px', textAlign: 'right' }}>
                         <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '6px' }} onClick={e => e.stopPropagation()}>
-                          {/* Quick status progression */}
-                          {r.status === "Heard Gospel" && (
-                            <button onClick={() => handleStatusUpdate(r, "Convert")} title="Mark as Convert"
-                              style={{ background: STATUS_CONFIG["Convert"].bg, border: `1px solid ${STATUS_CONFIG["Convert"].color}22`, borderRadius: 8, padding: '6px 10px', cursor: 'pointer', fontSize: '0.65rem', fontWeight: '800', color: STATUS_CONFIG["Convert"].color }}>
-                              → Convert
-                            </button>
+                          {!viewOnly && (
+                            <>
+                              {/* Quick status progression */}
+                              {r.status === "Heard Gospel" && (
+                                <button onClick={() => handleStatusUpdate(r, "Convert")} title="Mark as Convert"
+                                  style={{ background: STATUS_CONFIG["Convert"].bg, border: `1px solid ${STATUS_CONFIG["Convert"].color}22`, borderRadius: 8, padding: '6px 10px', cursor: 'pointer', fontSize: '0.65rem', fontWeight: '800', color: STATUS_CONFIG["Convert"].color }}>
+                                  → Convert
+                                </button>
+                              )}
+                              {r.status === "Convert" && (
+                                <button onClick={() => handleStatusUpdate(r, "Discipleship")} title="Move to Discipleship"
+                                  style={{ background: STATUS_CONFIG["Discipleship"].bg, border: `1px solid ${STATUS_CONFIG["Discipleship"].color}22`, borderRadius: 8, padding: '6px 10px', cursor: 'pointer', fontSize: '0.65rem', fontWeight: '800', color: STATUS_CONFIG["Discipleship"].color }}>
+                                  → Disciple
+                                </button>
+                              )}
+                              {r.status === "Discipleship" && (
+                                <button onClick={() => handleStatusUpdate(r, "Baptized")} title="Mark as Baptized"
+                                  style={{ background: STATUS_CONFIG["Baptized"].bg, border: `1px solid ${STATUS_CONFIG["Baptized"].color}22`, borderRadius: 8, padding: '6px 10px', cursor: 'pointer', fontSize: '0.65rem', fontWeight: '800', color: STATUS_CONFIG["Baptized"].color }}>
+                                  → Baptized
+                                </button>
+                              )}
+                              <button onClick={() => openModal(r)} style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}><Edit2 size={15} /></button>
+                              <button onClick={() => setDeleteId(r.id)} style={{ background: 'transparent', border: 'none', color: '#ef4444', cursor: 'pointer' }}><Trash2 size={15} /></button>
+                            </>
                           )}
-                          {r.status === "Convert" && (
-                            <button onClick={() => handleStatusUpdate(r, "Discipleship")} title="Move to Discipleship"
-                              style={{ background: STATUS_CONFIG["Discipleship"].bg, border: `1px solid ${STATUS_CONFIG["Discipleship"].color}22`, borderRadius: 8, padding: '6px 10px', cursor: 'pointer', fontSize: '0.65rem', fontWeight: '800', color: STATUS_CONFIG["Discipleship"].color }}>
-                              → Disciple
-                            </button>
+                          {viewOnly && (
+                            <span className="text-[10px] font-bold text-on-surface-variant/40 uppercase tracking-widest px-2">View Only</span>
                           )}
-                          {r.status === "Discipleship" && (
-                            <button onClick={() => handleStatusUpdate(r, "Baptized")} title="Mark as Baptized"
-                              style={{ background: STATUS_CONFIG["Baptized"].bg, border: `1px solid ${STATUS_CONFIG["Baptized"].color}22`, borderRadius: 8, padding: '6px 10px', cursor: 'pointer', fontSize: '0.65rem', fontWeight: '800', color: STATUS_CONFIG["Baptized"].color }}>
-                              → Baptized
-                            </button>
-                          )}
-                          <button onClick={() => openModal(r)} style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}><Edit2 size={15} /></button>
-                          <button onClick={() => setDeleteId(r.id)} style={{ background: 'transparent', border: 'none', color: '#ef4444', cursor: 'pointer' }}><Trash2 size={15} /></button>
                         </div>
                       </td>
                     </tr>

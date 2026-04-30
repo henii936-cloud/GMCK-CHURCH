@@ -8,7 +8,7 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 
-export default function Ministries() {
+export default function Ministries({ viewOnly = false }) {
   const [ministries, setMinistries] = useState([]);
   const [members, setMembers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -88,13 +88,15 @@ export default function Ministries() {
             Governing groups and service teams
           </p>
         </div>
-        <Button 
-          onClick={() => setShowAddModal(true)} 
-          icon={Plus} 
-          className="rounded-full px-8 shadow-xl shadow-primary/20 hover:scale-105 transition-transform"
-        >
-          Establish New Team
-        </Button>
+        {!viewOnly && (
+          <Button 
+            onClick={() => setShowAddModal(true)} 
+            icon={Plus} 
+            className="rounded-full px-8 shadow-xl shadow-primary/20 hover:scale-105 transition-transform"
+          >
+            Establish New Team
+          </Button>
+        )}
       </div>
 
       {success && (
@@ -160,12 +162,16 @@ export default function Ministries() {
                     <div className="w-14 h-14 rounded-2xl bg-primary/5 text-primary flex items-center justify-center group-hover:bg-primary group-hover:text-on-primary transition-all duration-700">
                       <Mic2 size={28} />
                     </div>
-                    <button 
-                      onClick={() => handleDeleteMinistry(min.id)}
-                      className="p-2 rounded-lg text-on-surface-variant/20 hover:text-red-500 hover:bg-red-50 transition-all opacity-0 group-hover:opacity-100"
-                    >
-                      <Trash2 size={18} />
-                    </button>
+                    {!viewOnly ? (
+                      <button 
+                        onClick={() => handleDeleteMinistry(min.id)}
+                        className="p-2 rounded-lg text-on-surface-variant/20 hover:text-red-500 hover:bg-red-50 transition-all opacity-0 group-hover:opacity-100"
+                      >
+                        <Trash2 size={18} />
+                      </button>
+                    ) : (
+                      <span className="text-[10px] font-black uppercase tracking-widest text-primary/30 opacity-0 group-hover:opacity-100 transition-opacity">View Only</span>
+                    )}
                   </div>
 
                   <h3 className="text-2xl font-black text-on-surface mb-2">{min.name}</h3>

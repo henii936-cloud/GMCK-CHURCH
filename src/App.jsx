@@ -69,15 +69,15 @@ export default function App() {
           <Route path="/admin" element={<AdminRoute><Layout allowedRoles={['admin']} /></AdminRoute>}>
             <Route index element={<AdminDashboard />} />
             <Route path="members" element={<AdminMembers />} />
-            <Route path="groups" element={<AdminGroups />} />
+            <Route path="groups" element={<AdminGroups viewOnly={true} />} />
             <Route path="reports" element={<AdminReports />} />
             <Route path="progress" element={<AdminProgress />} />
             <Route path="events" element={<AdminEvents />} />
-            <Route path="evangelism" element={<AdminEvangelism />} />
+            <Route path="evangelism" element={<AdminEvangelism viewOnly={true} />} />
             <Route path="finance" element={<AdminFinance />} />
             <Route path="budgets" element={<AdminBudgets />} />
             <Route path="programs" element={<AdminActivities />} />
-            <Route path="ministries" element={<ShepherdMinistries />} />
+            <Route path="ministries" element={<ShepherdMinistries viewOnly={true} />} />
           </Route>
 
           {/* Leader Routes */}
@@ -114,8 +114,9 @@ export default function App() {
           {/* Shepherd Routes */}
           <Route path="/shepherd" element={<ShepherdRoute><Layout allowedRoles={['shepherd']} /></ShepherdRoute>}>
             <Route index element={<ShepherdDashboard />} />
-            <Route path="groups" element={<ShepherdGroups />} />
-            <Route path="ministries" element={<ShepherdMinistries />} />
+            <Route path="groups" element={<AdminGroups viewOnly={false} />} />
+            <Route path="evangelism" element={<AdminEvangelism viewOnly={false} />} />
+            <Route path="ministries" element={<ShepherdMinistries viewOnly={false} />} />
           </Route>
 
           {/* Kids Ministry Routes */}

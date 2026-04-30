@@ -89,8 +89,9 @@ export default function Sidebar() {
     ],
     shepherd: [
       { name: "Overview", icon: Layers, path: "/shepherd" },
+      { name: "Bible Study Groups", icon: MapPin, path: "/shepherd/groups" },
+      { name: "Evangelism", icon: Heart, path: "/shepherd/evangelism" },
       { name: "Ministries", icon: Heart, path: "/shepherd/ministries" },
-      { name: "Assigned Groups", icon: Shield, path: "/shepherd/groups" },
     ],
     kids_ministry: [
       { name: "Dashboard", icon: Layers, path: "/kids" },

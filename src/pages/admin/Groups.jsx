@@ -6,7 +6,7 @@ import { MapPin, Users, User, Plus, Search, BookOpen, Layers, Activity, Trash2, 
 import { motion, AnimatePresence } from "framer-motion";
 import { supabase } from "../../services/supabaseClient";
 
-export default function Groups() {
+export default function Groups({ viewOnly = false }) {
   const navigate = useNavigate();
   const [groups, setGroups] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -91,7 +91,7 @@ export default function Groups() {
           <h1 style={{ fontSize: '2.25rem', fontWeight: '800', letterSpacing: '-0.025em' }}>Bible Study <span style={{ color: 'var(--primary)' }}>Groups</span></h1>
           <p style={{ color: 'var(--text-muted)', fontSize: '1rem', fontWeight: '500' }}>Manage groups, allow leaders to self-assign, and track participation across the church</p>
         </div>
-        <Button onClick={() => setShowModal(true)} icon={Plus}>Create New Group</Button>
+        {!viewOnly && <Button onClick={() => setShowModal(true)} icon={Plus}>Create New Group</Button>}
       </div>
 
       <div style={{ position: 'relative', marginBottom: '40px' }}>
@@ -127,15 +127,20 @@ export default function Groups() {
                     <div style={{ width: 44, height: 44, borderRadius: 12, background: 'rgba(99, 102, 241, 0.1)', display: 'grid', placeItems: 'center' }}>
                       <Layers size={22} color="var(--primary)" />
                     </div>
-                    <button 
-                      onClick={() => setGroupToDelete(group)}
-                      style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', padding: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '8px', transition: 'background 0.2s' }}
-                      onMouseOver={e => e.currentTarget.style.background = 'rgba(239, 68, 68, 0.1)'}
-                      onMouseOut={e => e.currentTarget.style.background = 'none'}
-                      title="Delete Group"
-                    >
-                      <Trash2 size={20} />
-                    </button>
+                    {!viewOnly && (
+                      <button 
+                        onClick={() => setGroupToDelete(group)}
+                        style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', padding: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '8px', transition: 'background 0.2s' }}
+                        onMouseOver={e => e.currentTarget.style.background = 'rgba(239, 68, 68, 0.1)'}
+                        onMouseOut={e => e.currentTarget.style.background = 'none'}
+                        title="Delete Group"
+                      >
+                        <Trash2 size={20} />
+                      </button>
+                    )}
+                    {viewOnly && (
+                      <span className="text-[10px] font-bold text-primary/40 uppercase tracking-widest">Admin View</span>
+                    )}
                   </div>
 
                   <h3 style={{ fontSize: '1.25rem', fontWeight: '700', marginBottom: '8px' }}>{group.group_name}</h3>

@@ -1,4 +1,3 @@
-import EtDatePicker from "../../components/common/EtDatePicker";
 import { formatToEthiopian } from "../../utils/ethiopianDate";
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
@@ -6,7 +5,7 @@ import { supabase } from "../../services/supabaseClient";
 import { Card, Button, Input } from "../../components/common/UI";
 import {
   Calendar, MapPin, Clock, Plus, Search, Trash2, Edit2,
-  XCircle, CheckCircle2, Users, ChevronDown, AlertCircle,
+  XCircle, CheckCircle2, Users, ChevronDown,
   CalendarDays, CalendarCheck, Tag, FileText, Eye,
   Mic, Music, UserCheck, StickyNote, Mic2
 } from "lucide-react";
@@ -58,8 +57,6 @@ export default function Events() {
   const [success, setSuccess] = useState(null);
   const [error, setError] = useState(null);
   const [isSaving, setIsSaving] = useState(false);
-
-  const [success, setSuccess] = useState(null);
 
   const [formData, setFormData] = useState({
     title: "",

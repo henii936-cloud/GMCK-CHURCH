@@ -41,6 +41,7 @@ export default function Members() {
     address: "",
     date_of_birth: "",
     emergency_contact: "",
+    emergency_relation: "",
 
     marital_status: "Unmarried",
     spouse_name: "",
@@ -106,6 +107,7 @@ export default function Members() {
         address: member.address || "",
         date_of_birth: member.date_of_birth || "",
         emergency_contact: member.emergency_contact || "",
+        emergency_relation: member.emergency_relation || "",
 
         marital_status: member.marital_status || "Unmarried",
         spouse_name: member.spouse_name || "",
@@ -138,6 +140,7 @@ export default function Members() {
         address: "",
         date_of_birth: "",
         emergency_contact: "",
+        emergency_relation: "",
 
         marital_status: "Unmarried",
         spouse_name: "",
@@ -648,7 +651,10 @@ export default function Members() {
                       </div>
                       <div>
                         <p className="text-[10px] text-on-surface-variant uppercase font-bold tracking-wider">Emergency Contact</p>
-                        <p className="font-semibold text-on-surface mt-0.5">{viewMember.emergency_contact || '--'}</p>
+                        <p className="font-semibold text-on-surface mt-0.5">
+                          {viewMember.emergency_contact || '--'} 
+                          {viewMember.emergency_relation ? ` (${viewMember.emergency_relation})` : ''}
+                        </p>
                       </div>
                       <div>
                         <p className="text-[10px] text-on-surface-variant uppercase font-bold tracking-wider">Marital Status</p>
@@ -949,6 +955,22 @@ export default function Members() {
                               value={formData.emergency_contact}
                               onChange={e => setFormData({ ...formData, emergency_contact: e.target.value })}
                             />
+                            <div className="space-y-2">
+                              <label className="text-sm font-semibold text-on-surface">Emergency Relation</label>
+                              <div className="relative">
+                                <select
+                                  className="w-full h-12 px-4 rounded-xl border border-outline-variant/20 bg-surface text-on-surface focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all appearance-none"
+                                  value={formData.emergency_relation}
+                                  onChange={e => setFormData({ ...formData, emergency_relation: e.target.value })}
+                                >
+                                  <option value="">Select Relation</option>
+                                  {['Father', 'Mother', 'Brother', 'Sister', 'Spouse', 'Employer', 'Other'].map(r => (
+                                    <option key={r} value={r}>{r}</option>
+                                  ))}
+                                </select>
+                                <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none" size={18} />
+                              </div>
+                            </div>
                             <div className="md:col-span-2">
                               <Input
                                 label="Residential Address"
@@ -1076,12 +1098,26 @@ export default function Members() {
                               </>
                             )}
 
-                            <Input
-                              label="Family ID"
-                              placeholder="Group identifier"
-                              value={formData.family_id}
-                              onChange={e => setFormData({ ...formData, family_id: e.target.value })}
-                            />
+                            <div className="space-y-2">
+                              <label className="text-sm font-semibold text-on-surface">Family ID (Father's Name)</label>
+                              <div className="relative">
+                                <input
+                                  list="father-names"
+                                  className="w-full h-12 px-4 rounded-xl border border-outline-variant/20 bg-surface text-on-surface focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+                                  placeholder="Type or select father's name"
+                                  value={formData.family_id}
+                                  onChange={e => setFormData({ ...formData, family_id: e.target.value })}
+                                />
+                                <datalist id="father-names">
+                                  {(members || [])
+                                    .filter(m => m.gender === 'Male' && m.marital_status === 'Married')
+                                    .map(m => (
+                                      <option key={m.id} value={m.full_name} />
+                                    ))
+                                  }
+                                </datalist>
+                              </div>
+                            </div>
                           </div>
                         </motion.div>
                       )}

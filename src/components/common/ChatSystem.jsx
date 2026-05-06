@@ -6,7 +6,7 @@ import {
   Minus, Maximize2, Trash2, Smile
 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
-import { supabase } from "../../lib/supabase";
+import { supabase } from "../../services/supabaseClient";
 import { format } from "date-fns";
 
 export default function ChatSystem() {

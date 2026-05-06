@@ -6,7 +6,7 @@ import {
   Smile, Image as ImageIcon, Paperclip, Phone, Video
 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
-import { supabase } from "../../lib/supabase";
+import { supabase } from "../../services/supabaseClient";
 import { format } from "date-fns";
 import { Card, Button, Input } from "../../components/common/UI";
 

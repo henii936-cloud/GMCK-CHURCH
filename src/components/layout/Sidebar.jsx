@@ -114,13 +114,23 @@ export default function Sidebar() {
   const sidebarContent = (
     <>
       <div className="flex flex-col gap-2 mb-16">
-        <div className="flex items-center gap-1.5">
-          <div className="w-10 h-10 rounded-xl bg-primary grid place-items-center signature-gradient shadow-lg">
-            <Layers size={20} className="text-on-primary" />
+        <div className="flex items-center gap-3">
+          <div className="w-12 h-12 rounded-2xl bg-surface-container-high overflow-hidden shadow-whisper border border-outline-variant/10">
+            <img 
+              src="/src/assets/admin-icon.png" 
+              alt="Admin Icon" 
+              className="w-full h-full object-cover"
+              onError={(e) => {
+                e.target.style.display = 'none';
+                e.target.parentElement.innerHTML = '<div class="w-full h-full bg-primary grid place-items-center"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-on-primary"><path d="m8 3 4 8 5-5 5 15H2L8 3z"/></svg></div>';
+              }}
+            />
           </div>
-          <h2 className="headline-sm text-primary tracking-tight">Church<span className="text-tertiary-fixed-dim italic">ERP</span></h2>
+          <div>
+            <h2 className="headline-sm text-primary tracking-tight">Church<span className="text-tertiary-fixed-dim italic">ERP</span></h2>
+            <p className="label-sm opacity-40 tracking-[0.2em]">{user?.role?.replace('_', ' ')}</p>
+          </div>
         </div>
-        <p className="label-sm opacity-40 tracking-[0.3em] pl-[46px] -mt-[5px]">{user?.role?.replace('_', ' ')}</p>
       </div>
 
       <nav className="flex-1 overflow-y-auto pr-2 -mt-[87px]">

@@ -68,8 +68,16 @@ export default function Login() {
         className="w-full max-w-lg relative z-10"
       >
         <div className="text-center mb-16">
-          <div className="w-24 h-24 rounded-[3rem] bg-primary grid place-items-center mx-auto mb-8 shadow-xl shadow-primary/10">
-            <UserCircle size={48} className="text-on-primary" />
+          <div className="w-28 h-28 rounded-[3.5rem] bg-surface-container-high overflow-hidden mx-auto mb-10 shadow-2xl shadow-primary/5 border border-outline-variant/10">
+            <img 
+              src="/src/assets/admin-icon.png" 
+              alt="Church Logo" 
+              className="w-full h-full object-cover"
+              onError={(e) => {
+                e.target.style.display = 'none';
+                e.target.parentElement.innerHTML = '<div class="w-full h-full bg-primary grid place-items-center"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-on-primary"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>';
+              }}
+            />
           </div>
 
           <h1 className="display-sm text-primary mb-4">

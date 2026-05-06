@@ -8,7 +8,7 @@ import {
   Calendar, MapPin, Clock, Plus, Search, Trash2, Edit2,
   XCircle, CheckCircle2, Users, ChevronDown, AlertCircle,
   CalendarDays, CalendarCheck, Tag, FileText, Eye,
-  Mic, Music, UserCheck, StickyNote, Zap, Mic2, Star
+  Mic, Music, UserCheck, StickyNote, Mic2
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { EtDatetime } from "abushakir";
@@ -24,6 +24,22 @@ const CATEGORIES = [
   { value: "Celebration", color: "#eab308", bg: "rgba(234,179,8,0.1)" },
 ];
 
+const ETHIOPIAN_MONTHS = [
+  { value: 1, label: "መስከረም (Meskerem)" },
+  { value: 2, label: "ጥቅምት (Tikimt)" },
+  { value: 3, label: "ህዳር (Hidar)" },
+  { value: 4, label: "ታህሳስ (Tahsas)" },
+  { value: 5, label: "ጥር (Tir)" },
+  { value: 6, label: "የካቲት (Yakatit)" },
+  { value: 7, label: "መጋቢት (Magabit)" },
+  { value: 8, label: "ሚያዝያ (Miyazya)" },
+  { value: 9, label: "ግንቦት (Ginbot)" },
+  { value: 10, label: "ሰኔ (Sane)" },
+  { value: 11, label: "ሐምሌ (Hamle)" },
+  { value: 12, label: "ነሐሴ (Nehasse)" },
+  { value: 13, label: "ጳጉሜ (Pagume)" },
+];
+
 const getCategoryStyle = (cat) => CATEGORIES.find(c => c.value === cat) || CATEGORIES[0];
 
 export default function Events() {
@@ -33,6 +49,8 @@ export default function Events() {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterCategory, setFilterCategory] = useState("All");
   const [filterTime, setFilterTime] = useState("all"); // all, upcoming, past
+  const [filterMonth, setFilterMonth] = useState("All");
+  const [filterYear, setFilterYear] = useState("All");
   const [showModal, setShowModal] = useState(false);
   const [viewEvent, setViewEvent] = useState(null);
   const [deleteId, setDeleteId] = useState(null);
@@ -41,32 +59,7 @@ export default function Events() {
   const [error, setError] = useState(null);
   const [isSaving, setIsSaving] = useState(false);
 
-  // PLANNER STATES
-  const [activeTab, setActiveTab] = useState("events");
-  const [showPlannerModal, setShowPlannerModal] = useState(false);
-  const [newPlan, setNewPlan] = useState({
-    type: "Sunday Service", date: "", time: "",
-    preacher: "", worshipLeader: "", theme: "", program: "Weekly"
-  });
-  const [programPlans, setProgramPlans] = useState([
-    { id: 1, type: "Sunday Service", date: "2026-03-22", time: "10:00 AM", preacher: "Rev. Samuel Johnson", worshipLeader: "Sarah Miller & Team", theme: "The Grace of Giving", program: "Weekly" },
-    { id: 2, type: "Tuesday Morning Program", date: "2026-03-24", time: "06:00 AM", preacher: "Pastor Daniel Okoro", worshipLeader: "David King", theme: "Morning Devotion", program: "Weekly" },
-    { id: 3, type: "Wednesday Night Program", date: "2026-03-25", time: "07:00 PM", preacher: "Evang. Grace Temi", worshipLeader: "Instrumentalists Only", theme: "Warfare Prayers", program: "Weekly" }
-  ]);
-
-  const handleAddPlan = (e) => {
-    e.preventDefault();
-    setProgramPlans([{ ...newPlan, id: Date.now() }, ...programPlans]);
-    setShowPlannerModal(false);
-    setNewPlan({ type: "Sunday Service", date: "", time: "", preacher: "", worshipLeader: "", theme: "", program: "Weekly" });
-  };
-
-  const getServiceColor = (type) => {
-    if (type.includes("Sunday")) return "#6366f1";
-    if (type.includes("Tuesday")) return "#10b981";
-    if (type.includes("Wednesday")) return "#f59e0b";
-    return "#ec4899";
-  };
+  const [success, setSuccess] = useState(null);
 
   const [formData, setFormData] = useState({
     title: "",
@@ -184,14 +177,32 @@ export default function Events() {
 
   const filteredEvents = events.filter(e => {
     const term = searchTerm.toLowerCase();
-    const searchMatch = e.title?.toLowerCase().includes(term) ||
+    const searchMatch = !term || e.title?.toLowerCase().includes(term) ||
       e.location?.toLowerCase().includes(term) ||
       e.description?.toLowerCase().includes(term);
     const catMatch = filterCategory === "All" || e.category === filterCategory;
     const timeMatch = filterTime === "all" ||
       (filterTime === "upcoming" && e.date >= today) ||
       (filterTime === "past" && e.date < today);
-    return searchMatch && catMatch && timeMatch;
+    
+    let calendarMatch = true;
+    if (filterMonth !== "All" || filterYear !== "All") {
+      try {
+        const dt = new Date(e.date);
+        if (!isNaN(dt.getTime())) {
+          const et = new EtDatetime(dt.getTime());
+          const monthMatch = filterMonth === "All" || et.month === parseInt(filterMonth);
+          const yearMatch = filterYear === "All" || et.year === parseInt(filterYear);
+          calendarMatch = monthMatch && yearMatch;
+        } else {
+          calendarMatch = false;
+        }
+      } catch (err) {
+        calendarMatch = false;
+      }
+    }
+
+    return searchMatch && catMatch && timeMatch && calendarMatch;
   });
 
   const stats = {
@@ -233,28 +244,16 @@ export default function Events() {
           </h1>
           <p className="text-on-surface-variant font-medium mt-1">Plan, organize, and track all church activities</p>
         </div>
-        <div style={{ display: 'flex', background: 'rgba(255,255,255,0.05)', borderRadius: '12px', padding: '6px' }}>
-          <button onClick={() => setActiveTab("events")} style={{ padding: '8px 20px', borderRadius: '8px', fontSize: '0.875rem', fontWeight: '700', background: activeTab === 'events' ? 'var(--primary)' : 'transparent', color: activeTab === 'events' ? 'white' : 'var(--text-muted)', transition: '0.3s', border: 'none', cursor: 'pointer' }}>
-            Event Directory
-          </button>
-          <button onClick={() => setActiveTab("planner")} style={{ padding: '8px 20px', borderRadius: '8px', fontSize: '0.875rem', fontWeight: '700', background: activeTab === 'planner' ? 'var(--primary)' : 'transparent', color: activeTab === 'planner' ? 'white' : 'var(--text-muted)', transition: '0.3s', border: 'none', cursor: 'pointer' }}>
-            Program Planner
-          </button>
-        </div>
-        {activeTab === 'events' && (
-          <Button
-            onClick={() => openModal()}
-            icon={Plus}
-            className="rounded-full px-6 shadow-lg shadow-primary/20 pulse-animation"
-          >
-            {t("Create Event")}
-          </Button>
-        )}
+        <Button
+          onClick={() => openModal()}
+          icon={Plus}
+          className="rounded-full px-6 shadow-lg shadow-primary/20 pulse-animation"
+        >
+          {t("Create Event")}
+        </Button>
       </div>
 
-      <AnimatePresence mode="wait">
-        {activeTab === 'events' && (
-          <motion.div key="events" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }}>
+      <div className="mt-4">
             {/* Stats Row */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
         <motion.div
@@ -347,24 +346,69 @@ export default function Events() {
           </select>
           <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none" size={18} />
         </div>
-        <div className="flex rounded-2xl overflow-hidden border border-outline-variant/20">
-          {[
-            { key: "all", label: "All" },
-            { key: "upcoming", label: "Upcoming" },
-            { key: "past", label: "Past" },
-          ].map(t => (
+
+        {/* Month Filter */}
+        <div className="relative md:w-48">
+          <select
+            className="w-full h-14 pl-4 pr-10 rounded-2xl border border-outline-variant/20 bg-surface text-on-surface focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all appearance-none cursor-pointer"
+            value={filterMonth}
+            onChange={(e) => setFilterMonth(e.target.value)}
+          >
+            <option value="All">All Months</option>
+            {ETHIOPIAN_MONTHS.map(m => <option key={m.value} value={m.value}>{m.label}</option>)}
+          </select>
+          <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none" size={18} />
+        </div>
+
+        {/* Year Filter */}
+        <div className="relative md:w-32">
+          <select
+            className="w-full h-14 pl-4 pr-10 rounded-2xl border border-outline-variant/20 bg-surface text-on-surface focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all appearance-none cursor-pointer"
+            value={filterYear}
+            onChange={(e) => setFilterYear(e.target.value)}
+          >
+            <option value="All">Year</option>
+            {[2015, 2016, 2017, 2018, 2019, 2020].map(y => <option key={y} value={y}>{y}</option>)}
+          </select>
+          <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none" size={18} />
+        </div>
+        <div className="flex gap-2">
+          <div className="flex rounded-2xl overflow-hidden border border-outline-variant/20">
+            {[
+              { key: "all", label: "All" },
+              { key: "upcoming", label: "Upcoming" },
+              { key: "past", label: "Past" },
+            ].map(t => (
+              <button
+                key={t.key}
+                onClick={() => setFilterTime(t.key)}
+                className={`px-5 h-14 text-sm font-bold transition-all cursor-pointer ${
+                  filterTime === t.key
+                    ? 'bg-primary text-on-primary'
+                    : 'bg-surface text-on-surface-variant hover:bg-surface-container'
+                }`}
+              >
+                {t.label}
+              </button>
+            ))}
+          </div>
+
+          {(searchTerm || filterCategory !== "All" || filterMonth !== "All" || filterYear !== "All" || filterTime !== "all") && (
             <button
-              key={t.key}
-              onClick={() => setFilterTime(t.key)}
-              className={`px-5 h-14 text-sm font-bold transition-all cursor-pointer ${
-                filterTime === t.key
-                  ? 'bg-primary text-on-primary'
-                  : 'bg-surface text-on-surface-variant hover:bg-surface-container'
-              }`}
+              onClick={() => {
+                setSearchTerm("");
+                setFilterCategory("All");
+                setFilterMonth("All");
+                setFilterYear("All");
+                setFilterTime("all");
+              }}
+              className="h-14 px-4 rounded-2xl border border-outline-variant/20 bg-surface text-on-surface-variant hover:text-red-500 hover:border-red-500/50 transition-all flex items-center gap-2 group cursor-pointer"
+              title="Reset all filters"
             >
-              {t.label}
+              <XCircle size={18} className="group-hover:rotate-90 transition-transform" />
+              <span className="text-xs font-bold uppercase tracking-wider hidden lg:inline">Reset</span>
             </button>
-          ))}
+          )}
         </div>
       </div>
 
@@ -863,20 +907,28 @@ export default function Events() {
                         )}
 
                         {/* Actions */}
-                        <div className="flex gap-3 pt-2">
+                        <div className="flex flex-wrap gap-3 pt-2">
                           <Button
                             variant="secondary"
                             onClick={() => { setViewEvent(null); openModal(viewEvent); }}
-                            className="flex-1 h-14 rounded-2xl font-black text-xs uppercase tracking-widest"
+                            className="flex-1 h-14 rounded-2xl font-black text-xs uppercase tracking-widest min-w-[140px]"
                             icon={Edit2}
                           >
                             Edit Details
                           </Button>
                           <Button
-                            onClick={() => setViewEvent(null)}
-                            className="flex-1 h-14 rounded-2xl font-black text-xs uppercase tracking-widest"
+                            onClick={() => { setViewEvent(null); setDeleteId(viewEvent.id); }}
+                            className="flex-1 h-14 rounded-2xl font-black text-xs uppercase tracking-widest min-w-[140px] bg-red-500 hover:bg-red-600 border-none"
+                            icon={Trash2}
                           >
-                            Dismiss
+                            Delete
+                          </Button>
+                          <Button
+                            variant="secondary"
+                            onClick={() => setViewEvent(null)}
+                            className="w-full h-12 rounded-2xl font-black text-[10px] uppercase tracking-[0.2em] border-none text-on-surface-variant opacity-60 hover:opacity-100"
+                          >
+                            Close View
                           </Button>
                         </div>
                       </div>
@@ -888,153 +940,7 @@ export default function Events() {
         )}
       </AnimatePresence>
 
-      {/* END SECTION FOR TAB EVENTS */}
-      </motion.div>
-      )}
-
-        {/* START SECTION FOR PLANNER */}
-        {activeTab === 'planner' && (
-          <motion.div key="planner" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
-            <div style={{ display: 'flex', gap: '16px', marginBottom: '32px' }}>
-              <Button icon={Plus} style={{ flex: 1 }} onClick={() => setShowPlannerModal(true)}>Schedule New Program</Button>
-              <Button variant="secondary" icon={CalendarDays} style={{ flex: 1 }}>View Monthly Calendar</Button>
-              <Button variant="secondary" icon={Star} style={{ flex: 1 }}>Yearly Outlook</Button>
-            </div>
-
-            <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-              {programPlans.map((plan, i) => {
-                const color = getServiceColor(plan.type);
-                return (
-                  <motion.div 
-                    key={plan.id} 
-                    initial={{ opacity: 0, y: 20 }} 
-                    animate={{ opacity: 1, y: 0 }} 
-                    transition={{ delay: i * 0.08 }}
-                    whileHover={{ y: -4 }}
-                  >
-                    <div className="group relative bg-surface border border-outline-variant/20 rounded-[2rem] overflow-hidden shadow-sm hover:shadow-xl hover:shadow-primary/5 transition-all">
-                      <div className="absolute top-0 left-0 w-2 h-full" style={{ background: color }} />
-                      
-                      <div className="p-8">
-                        <div className="flex justify-between items-start mb-6">
-                          <div className="flex flex-col gap-1">
-                            <span className="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider w-fit" style={{ background: `${color}15`, color }}>
-                              {plan.type}
-                            </span>
-                            <span className="text-xs font-bold text-on-surface-variant opacity-60 px-1">{plan.program} Cycle</span>
-                          </div>
-                          <div className="p-3 rounded-2xl bg-surface-container-low text-on-surface-variant group-hover:text-primary transition-colors">
-                            <CalendarDays size={20} />
-                          </div>
-                        </div>
-
-                        <h3 className="text-xl font-black text-on-surface mb-6 leading-tight group-hover:text-primary transition-colors">
-                          "{plan.theme || 'Untitled Program'}"
-                        </h3>
-                        
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-6 border-t border-outline-variant/10">
-                          <div className="flex items-center gap-4">
-                            <div className="w-12 h-12 rounded-2xl bg-surface-container-high flex items-center justify-center text-primary">
-                              <Mic2 size={20} />
-                            </div>
-                            <div className="min-w-0">
-                              <p className="text-[10px] text-on-surface-variant uppercase font-black tracking-widest opacity-60">Preacher</p>
-                              <p className="text-sm font-black text-on-surface truncate">{plan.preacher || 'TBA'}</p>
-                            </div>
-                          </div>
-
-                          <div className="flex items-center gap-4">
-                            <div className="w-12 h-12 rounded-2xl bg-surface-container-high flex items-center justify-center text-pink-500">
-                              <Music size={20} />
-                            </div>
-                            <div className="min-w-0">
-                              <p className="text-[10px] text-on-surface-variant uppercase font-black tracking-widest opacity-60">Worship</p>
-                              <p className="text-sm font-black text-on-surface truncate">{plan.worshipLeader || 'TBA'}</p>
-                            </div>
-                          </div>
-
-                          <div className="flex items-center gap-4">
-                            <div className="w-12 h-12 rounded-2xl bg-surface-container-high flex items-center justify-center text-amber-500">
-                              <Clock size={20} />
-                            </div>
-                            <div className="min-w-0">
-                              <p className="text-[10px] text-on-surface-variant uppercase font-black tracking-widest opacity-60">Schedule</p>
-                              <p className="text-sm font-black text-on-surface truncate">
-                                {plan.date ? formatDate(plan.date) : 'TBD'} @ {plan.time || 'TBD'}
-                              </p>
-                            </div>
-                          </div>
-
-                          <div className="flex items-center gap-4">
-                            <div className="w-12 h-12 rounded-2xl bg-surface-container-high flex items-center justify-center text-emerald-500">
-                              <Zap size={20} />
-                            </div>
-                            <div className="min-w-0">
-                              <p className="text-[10px] text-on-surface-variant uppercase font-black tracking-widest opacity-60">Status</p>
-                              <p className="text-sm font-black text-emerald-600 truncate">Draft Mode</p>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="px-8 py-4 bg-surface-container-lowest border-t border-outline-variant/10 flex justify-between items-center">
-                        <button className="text-xs font-black text-on-surface-variant hover:text-primary transition-colors flex items-center gap-2 uppercase tracking-widest cursor-pointer">
-                          <Edit2 size={14} /> Edit Plan
-                        </button>
-                        <button className="text-xs font-black text-red-500 hover:text-red-600 transition-colors uppercase tracking-widest cursor-pointer">
-                          Postpone
-                        </button>
-                      </div>
-                    </div>
-                  </motion.div>
-                );
-              })}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* PLANNER MODAL */}
-      <AnimatePresence>
-      {showPlannerModal && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(8px)', display: 'grid', placeItems: 'center', zIndex: 1000, padding: '20px' }}>
-          <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="glass-card" style={{ width: '100%', maxWidth: '600px', padding: '40px' }}>
-            <h2 style={{ fontSize: '1.75rem', fontWeight: '800', marginBottom: '24px' }}>Strategic <span style={{ color: 'var(--primary)' }}>Planner</span></h2>
-            <form onSubmit={handleAddPlan} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
-              <div style={{ gridColumn: 'span 2' }}>
-                <Input label="Program Theme" placeholder="e.g. Divine Restoration" value={newPlan.theme} onChange={e => setNewPlan({...newPlan, theme: e.target.value})} required />
-              </div>
-              <div className="form-group">
-                <label style={{ display: 'block', marginBottom: '6px', fontSize: '0.875rem', fontWeight: '500', color: 'var(--text-muted)' }}>Service Category</label>
-                <select className="input-field" value={newPlan.type} onChange={e => setNewPlan({...newPlan, type: e.target.value})}>
-                  <option>Sunday Service</option>
-                  <option>Tuesday Morning Program</option>
-                  <option>Wednesday Night Program</option>
-                  <option>Special Event</option>
-                </select>
-              </div>
-              <div className="form-group">
-                <label style={{ display: 'block', marginBottom: '6px', fontSize: '0.875rem', fontWeight: '500', color: 'var(--text-muted)' }}>Cycle</label>
-                <select className="input-field" value={newPlan.program} onChange={e => setNewPlan({...newPlan, program: e.target.value})}>
-                  <option>Weekly</option>
-                  <option>Monthly</option>
-                  <option>Annual</option>
-                </select>
-              </div>
-              <Input label="Preacher" placeholder="Enter name" value={newPlan.preacher} onChange={e => setNewPlan({...newPlan, preacher: e.target.value})} />
-              <Input label="Worship Leader" placeholder="Enter name" value={newPlan.worshipLeader} onChange={e => setNewPlan({...newPlan, worshipLeader: e.target.value})} />
-              <EtDatePicker label="Date" value={newPlan.date} onChange={e => setNewPlan({...newPlan, date: e.target.value})} />
-              <Input type="time" label="Start Time" value={newPlan.time} onChange={e => setNewPlan({...newPlan, time: e.target.value})} />
-              
-              <div style={{ gridColumn: 'span 2', display: 'flex', gap: '12px', marginTop: '12px' }}>
-                <Button type="submit" style={{ flex: 1 }}>Publish Program</Button>
-                <Button variant="secondary" onClick={() => setShowPlannerModal(false)}>Cancel</Button>
-              </div>
-            </form>
-          </motion.div>
-        </div>
-      )}
-      </AnimatePresence>
+      </div>
 
       {/* Delete Confirmation */}
       <AnimatePresence>

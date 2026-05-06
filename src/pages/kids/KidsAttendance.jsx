@@ -1,3 +1,4 @@
+import { formatToEthiopian } from "../../utils/ethiopianDate";
 import { useState, useEffect } from "react";
 import { supabase } from "../../services/supabaseClient";
 import { useAuth } from "../../context/AuthContext";
@@ -92,7 +93,7 @@ export default function KidsAttendance() {
           <p className="label-sm text-on-surface-variant tracking-widest">Weekly record keeping for children's classes</p>
         </div>
         <div className="bg-surface-container-low px-6 py-3 rounded-2xl border border-outline-variant/10 text-primary font-bold">
-          {new Date().toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' })}
+          {formatToEthiopian(new Date())}
         </div>
       </div>
 
@@ -179,7 +180,7 @@ export default function KidsAttendance() {
                       <Calendar size={20} />
                     </div>
                     <div>
-                      <p className="font-black text-primary">{new Date(h.date).toLocaleDateString()}</p>
+                      <p className="font-black text-primary">{formatToEthiopian(h.date)}</p>
                       <p className="text-xs text-on-surface-variant">{h.kids_classes?.class_name}</p>
                     </div>
                   </div>

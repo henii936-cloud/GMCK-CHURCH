@@ -1,3 +1,4 @@
+import { formatToEthiopian } from "../../utils/ethiopianDate";
 import { useState, useEffect } from "react";
 import { supabase } from "../../services/supabaseClient";
 import { useAuth } from "../../context/AuthContext";
@@ -123,7 +124,7 @@ export default function YouthDashboard() {
                 </div>
                 <div className="overflow-hidden">
                   <p className="text-sm font-bold text-primary truncate">{e.title}</p>
-                  <p className="text-xs text-on-surface-variant">{new Date(e.event_date).toLocaleDateString()}</p>
+                  <p className="text-xs text-on-surface-variant">{formatToEthiopian(e.event_date)}</p>
                   <span className={`text-[9px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider ${e.status === "Upcoming" ? "bg-green-500/10 text-green-500" : "bg-orange-400/10 text-orange-400"}`}>
                     {e.status}
                   </span>

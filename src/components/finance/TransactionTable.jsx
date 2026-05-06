@@ -1,3 +1,4 @@
+import { formatToEthiopian } from "../../utils/ethiopianDate";
 import { motion } from "motion/react";
 import { ListFilter, Search, ArrowRight, Wallet, DollarSign, Heart, ArrowDownRight, User, Sprout } from "lucide-react";
 
@@ -92,7 +93,7 @@ export default function TransactionTable({ transactions = [] }) {
                   </td>
 
                   <td className="py-6 pl-4 text-right">
-                    <p className="text-sm font-medium text-on-surface-variant">{new Date(t.transaction_date || t.date).toLocaleDateString()}</p>
+                    <p className="text-sm font-medium text-on-surface-variant">{formatToEthiopian(t.transaction_date || t.date)}</p>
                   </td>
                 </motion.tr>
               );
@@ -136,7 +137,7 @@ export default function TransactionTable({ transactions = [] }) {
                   >
                     {t.type}
                   </span>
-                  <span className="text-[10px] text-on-surface-variant font-medium">{new Date(t.transaction_date || t.date).toLocaleDateString()}</span>
+                  <span className="text-[10px] text-on-surface-variant font-medium">{formatToEthiopian(t.transaction_date || t.date)}</span>
                 </div>
               </div>
             </motion.div>

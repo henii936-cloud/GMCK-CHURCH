@@ -1,3 +1,4 @@
+import { formatToEthiopian } from "../../utils/ethiopianDate";
 import React, { useEffect, useState } from 'react';
 import {
   Users, MapPin, ShieldCheck, ClipboardList, BookOpen, Activity,
@@ -121,7 +122,7 @@ export default function AdminDashboard() {
           </div>
           <div className="text-right">
             <p className="label-sm opacity-60 mb-1">Current Period</p>
-            <p className="text-lg font-heading font-bold text-primary">{new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}</p>
+            <p className="text-lg font-heading font-bold text-primary">{formatToEthiopian(new Date())}</p>
           </div>
         </div>
       </div>
@@ -187,7 +188,7 @@ export default function AdminDashboard() {
                     <p className="text-xs text-on-surface-variant truncate">{study.topic}</p>
                   </div>
                   <div className="text-right shrink-0">
-                    <p className="label-sm opacity-60 text-xs">{new Date(study.date).toLocaleDateString()}</p>
+                    <p className="label-sm opacity-60 text-xs">{formatToEthiopian(study.date)}</p>
                     <p className="text-[9px] font-black uppercase tracking-widest text-primary">Completed</p>
                   </div>
                 </div>
@@ -207,7 +208,7 @@ export default function AdminDashboard() {
                 <div key={event.id} className="flex gap-4 group items-center">
                   <div className="text-center min-w-[40px] shrink-0">
                     <p className="label-sm text-tertiary-fixed-dim text-xs">
-                      {date.toLocaleDateString('en-US', { month: 'short' })}
+                      {formatToEthiopian(date)}
                     </p>
                     <p className="text-xl font-heading font-bold text-primary leading-none">{date.getDate()}</p>
                   </div>
@@ -328,7 +329,7 @@ export default function AdminDashboard() {
                 <div className="flex-1 min-w-0">
                   <p className="text-xs font-bold text-on-surface mb-1 leading-snug">{log.description}</p>
                   <p className="text-[10px] text-on-surface-variant/60 font-medium">
-                    {new Date(log.created_at).toLocaleTimeString()} • {new Date(log.created_at).toLocaleDateString()}
+                    {new Date(log.created_at).toLocaleTimeString()} • {formatToEthiopian(log.created_at)}
                   </p>
                 </div>
               </div>

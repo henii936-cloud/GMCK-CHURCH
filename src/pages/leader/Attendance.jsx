@@ -1,3 +1,4 @@
+import { formatToEthiopian } from "../../utils/ethiopianDate";
 import { useEffect, useState } from "react";
 import { attendanceService, memberService } from "../../services/api";
 import { useAuth } from "../../context/AuthContext";
@@ -123,7 +124,7 @@ export default function Attendance() {
         </div>
         <div className="bg-surface-container-low px-3 sm:px-4 py-2 sm:py-3 rounded-lg sm:rounded-xl border border-outline-variant/10 self-start sm:self-auto">
           <p className="text-xs sm:text-sm font-bold text-primary">
-            {new Date().toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' })}
+            {formatToEthiopian(new Date())}
           </p>
         </div>
       </div>

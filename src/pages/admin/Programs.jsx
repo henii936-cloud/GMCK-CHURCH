@@ -1,3 +1,4 @@
+import { formatToEthiopian } from "../../utils/ethiopianDate";
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { activityService, attendanceService, studyService } from "../../services/api";
@@ -160,7 +161,7 @@ export default function Programs() {
                                   📖 Study
                                 </div>
                                 <span style={{ fontSize: '0.7rem', fontWeight: '600', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                                  <Clock size={11} /> {new Date(a.created_at).toLocaleDateString()}
+                                  <Clock size={11} /> {formatToEthiopian(a.created_at)}
                                 </span>
                               </div>
 

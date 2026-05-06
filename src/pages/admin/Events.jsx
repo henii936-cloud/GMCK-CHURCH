@@ -1,3 +1,5 @@
+import EtDatePicker from "../../components/common/EtDatePicker";
+import { formatToEthiopian } from "../../utils/ethiopianDate";
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { supabase } from "../../services/supabaseClient";
@@ -200,7 +202,7 @@ export default function Events() {
   const formatDate = (dateStr) => {
     if (!dateStr) return '';
     const [y, m, d] = dateStr.split('-');
-    return new Date(y, m - 1, d).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
+    return formatToEthiopian(y, m - 1, d);
   };
 
   const formatDateShort = (dateStr) => {
@@ -209,8 +211,8 @@ export default function Events() {
     const date = new Date(y, m - 1, d);
     return {
       day: date.getDate(),
-      month: date.toLocaleDateString('en-US', { month: 'short' }).toUpperCase(),
-      weekday: date.toLocaleDateString('en-US', { weekday: 'short' })
+      month: formatToEthiopian(date).toUpperCase(),
+      weekday: formatToEthiopian(date)
     };
   };
 
@@ -548,8 +550,7 @@ export default function Events() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <label className="text-sm font-semibold text-on-surface">Start Date *</label>
-                      <input
-                        type="date"
+                      <EtDatePicker
                         required
                         value={formData.date}
                         onChange={e => setFormData({ ...formData, date: e.target.value })}
@@ -558,8 +559,7 @@ export default function Events() {
                     </div>
                     <div className="space-y-2">
                       <label className="text-sm font-semibold text-on-surface">End Date</label>
-                      <input
-                        type="date"
+                      <EtDatePicker
                         value={formData.end_date}
                         onChange={e => setFormData({ ...formData, end_date: e.target.value })}
                         className="w-full h-12 px-4 rounded-xl border border-outline-variant/20 bg-surface text-on-surface focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
@@ -918,7 +918,7 @@ export default function Events() {
                           <p style={{ fontWeight: '600', fontSize: '0.9rem' }}>
                             {plan.date ? (() => {
                               const [y, m, d] = plan.date.split('-');
-                              return new Date(y, m - 1, d).toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' });
+                              return formatToEthiopian(y, m - 1, d);
                             })() : 'Set Date'} @ {plan.time || 'Set Time'}
                           </p>
                         </div>
@@ -966,7 +966,7 @@ export default function Events() {
               </div>
               <Input label="Preacher" placeholder="Enter name" value={newPlan.preacher} onChange={e => setNewPlan({...newPlan, preacher: e.target.value})} />
               <Input label="Worship Leader" placeholder="Enter name" value={newPlan.worshipLeader} onChange={e => setNewPlan({...newPlan, worshipLeader: e.target.value})} />
-              <Input type="date" label="Date" value={newPlan.date} onChange={e => setNewPlan({...newPlan, date: e.target.value})} />
+              <EtDatePicker label="Date" value={newPlan.date} onChange={e => setNewPlan({...newPlan, date: e.target.value})} />
               <Input type="time" label="Start Time" value={newPlan.time} onChange={e => setNewPlan({...newPlan, time: e.target.value})} />
               
               <div style={{ gridColumn: 'span 2', display: 'flex', gap: '12px', marginTop: '12px' }}>

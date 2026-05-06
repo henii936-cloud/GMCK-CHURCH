@@ -1,3 +1,4 @@
+import { formatToEthiopian } from "../../utils/ethiopianDate";
 import { useState, useEffect } from "react";
 import { supabase } from "../../services/supabaseClient";
 import { useAuth } from "../../context/AuthContext";
@@ -80,7 +81,7 @@ export default function YouthMembersPage() {
                   {m.phone && <p className="text-xs text-on-surface-variant">📞 {m.phone}</p>}
                   {m.email && <p className="text-xs text-on-surface-variant truncate">✉️ {m.email}</p>}
                   {m.bible_study_groups?.group_name && <p className="text-xs text-on-surface-variant">🏠 {m.bible_study_groups.group_name}</p>}
-                  <p className="text-xs text-on-surface-variant">Joined: {m.join_date ? new Date(m.join_date).toLocaleDateString() : "—"}</p>
+                  <p className="text-xs text-on-surface-variant">Joined: {m.join_date ? formatToEthiopian(m.join_date) : "—"}</p>
                 </div>
               </motion.div>
             ))}

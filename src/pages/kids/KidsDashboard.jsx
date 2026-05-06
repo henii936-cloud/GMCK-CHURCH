@@ -1,3 +1,4 @@
+import { formatToEthiopian } from "../../utils/ethiopianDate";
 import { useState, useEffect } from "react";
 import { supabase } from "../../services/supabaseClient";
 import { useAuth } from "../../context/AuthContext";
@@ -123,7 +124,7 @@ export default function KidsDashboard() {
                   <Smile size={16} className={a.status === 'Present' ? 'text-green-500' : 'text-red-500'} />
                 </div>
                 <div className="flex-1 overflow-hidden">
-                  <p className="text-sm font-bold text-primary truncate">Session: {new Date(a.date).toLocaleDateString()}</p>
+                  <p className="text-sm font-bold text-primary truncate">Session: {formatToEthiopian(a.date)}</p>
                   <p className="text-xs text-on-surface-variant">{a.status}</p>
                 </div>
               </div>

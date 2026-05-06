@@ -1,3 +1,4 @@
+import EtDatePicker from "../../components/common/EtDatePicker";
 import { useEffect, useState } from "react";
 import { financeService } from "../../services/api";
 import { useAuth } from "../../context/AuthContext";
@@ -172,9 +173,8 @@ export default function Expenses() {
                   </select>
                 </div>
 
-                <Input 
+                <EtDatePicker 
                   label="Expense Date" 
-                  type="date" 
                   value={formData.date}
                   onChange={(e) => setFormData({...formData, date: e.target.value})}
                   required

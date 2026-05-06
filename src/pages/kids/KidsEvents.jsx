@@ -1,3 +1,5 @@
+import EtDatePicker from "../../components/common/EtDatePicker";
+import { formatToEthiopian } from "../../utils/ethiopianDate";
 import { useState, useEffect } from "react";
 import { supabase } from "../../services/supabaseClient";
 import { Card, Button, Input } from "../../components/common/UI";
@@ -120,7 +122,7 @@ export default function KidsEvents() {
               <div className="mt-auto space-y-4">
                 <div className="flex items-center gap-3 text-sm font-bold text-primary">
                   <Calendar size={18} className="text-tertiary-fixed-dim" />
-                  {new Date(e.date).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' })}
+                  {formatToEthiopian(e.date)}
                 </div>
                 <div className="flex items-center gap-3 text-sm font-medium text-on-surface-variant">
                   <Clock size={18} /> {e.event_time}
@@ -157,7 +159,7 @@ export default function KidsEvents() {
               <form onSubmit={handleSave} className="p-10 space-y-8">
                 <Input label="Event Title" placeholder="e.g. Vacation Bible School 2026" value={formData.title} onChange={e => setFormData({ ...formData, title: e.target.value })} required />
                 <div className="grid grid-cols-2 gap-6">
-                  <Input label="Event Date" type="date" value={formData.date} onChange={e => setFormData({ ...formData, date: e.target.value })} required />
+                  <EtDatePicker label="Event Date" value={formData.date} onChange={e => setFormData({ ...formData, date: e.target.value })} required />
                   <Input label="Event Time" placeholder="e.g. 10:00 AM" value={formData.event_time} onChange={e => setFormData({ ...formData, event_time: e.target.value })} required />
                 </div>
                 <Input label="Location" value={formData.location} onChange={e => setFormData({ ...formData, location: e.target.value })} />

@@ -1,3 +1,4 @@
+import { formatToEthiopian } from "../../utils/ethiopianDate";
 import { useState } from "react";
 import { Calendar, ChevronDown, ChevronUp } from "lucide-react";
 
@@ -46,17 +47,8 @@ export default function AttendanceHistory({ history }) {
           const excusedCount = records.filter(r => r.status === 'Excused').length;
           
           const [year, month, day] = groupData.date.split('-');
-          const displayDate = new Date(year, month - 1, day).toLocaleDateString(undefined, { 
-            weekday: 'short', 
-            month: 'short', 
-            day: 'numeric' 
-          });
-          const displayDateLong = new Date(year, month - 1, day).toLocaleDateString(undefined, { 
-            weekday: 'long', 
-            year: 'numeric', 
-            month: 'long', 
-            day: 'numeric' 
-          });
+          const displayDate = formatToEthiopian(year, month - 1, day);
+          const displayDateLong = formatToEthiopian(year, month - 1, day);
 
           const isExpanded = expandedDates[key];
 

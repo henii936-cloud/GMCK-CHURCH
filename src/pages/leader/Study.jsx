@@ -1,3 +1,4 @@
+import EtDatePicker from "../../components/common/EtDatePicker";
 import { useState, useEffect } from "react";
 import { studyService } from "../../services/api";
 import { useAuth } from "../../context/AuthContext";
@@ -84,9 +85,8 @@ export default function Study() {
               required
             />
             
-            <Input 
+            <EtDatePicker 
               label="Completion Date" 
-              type="date" 
               value={formData.completion_date}
               onChange={(e) => setFormData({...formData, completion_date: e.target.value})}
               required

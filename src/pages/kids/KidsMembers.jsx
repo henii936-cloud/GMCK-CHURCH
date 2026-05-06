@@ -1,3 +1,5 @@
+import EtDatePicker from "../../components/common/EtDatePicker";
+import { formatToEthiopian } from "../../utils/ethiopianDate";
 import { useState, useEffect } from "react";
 import { supabase } from "../../services/supabaseClient";
 import { useAuth } from "../../context/AuthContext";
@@ -179,7 +181,7 @@ export default function KidsMembers() {
                 </div>
                 <div className="flex justify-between text-xs">
                   <span className="text-on-surface-variant">Birth Date</span>
-                  <span className="font-bold text-primary">{k.birth_date ? new Date(k.birth_date).toLocaleDateString() : "—"}</span>
+                  <span className="font-bold text-primary">{k.birth_date ? formatToEthiopian(k.birth_date) : "—"}</span>
                 </div>
                 {k.growth_notes && (
                   <div className="mt-4 p-3 rounded-xl bg-surface-container-low border border-outline-variant/5">
@@ -221,7 +223,7 @@ export default function KidsMembers() {
                       <option value="Female">Female</option>
                     </select>
                   </div>
-                  <Input label="Birth Date" type="date" value={formData.birth_date} onChange={e => setFormData({ ...formData, birth_date: e.target.value })} />
+                  <EtDatePicker label="Birth Date" value={formData.birth_date} onChange={e => setFormData({ ...formData, birth_date: e.target.value })} />
                   <div className="space-y-2">
                     <label className="text-sm font-semibold text-on-surface pl-1">Parent / Guardian</label>
                     <select className="w-full h-14 px-4 rounded-xl border border-outline-variant/20 bg-surface-container-low text-on-surface appearance-none"

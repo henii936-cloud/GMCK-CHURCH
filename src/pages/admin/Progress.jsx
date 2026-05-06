@@ -1,3 +1,4 @@
+import { formatToEthiopian } from "../../utils/ethiopianDate";
 import { useState, useEffect } from "react";
 import { supabase } from "../../services/supabaseClient";
 import { Card, Button } from "../../components/common/UI";
@@ -139,7 +140,7 @@ export default function Progress() {
                     </div>
                     <span style={{ fontSize: '0.7rem', fontWeight: '600', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '4px' }}>
                       <Clock size={11} />
-                      {p.completion_date ? new Date(p.completion_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : 'No date'}
+                      {p.completion_date ? formatToEthiopian(p.completion_date) : 'No date'}
                     </span>
                   </div>
 
@@ -174,7 +175,7 @@ export default function Progress() {
                   {/* Footer */}
                   <div style={{ paddingTop: '14px', marginTop: '16px', borderTop: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                     <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: '500' }}>
-                      {p.completion_date ? new Date(p.completion_date).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' }) : ''}
+                      {p.completion_date ? formatToEthiopian(p.completion_date) : ''}
                     </span>
                   </div>
                 </div>

@@ -1,3 +1,4 @@
+import { formatToEthiopian } from "../../utils/ethiopianDate";
 import { useState, useEffect } from "react";
 import { financeService } from "../../services/api";
 import { Card, Button, Input } from "../../components/common/UI";
@@ -307,7 +308,7 @@ export default function Budgets() {
                                       </div>
                                       <span className="font-bold text-on-surface/70">{app.approver_name}</span>
                                     </div>
-                                    <span className="opacity-40">{new Date(app.approved_at).toLocaleDateString()}</span>
+                                    <span className="opacity-40">{formatToEthiopian(app.approved_at)}</span>
                                   </div>
                                 ))}
                               </div>

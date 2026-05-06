@@ -1,3 +1,5 @@
+import EtDatePicker from "../../components/common/EtDatePicker";
+import { formatToEthiopian } from "../../utils/ethiopianDate";
 import { useState, useEffect } from "react";
 import { memberService, groupService, ministryService } from "../../services/api";
 import { supabase } from "../../services/supabaseClient";
@@ -524,7 +526,7 @@ export default function Members() {
                   </td>
                   <td style={{ padding: '20px 24px' }}>
                     <span style={{ fontSize: '0.875rem', color: 'var(--text-muted)' }}>
-                      {new Date(m.join_date).toLocaleDateString()}
+                      {formatToEthiopian(m.join_date)}
                     </span>
                   </td>
                   <td style={{ padding: '20px 24px', textAlign: 'right' }}>
@@ -936,9 +938,8 @@ export default function Members() {
                                 <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none" size={18} />
                               </div>
                             </div>
-                            <Input
+                            <EtDatePicker
                               label="Date of Birth"
-                              type="date"
                               value={formData.date_of_birth}
                               onChange={e => setFormData({ ...formData, date_of_birth: e.target.value })}
                             />
@@ -1170,9 +1171,8 @@ export default function Members() {
                                 </div>
                               </>
                             )}
-                            <Input
+                            <EtDatePicker
                               label="Join Date"
-                              type="date"
                               value={formData.join_date}
                               onChange={e => {
                                 const val = e.target.value;

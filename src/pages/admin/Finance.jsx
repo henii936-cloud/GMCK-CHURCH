@@ -1,3 +1,4 @@
+import { formatToEthiopian } from "../../utils/ethiopianDate";
 import { useState, useEffect, useMemo } from "react";
 import { financeService } from "../../services/api";
 import { Card, Button } from "../../components/common/UI";
@@ -191,7 +192,7 @@ export default function Finance() {
           </div>
           <div className="text-right">
             <p className="label-sm opacity-60 mb-0.5 text-[9px] sm:text-[11px]">Current Period</p>
-            <p className="text-sm sm:text-lg font-heading font-bold text-primary">{new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}</p>
+            <p className="text-sm sm:text-lg font-heading font-bold text-primary">{formatToEthiopian(new Date())}</p>
           </div>
         </div>
       </motion.div>

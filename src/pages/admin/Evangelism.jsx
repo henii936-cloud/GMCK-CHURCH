@@ -1,3 +1,5 @@
+import EtDatePicker from "../../components/common/EtDatePicker";
+import { formatToEthiopian } from "../../utils/ethiopianDate";
 import { useState, useEffect } from "react";
 import { supabase } from "../../services/supabaseClient";
 import { Card, Button, Input } from "../../components/common/UI";
@@ -391,7 +393,7 @@ export default function Evangelism({ viewOnly = false }) {
                       </td>
                       <td style={{ padding: '16px 24px' }}>
                         <span style={{ fontSize: '0.875rem', color: 'var(--text-muted)' }}>
-                          {r.date_reached ? new Date(r.date_reached).toLocaleDateString() : '--'}
+                          {r.date_reached ? formatToEthiopian(r.date_reached) : '--'}
                         </span>
                       </td>
                       <td style={{ padding: '16px 24px', textAlign: 'right' }}>
@@ -507,13 +509,13 @@ export default function Evangelism({ viewOnly = false }) {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <label className="text-sm font-semibold text-on-surface">Date Reached *</label>
-                      <input type="date" required value={formData.date_reached}
+                      <EtDatePicker required value={formData.date_reached}
                         onChange={e => setFormData({ ...formData, date_reached: e.target.value })}
                         className="w-full h-12 px-4 rounded-xl border border-outline-variant/20 bg-surface text-on-surface focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all" />
                     </div>
                     <div className="space-y-2">
                       <label className="text-sm font-semibold text-on-surface">Follow-up Date</label>
-                      <input type="date" value={formData.follow_up_date}
+                      <EtDatePicker value={formData.follow_up_date}
                         onChange={e => setFormData({ ...formData, follow_up_date: e.target.value })}
                         className="w-full h-12 px-4 rounded-xl border border-outline-variant/20 bg-surface text-on-surface focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all" />
                     </div>
@@ -601,7 +603,7 @@ export default function Evangelism({ viewOnly = false }) {
                       )}
                       <div className="flex items-center gap-3">
                         <Calendar size={16} className="text-on-surface-variant/50 shrink-0" />
-                        <span className="text-sm font-medium">Reached: {viewRecord.date_reached ? new Date(viewRecord.date_reached).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) : '--'}</span>
+                        <span className="text-sm font-medium">Reached: {viewRecord.date_reached ? formatToEthiopian(viewRecord.date_reached) : '--'}</span>
                       </div>
                       {viewRecord.reached_by && (
                         <div className="flex items-center gap-3">
@@ -612,7 +614,7 @@ export default function Evangelism({ viewOnly = false }) {
                       {viewRecord.follow_up_date && (
                         <div className="flex items-center gap-3">
                           <Target size={16} className="text-on-surface-variant/50 shrink-0" />
-                          <span className="text-sm font-medium">Follow-up: {new Date(viewRecord.follow_up_date).toLocaleDateString()}</span>
+                          <span className="text-sm font-medium">Follow-up: {formatToEthiopian(viewRecord.follow_up_date)}</span>
                         </div>
                       )}
                       {viewRecord.notes && (

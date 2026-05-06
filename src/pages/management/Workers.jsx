@@ -1,3 +1,4 @@
+import EtDatePicker from "../../components/common/EtDatePicker";
 import { useState, useEffect } from "react";
 import { supabase } from "../../services/supabaseClient";
 import { useAuth } from "../../context/AuthContext";
@@ -157,7 +158,7 @@ export default function WorkersPage() {
                       </select>
                     </div>
                   </div>
-                  <Input label="Hired Date" type="date" value={form.hired_date} onChange={e => setForm({ ...form, hired_date: e.target.value })} />
+                  <EtDatePicker label="Hired Date" value={form.hired_date} onChange={e => setForm({ ...form, hired_date: e.target.value })} />
                   <Button type="submit" loading={saving} className="w-full h-12 bg-primary text-on-primary border-none">
                     {editId ? "Update Worker" : "Add Worker"}
                   </Button>

@@ -11,6 +11,7 @@ import {
   Mic, Music, UserCheck, StickyNote, Zap, Mic2, Star
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
+import { EtDatetime } from "abushakir";
 
 const CATEGORIES = [
   { value: "General", color: "#6366f1", bg: "rgba(99,102,241,0.1)" },
@@ -201,19 +202,23 @@ export default function Events() {
 
   const formatDate = (dateStr) => {
     if (!dateStr) return '';
-    const [y, m, d] = dateStr.split('-');
-    return formatToEthiopian(y, m - 1, d);
+    return formatToEthiopian(dateStr);
   };
 
   const formatDateShort = (dateStr) => {
-    if (!dateStr) return { day: '', month: '' };
-    const [y, m, d] = dateStr.split('-');
-    const date = new Date(y, m - 1, d);
-    return {
-      day: date.getDate(),
-      month: formatToEthiopian(date).toUpperCase(),
-      weekday: formatToEthiopian(date)
-    };
+    if (!dateStr) return { day: '', month: '', weekday: '' };
+    const dt = new Date(dateStr);
+    if (isNaN(dt.getTime())) return { day: '?', month: '?', weekday: '?' };
+    try {
+      const et = new EtDatetime(dt.getTime());
+      return {
+        day: et.day,
+        month: et.monthGeez,
+        weekday: et.dayGeez // Using dayGeez for the weekday name in Ge'ez
+      };
+    } catch (e) {
+      return { day: dt.getDate(), month: '?', weekday: '' };
+    }
   };
 
   const isUpcoming = (dateStr) => dateStr >= today;
@@ -743,119 +748,139 @@ export default function Events() {
                 const catStyle = getCategoryStyle(viewEvent.category);
                 const upcoming = isUpcoming(viewEvent.date);
                 return (
-                  <>
-                    {/* Colored header */}
-                    <div className="p-8 text-center" style={{ background: catStyle.bg }}>
-                      <span
-                        className="inline-block px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider mb-3"
-                        style={{ background: `${catStyle.color}20`, color: catStyle.color }}
+                    /* Redesigned Premium Detail View */
+                    <div className="relative">
+                      {/* Close Button */}
+                      <button 
+                        onClick={() => setViewEvent(null)}
+                        className="absolute top-6 right-6 z-10 p-2 rounded-full bg-surface/50 hover:bg-surface text-on-surface-variant transition-all"
                       >
-                        {viewEvent.category || 'General'}
-                      </span>
-                      <h2 className="text-2xl font-black text-on-surface mb-2">{viewEvent.title}</h2>
-                      <span className={`inline-block px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider ${
-                        upcoming ? 'bg-emerald-500/10 text-emerald-600' : 'bg-on-surface-variant/10 text-on-surface-variant'
-                      }`}>
-                        {upcoming ? 'Upcoming' : 'Completed'}
-                      </span>
-                    </div>
+                        <XCircle size={24} />
+                      </button>
 
-                    <div className="p-8 space-y-5">
-                      {viewEvent.description && (
-                        <div className="flex gap-3">
-                          <FileText size={18} className="text-on-surface-variant/50 shrink-0 mt-0.5" />
-                          <p className="text-sm text-on-surface-variant leading-relaxed">{viewEvent.description}</p>
-                        </div>
-                      )}
-
-                      <div className="flex gap-3 items-center">
-                        <Calendar size={18} className="text-on-surface-variant/50 shrink-0" />
-                        <span className="text-sm font-semibold text-on-surface">
-                          {formatDate(viewEvent.date)}
-                          {viewEvent.end_date && viewEvent.end_date !== viewEvent.date ? ` – ${formatDate(viewEvent.end_date)}` : ''}
-                        </span>
-                      </div>
-
-                      {viewEvent.event_time && (
-                        <div className="flex gap-3 items-center">
-                          <Clock size={18} className="text-on-surface-variant/50 shrink-0" />
-                          <span className="text-sm font-semibold text-on-surface">
-                            {viewEvent.event_time}{viewEvent.end_time ? ` – ${viewEvent.end_time}` : ''}
+                      {/* Top Header Section */}
+                      <div className="p-8 pb-10 text-center" style={{ background: `linear-gradient(135deg, ${catStyle.bg}, ${catStyle.bg}44)` }}>
+                        <div className="flex justify-center gap-2 mb-4">
+                          <span
+                            className="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider"
+                            style={{ background: `${catStyle.color}20`, color: catStyle.color }}
+                          >
+                            {viewEvent.category || 'General'}
+                          </span>
+                          <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider ${
+                            upcoming ? 'bg-emerald-500/10 text-emerald-600' : 'bg-on-surface-variant/10 text-on-surface-variant'
+                          }`}>
+                            {upcoming ? 'Upcoming' : 'Completed'}
                           </span>
                         </div>
-                      )}
+                        <h2 className="text-3xl font-black text-on-surface mb-4 leading-tight">{viewEvent.title}</h2>
+                        
+                        {viewEvent.description && (
+                          <div className="max-w-xs mx-auto px-4 py-2 bg-white/40 dark:bg-black/20 rounded-2xl backdrop-blur-sm">
+                            <p className="text-xs text-on-surface-variant font-medium leading-relaxed italic">
+                              "{viewEvent.description}"
+                            </p>
+                          </div>
+                        )}
+                      </div>
 
-                      {viewEvent.location && (
-                        <div className="flex gap-3 items-center">
-                          <MapPin size={18} className="text-on-surface-variant/50 shrink-0" />
-                          <span className="text-sm font-semibold text-on-surface">{viewEvent.location}</span>
-                        </div>
-                      )}
-
-                      {/* Service Team */}
-                      {(viewEvent.preacher || viewEvent.worship_leader || viewEvent.mc) && (
-                        <div className="pt-3 border-t border-outline-variant/10">
-                          <p className="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest mb-3">Service Team</p>
-                          <div className="space-y-2.5">
-                            {viewEvent.preacher && (
-                              <div className="flex gap-3 items-center">
-                                <Mic size={16} className="text-primary/60 shrink-0" />
-                                <div>
-                                  <p className="text-[10px] text-on-surface-variant uppercase font-bold tracking-wider">Preacher</p>
-                                  <p className="text-sm font-semibold text-on-surface">{viewEvent.preacher}</p>
-                                </div>
-                              </div>
-                            )}
-                            {viewEvent.worship_leader && (
-                              <div className="flex gap-3 items-center">
-                                <Music size={16} className="text-primary/60 shrink-0" />
-                                <div>
-                                  <p className="text-[10px] text-on-surface-variant uppercase font-bold tracking-wider">Worship Leader</p>
-                                  <p className="text-sm font-semibold text-on-surface">{viewEvent.worship_leader}</p>
-                                </div>
-                              </div>
-                            )}
-                            {viewEvent.mc && (
-                              <div className="flex gap-3 items-center">
-                                <UserCheck size={16} className="text-primary/60 shrink-0" />
-                                <div>
-                                  <p className="text-[10px] text-on-surface-variant uppercase font-bold tracking-wider">MC / Host</p>
-                                  <p className="text-sm font-semibold text-on-surface">{viewEvent.mc}</p>
-                                </div>
-                              </div>
-                            )}
+                      {/* Main Info Grid */}
+                      <div className="p-8 -mt-6 bg-surface rounded-t-[3rem] shadow-xl relative z-0">
+                        <div className="grid grid-cols-3 gap-3 mb-8">
+                          <div className="p-4 rounded-3xl bg-surface-container-low border border-outline-variant/10 flex flex-col items-center text-center">
+                            <Calendar className="text-primary mb-2" size={20} />
+                            <p className="text-[9px] text-on-surface-variant uppercase font-bold tracking-tighter mb-1">Date</p>
+                            <p className="text-xs font-black text-on-surface truncate w-full">{formatDate(viewEvent.date)}</p>
+                          </div>
+                          <div className="p-4 rounded-3xl bg-surface-container-low border border-outline-variant/10 flex flex-col items-center text-center">
+                            <Clock className="text-amber-500 mb-2" size={20} />
+                            <p className="text-[9px] text-on-surface-variant uppercase font-bold tracking-tighter mb-1">Time</p>
+                            <p className="text-xs font-black text-on-surface truncate w-full">{viewEvent.event_time || 'TBA'}</p>
+                          </div>
+                          <div className="p-4 rounded-3xl bg-surface-container-low border border-outline-variant/10 flex flex-col items-center text-center">
+                            <MapPin className="text-emerald-500 mb-2" size={20} />
+                            <p className="text-[9px] text-on-surface-variant uppercase font-bold tracking-tighter mb-1">Location</p>
+                            <p className="text-xs font-black text-on-surface truncate w-full">{viewEvent.location || 'TBA'}</p>
                           </div>
                         </div>
-                      )}
 
-                      {viewEvent.notes && (
-                        <div className="flex gap-3 pt-3 border-t border-outline-variant/10">
-                          <StickyNote size={16} className="text-on-surface-variant/50 shrink-0 mt-0.5" />
-                          <div>
-                            <p className="text-[10px] text-on-surface-variant uppercase font-bold tracking-wider mb-1">Notes</p>
-                            <p className="text-sm text-on-surface-variant leading-relaxed">{viewEvent.notes}</p>
+                        {/* Service Team */}
+                        {(viewEvent.preacher || viewEvent.worship_leader || viewEvent.mc) && (
+                          <div className="mb-8 p-6 rounded-[2rem] bg-surface-container-lowest border border-outline-variant/10">
+                            <div className="flex items-center gap-2 mb-5">
+                              <Users size={16} className="text-primary" />
+                              <p className="text-xs font-black text-on-surface uppercase tracking-widest">Service Team</p>
+                            </div>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                              {viewEvent.preacher && (
+                                <div className="flex items-center gap-3">
+                                  <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
+                                    <Mic2 size={18} />
+                                  </div>
+                                  <div className="min-w-0">
+                                    <p className="text-[9px] text-on-surface-variant uppercase font-bold">Preacher</p>
+                                    <p className="text-sm font-black text-on-surface truncate">{viewEvent.preacher}</p>
+                                  </div>
+                                </div>
+                              )}
+                              {viewEvent.worship_leader && (
+                                <div className="flex items-center gap-3">
+                                  <div className="w-10 h-10 rounded-xl bg-pink-500/10 flex items-center justify-center text-pink-500">
+                                    <Music size={18} />
+                                  </div>
+                                  <div className="min-w-0">
+                                    <p className="text-[9px] text-on-surface-variant uppercase font-bold">Worship</p>
+                                    <p className="text-sm font-black text-on-surface truncate">{viewEvent.worship_leader}</p>
+                                  </div>
+                                </div>
+                              )}
+                              {viewEvent.mc && (
+                                <div className="flex items-center gap-3">
+                                  <div className="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-500">
+                                    <UserCheck size={18} />
+                                  </div>
+                                  <div className="min-w-0">
+                                    <p className="text-[9px] text-on-surface-variant uppercase font-bold">MC</p>
+                                    <p className="text-sm font-black text-on-surface truncate">{viewEvent.mc}</p>
+                                  </div>
+                                </div>
+                              )}
+                            </div>
                           </div>
-                        </div>
-                      )}
+                        )}
 
-                      <div className="flex gap-3 pt-4">
-                        <Button
-                          variant="secondary"
-                          onClick={() => { setViewEvent(null); openModal(viewEvent); }}
-                          className="flex-1"
-                          icon={Edit2}
-                        >
-                          Edit
-                        </Button>
-                        <Button
-                          onClick={() => setViewEvent(null)}
-                          className="flex-1"
-                        >
-                          Close
-                        </Button>
+                        {/* Notes */}
+                        {viewEvent.notes && (
+                          <div className="mb-8 p-6 rounded-[2rem] bg-amber-50/30 dark:bg-amber-950/10 border border-amber-200/20">
+                            <div className="flex items-center gap-2 mb-3">
+                              <StickyNote size={16} className="text-amber-500" />
+                              <p className="text-xs font-black text-on-surface uppercase tracking-widest">Notes & Instructions</p>
+                            </div>
+                            <p className="text-sm text-on-surface-variant leading-relaxed">
+                              {viewEvent.notes}
+                            </p>
+                          </div>
+                        )}
+
+                        {/* Actions */}
+                        <div className="flex gap-3 pt-2">
+                          <Button
+                            variant="secondary"
+                            onClick={() => { setViewEvent(null); openModal(viewEvent); }}
+                            className="flex-1 h-14 rounded-2xl font-black text-xs uppercase tracking-widest"
+                            icon={Edit2}
+                          >
+                            Edit Details
+                          </Button>
+                          <Button
+                            onClick={() => setViewEvent(null)}
+                            className="flex-1 h-14 rounded-2xl font-black text-xs uppercase tracking-widest"
+                          >
+                            Dismiss
+                          </Button>
+                        </div>
                       </div>
                     </div>
-                  </>
                 );
               })()}
             </motion.div>
@@ -876,62 +901,94 @@ export default function Events() {
               <Button variant="secondary" icon={Star} style={{ flex: 1 }}>Yearly Outlook</Button>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(380px, 1fr))', gap: '24px' }}>
-              {programPlans.map((plan, i) => (
-                <motion.div key={plan.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.08 }}>
-                  <Card style={{ padding: '0', overflow: 'hidden', borderLeft: `6px solid ${getServiceColor(plan.type)}` }}>
-                    <div style={{ padding: '28px' }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '20px' }}>
-                        <div style={{ padding: '5px 12px', borderRadius: '8px', background: `${getServiceColor(plan.type)}22`, color: getServiceColor(plan.type), fontSize: '0.7rem', fontWeight: '800', textTransform: 'uppercase' }}>
-                          {plan.type}
-                        </div>
-                        <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem', fontWeight: '600' }}>{plan.program}</span>
-                      </div>
-
-                      <h3 style={{ fontSize: '1.35rem', fontWeight: '800', marginBottom: '16px' }}>"{plan.theme || 'Untitled Program'}"</h3>
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+              {programPlans.map((plan, i) => {
+                const color = getServiceColor(plan.type);
+                return (
+                  <motion.div 
+                    key={plan.id} 
+                    initial={{ opacity: 0, y: 20 }} 
+                    animate={{ opacity: 1, y: 0 }} 
+                    transition={{ delay: i * 0.08 }}
+                    whileHover={{ y: -4 }}
+                  >
+                    <div className="group relative bg-surface border border-outline-variant/20 rounded-[2rem] overflow-hidden shadow-sm hover:shadow-xl hover:shadow-primary/5 transition-all">
+                      <div className="absolute top-0 left-0 w-2 h-full" style={{ background: color }} />
                       
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', borderTop: '1px solid var(--border)', paddingTop: '20px' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                          <div style={{ width: 40, height: 40, borderRadius: 10, background: 'rgba(255,255,255,0.05)', display: 'grid', placeItems: 'center' }}>
-                            <Mic2 size={18} color="var(--primary)" />
+                      <div className="p-8">
+                        <div className="flex justify-between items-start mb-6">
+                          <div className="flex flex-col gap-1">
+                            <span className="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider w-fit" style={{ background: `${color}15`, color }}>
+                              {plan.type}
+                            </span>
+                            <span className="text-xs font-bold text-on-surface-variant opacity-60 px-1">{plan.program} Cycle</span>
                           </div>
-                          <div>
-                            <p style={{ fontSize: '0.65rem', color: 'var(--text-muted)', fontWeight: '700', textTransform: 'uppercase' }}>Preacher</p>
-                            <p style={{ fontWeight: '700', fontSize: '1rem' }}>{plan.preacher || 'TBA'}</p>
-                          </div>
-                        </div>
-
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                          <div style={{ width: 40, height: 40, borderRadius: 10, background: 'rgba(255,255,255,0.05)', display: 'grid', placeItems: 'center' }}>
-                            <Music size={18} color="#ec4899" />
-                          </div>
-                          <div>
-                            <p style={{ fontSize: '0.65rem', color: 'var(--text-muted)', fontWeight: '700', textTransform: 'uppercase' }}>Worship Leader</p>
-                            <p style={{ fontWeight: '700', fontSize: '1rem' }}>{plan.worshipLeader || 'TBA'}</p>
+                          <div className="p-3 rounded-2xl bg-surface-container-low text-on-surface-variant group-hover:text-primary transition-colors">
+                            <CalendarDays size={20} />
                           </div>
                         </div>
 
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                          <div style={{ width: 40, height: 40, borderRadius: 10, background: 'rgba(255,255,255,0.05)', display: 'grid', placeItems: 'center' }}>
-                            <Calendar size={18} color="var(--text-muted)" />
+                        <h3 className="text-xl font-black text-on-surface mb-6 leading-tight group-hover:text-primary transition-colors">
+                          "{plan.theme || 'Untitled Program'}"
+                        </h3>
+                        
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-6 border-t border-outline-variant/10">
+                          <div className="flex items-center gap-4">
+                            <div className="w-12 h-12 rounded-2xl bg-surface-container-high flex items-center justify-center text-primary">
+                              <Mic2 size={20} />
+                            </div>
+                            <div className="min-w-0">
+                              <p className="text-[10px] text-on-surface-variant uppercase font-black tracking-widest opacity-60">Preacher</p>
+                              <p className="text-sm font-black text-on-surface truncate">{plan.preacher || 'TBA'}</p>
+                            </div>
                           </div>
-                          <p style={{ fontWeight: '600', fontSize: '0.9rem' }}>
-                            {plan.date ? (() => {
-                              const [y, m, d] = plan.date.split('-');
-                              return formatToEthiopian(y, m - 1, d);
-                            })() : 'Set Date'} @ {plan.time || 'Set Time'}
-                          </p>
+
+                          <div className="flex items-center gap-4">
+                            <div className="w-12 h-12 rounded-2xl bg-surface-container-high flex items-center justify-center text-pink-500">
+                              <Music size={20} />
+                            </div>
+                            <div className="min-w-0">
+                              <p className="text-[10px] text-on-surface-variant uppercase font-black tracking-widest opacity-60">Worship</p>
+                              <p className="text-sm font-black text-on-surface truncate">{plan.worshipLeader || 'TBA'}</p>
+                            </div>
+                          </div>
+
+                          <div className="flex items-center gap-4">
+                            <div className="w-12 h-12 rounded-2xl bg-surface-container-high flex items-center justify-center text-amber-500">
+                              <Clock size={20} />
+                            </div>
+                            <div className="min-w-0">
+                              <p className="text-[10px] text-on-surface-variant uppercase font-black tracking-widest opacity-60">Schedule</p>
+                              <p className="text-sm font-black text-on-surface truncate">
+                                {plan.date ? formatDate(plan.date) : 'TBD'} @ {plan.time || 'TBD'}
+                              </p>
+                            </div>
+                          </div>
+
+                          <div className="flex items-center gap-4">
+                            <div className="w-12 h-12 rounded-2xl bg-surface-container-high flex items-center justify-center text-emerald-500">
+                              <Zap size={20} />
+                            </div>
+                            <div className="min-w-0">
+                              <p className="text-[10px] text-on-surface-variant uppercase font-black tracking-widest opacity-60">Status</p>
+                              <p className="text-sm font-black text-emerald-600 truncate">Draft Mode</p>
+                            </div>
+                          </div>
                         </div>
                       </div>
-                    </div>
 
-                    <div style={{ background: 'rgba(255,255,255,0.03)', padding: '14px 28px', borderTop: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between' }}>
-                      <button style={{ color: 'var(--text-muted)', fontSize: '0.825rem', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '6px', background: 'none', border: 'none', cursor: 'pointer' }}><Zap size={14} /> Edit</button>
-                      <button style={{ color: '#ef4444', fontSize: '0.825rem', fontWeight: '600', background: 'none', border: 'none', cursor: 'pointer' }}>Postpone</button>
+                      <div className="px-8 py-4 bg-surface-container-lowest border-t border-outline-variant/10 flex justify-between items-center">
+                        <button className="text-xs font-black text-on-surface-variant hover:text-primary transition-colors flex items-center gap-2 uppercase tracking-widest cursor-pointer">
+                          <Edit2 size={14} /> Edit Plan
+                        </button>
+                        <button className="text-xs font-black text-red-500 hover:text-red-600 transition-colors uppercase tracking-widest cursor-pointer">
+                          Postpone
+                        </button>
+                      </div>
                     </div>
-                  </Card>
-                </motion.div>
-              ))}
+                  </motion.div>
+                );
+              })}
             </div>
           </motion.div>
         )}

@@ -60,12 +60,12 @@ export default function EtDatePicker({ value, onChange, label, required, classNa
   const days = Array.from({ length: 30 }, (_, i) => i + 1);
 
   return (
-    <div className={`space-y-2 ${className}`}>
+    <div className={`space-y-1.5 ${className}`}>
       {label && <label className="text-sm font-semibold text-on-surface">{label} {required && <span className="text-error">*</span>}</label>}
-      <div className="flex gap-2">
-        <div className="relative flex-1">
+      <div className="flex flex-row w-full gap-2 items-center">
+        <div className="relative flex-[1.2] min-w-0">
           <select
-            className="w-full h-12 pl-4 pr-8 rounded-xl border border-outline-variant/20 bg-surface text-on-surface focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all appearance-none"
+            className="w-full h-10 pl-3 pr-7 rounded-lg border border-outline-variant/20 bg-surface text-sm text-on-surface focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all appearance-none"
             value={etMonth}
             onChange={(e) => handleChange(etYear, e.target.value, etDay)}
             required={required}
@@ -73,11 +73,11 @@ export default function EtDatePicker({ value, onChange, label, required, classNa
             <option value="">Month</option>
             {months.map((m, i) => <option key={i + 1} value={i + 1}>{m}</option>)}
           </select>
-          <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none" size={16} />
+          <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none" size={14} />
         </div>
-        <div className="relative flex-[0.7]">
+        <div className="relative flex-[0.8] min-w-0">
           <select
-            className="w-full h-12 pl-4 pr-8 rounded-xl border border-outline-variant/20 bg-surface text-on-surface focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all appearance-none"
+            className="w-full h-10 pl-3 pr-7 rounded-lg border border-outline-variant/20 bg-surface text-sm text-on-surface focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all appearance-none"
             value={etDay}
             onChange={(e) => handleChange(etYear, etMonth, e.target.value)}
             required={required}
@@ -85,11 +85,11 @@ export default function EtDatePicker({ value, onChange, label, required, classNa
             <option value="">Day</option>
             {days.map(d => <option key={d} value={d}>{d}</option>)}
           </select>
-          <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none" size={16} />
+          <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none" size={14} />
         </div>
-        <div className="relative flex-[0.9]">
+        <div className="relative flex-[1] min-w-0">
           <select
-            className="w-full h-12 pl-4 pr-8 rounded-xl border border-outline-variant/20 bg-surface text-on-surface focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all appearance-none"
+            className="w-full h-10 pl-3 pr-7 rounded-lg border border-outline-variant/20 bg-surface text-sm text-on-surface focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all appearance-none"
             value={etYear}
             onChange={(e) => handleChange(e.target.value, etMonth, etDay)}
             required={required}
@@ -97,7 +97,7 @@ export default function EtDatePicker({ value, onChange, label, required, classNa
             <option value="">Year</option>
             {years.map(y => <option key={y} value={y}>{y}</option>)}
           </select>
-          <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none" size={16} />
+          <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none" size={14} />
         </div>
       </div>
     </div>

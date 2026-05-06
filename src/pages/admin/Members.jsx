@@ -886,7 +886,7 @@ export default function Members() {
                     ))}
                   </div>
 
-                  <form id="member-form" onSubmit={handleSaveMember} className="space-y-8">
+                  <form id="member-form" onSubmit={(e) => e.preventDefault()} className="space-y-8">
                     <AnimatePresence mode="wait">
                       {currentStep === 1 && (
                         <motion.div
@@ -1268,6 +1268,7 @@ export default function Members() {
                   <div className="flex gap-4">
                     {currentStep > 1 && (
                       <Button
+                        type="button"
                         variant="secondary"
                         onClick={() => setCurrentStep(currentStep - 1)}
                         className="px-8"
@@ -1276,6 +1277,7 @@ export default function Members() {
                       </Button>
                     )}
                     <Button
+                      type="button"
                       variant="outline"
                       onClick={() => setShowModal(false)}
                       className="px-8 border-outline-variant/20"
@@ -1286,6 +1288,7 @@ export default function Members() {
 
                   {currentStep < 3 ? (
                     <Button
+                      type="button"
                       onClick={() => setCurrentStep(currentStep + 1)}
                       className="px-8"
                     >
@@ -1293,8 +1296,8 @@ export default function Members() {
                     </Button>
                   ) : (
                     <Button
-                      type="submit"
-                      form="member-form"
+                      type="button"
+                      onClick={handleSaveMember}
                       className="px-8"
                       loading={isSaving}
                     >

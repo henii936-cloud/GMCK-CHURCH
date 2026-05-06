@@ -1,5 +1,6 @@
 import { Outlet, Navigate } from "react-router-dom";
 import Sidebar from "./Sidebar";
+import ChatSystem from "../common/ChatSystem";
 import { useAuth } from "../../context/AuthContext";
 
 export default function Layout({ allowedRoles }) {
@@ -49,6 +50,7 @@ export default function Layout({ allowedRoles }) {
           <Outlet />
         </div>
       </main>
+      <ChatSystem />
     </div>
   );
 }

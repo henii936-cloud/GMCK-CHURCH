@@ -43,6 +43,7 @@ import YouthMembers from "./pages/youth/YouthMembers";
 import ShepherdDashboard from "./pages/shepherd/ShepherdDashboard";
 import ShepherdGroups from "./pages/shepherd/ShepherdGroups";
 import ShepherdMinistries from "./pages/shepherd/Ministries";
+import Messages from "./pages/common/Messages";
 // Kids Ministry pages
 import KidsRoute from "./routes/KidsRoute";
 import KidsDashboard from "./pages/kids/KidsDashboard";
@@ -78,6 +79,7 @@ export default function App() {
             <Route path="budgets" element={<AdminBudgets />} />
             <Route path="programs" element={<AdminActivities />} />
             <Route path="ministries" element={<ShepherdMinistries viewOnly={true} />} />
+            <Route path="messages" element={<Messages />} />
           </Route>
 
           {/* Leader Routes */}
@@ -86,6 +88,7 @@ export default function App() {
             <Route path="members" element={<LeaderMembers />} />
             <Route path="attendance" element={<LeaderAttendance />} />
             <Route path="study" element={<LeaderStudy />} />
+            <Route path="messages" element={<Messages />} />
           </Route>
 
           {/* Finance Routes */}
@@ -94,6 +97,7 @@ export default function App() {
             <Route path="record" element={<RecordGiving />} />
             <Route path="budgets" element={<ApprovedBudgets />} />
             <Route path="expenses" element={<Expenses />} />
+            <Route path="messages" element={<Messages />} />
           </Route>
 
           {/* Management Routes */}
@@ -102,6 +106,7 @@ export default function App() {
             <Route path="workers" element={<Workers />} />
             <Route path="salaries" element={<Salaries />} />
             <Route path="finance" element={<ManagementFinance />} />
+            <Route path="messages" element={<Messages />} />
           </Route>
 
           {/* Youth Ministry Routes */}
@@ -109,6 +114,7 @@ export default function App() {
             <Route index element={<YouthDashboard />} />
             <Route path="events" element={<YouthEvents />} />
             <Route path="members" element={<YouthMembers />} />
+            <Route path="messages" element={<Messages />} />
           </Route>
 
           {/* Shepherd Routes */}
@@ -117,6 +123,7 @@ export default function App() {
             <Route path="groups" element={<AdminGroups viewOnly={false} />} />
             <Route path="evangelism" element={<AdminEvangelism viewOnly={false} />} />
             <Route path="ministries" element={<ShepherdMinistries viewOnly={false} />} />
+            <Route path="messages" element={<Messages />} />
           </Route>
 
           {/* Kids Ministry Routes */}
@@ -126,6 +133,7 @@ export default function App() {
             <Route path="classes" element={<KidsClasses />} />
             <Route path="attendance" element={<KidsAttendance />} />
             <Route path="events" element={<KidsEvents />} />
+            <Route path="messages" element={<Messages />} />
           </Route>
 
           <Route path="/" element={<Landing />} />

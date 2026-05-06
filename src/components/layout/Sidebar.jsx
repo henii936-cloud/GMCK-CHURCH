@@ -5,7 +5,7 @@ import { motion } from "motion/react";
 import {
   Users, Layers, DollarSign, Activity, Settings,
   MapPin, BookOpen, ClipboardList, LogOut, ChevronRight, ShieldCheck, Wallet, Heart, ArrowDownRight,
-  Menu, X, Briefcase, Zap, Eye, UserCheck, Calendar, Shield, FileText
+  Menu, X, Briefcase, Zap, Eye, UserCheck, Calendar, Shield, FileText, MessageSquare
 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import { useState, useEffect } from "react";
@@ -64,34 +64,40 @@ export default function Sidebar() {
       { name: "Finance", icon: DollarSign, path: "/admin/finance" },
       { name: "Budgets", icon: Wallet, path: "/admin/budgets" },
       { name: "Reports", icon: ClipboardList, path: "/admin/reports" },
+      { name: "Messages", icon: MessageSquare, path: "/admin/messages" },
     ],
     bible_leader: [
       { name: "My Group Members", icon: Users, path: "/leader" },
       { name: "Take Attendance", icon: ClipboardList, path: "/leader/attendance" },
       { name: "Record Study Progress", icon: BookOpen, path: "/leader/study" },
+      { name: "Messages", icon: MessageSquare, path: "/leader/messages" },
     ],
     finance: [
       { name: "Dashboard", icon: Layers, path: "/finance" },
       { name: "Approved Budgets", icon: Wallet, path: "/finance/budgets" },
       { name: "Record Giving", icon: DollarSign, path: "/finance/record" },
       { name: "Expenses", icon: ArrowDownRight, path: "/finance/expenses" },
+      { name: "Messages", icon: MessageSquare, path: "/finance/messages" },
     ],
     management: [
       { name: "Dashboard", icon: Layers, path: "/management" },
       { name: "Church Workers", icon: UserCheck, path: "/management/workers" },
       { name: "Salary Management", icon: Wallet, path: "/management/salaries" },
       { name: "Finance Overview", icon: DollarSign, path: "/management/finance" },
+      { name: "Messages", icon: MessageSquare, path: "/management/messages" },
     ],
     youth_ministry: [
       { name: "Dashboard", icon: Layers, path: "/youth" },
       { name: "Youth Members", icon: Users, path: "/youth/members" },
       { name: "Youth Events", icon: Calendar, path: "/youth/events" },
+      { name: "Messages", icon: MessageSquare, path: "/youth/messages" },
     ],
     shepherd: [
       { name: "Overview", icon: Layers, path: "/shepherd" },
       { name: "Bible Study Groups", icon: MapPin, path: "/shepherd/groups" },
       { name: "Evangelism", icon: Heart, path: "/shepherd/evangelism" },
       { name: "Ministries", icon: Heart, path: "/shepherd/ministries" },
+      { name: "Messages", icon: MessageSquare, path: "/shepherd/messages" },
     ],
     kids_ministry: [
       { name: "Dashboard", icon: Layers, path: "/kids" },
@@ -99,6 +105,7 @@ export default function Sidebar() {
       { name: "Classes", icon: Layers, path: "/kids/classes" },
       { name: "Attendance", icon: ClipboardList, path: "/kids/attendance" },
       { name: "Kids Events", icon: Calendar, path: "/kids/events" },
+      { name: "Messages", icon: MessageSquare, path: "/kids/messages" },
     ],
   };
 

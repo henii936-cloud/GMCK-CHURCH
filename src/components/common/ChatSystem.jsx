@@ -41,8 +41,8 @@ export default function ChatSystem() {
       currentChannels.push({ id: "role:admin_shepherd", name: "Admin & Shepherd", icon: Hash, color: "bg-secondary" });
     }
 
-    // Add Bible Study Groups for Admins and Shepherds
-    if (user?.role === 'admin' || user?.role === 'shepherd') {
+    // Add Bible Study Groups for Admins, Shepherds, and Leaders
+    if (user?.role === 'admin' || user?.role === 'shepherd' || user?.role === 'bible_leader') {
       bibleStudyGroups.forEach(group => {
         currentChannels.push({ 
           id: `group:${group.id}`, 
@@ -151,9 +151,14 @@ export default function ChatSystem() {
       channel: activeChannel,
     };
 
-    const { error } = await supabase.from('messages').insert([messageData]);
-    if (!error) {
+    const { data: sentMsg, error } = await supabase.from('messages').insert([messageData]).select().single();
+    if (!error && sentMsg) {
       setNewMessage("");
+      setMessages(current => {
+        if (current.find(m => m.id === sentMsg.id)) return current;
+        return [...current, sentMsg];
+      });
+      scrollToBottom();
     }
   };
 

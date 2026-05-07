@@ -21,6 +21,10 @@ export default function Members() {
   const [editingMember, setEditingMember] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedGroup, setSelectedGroup] = useState("All");
+  const [selectedAge, setSelectedAge] = useState("All");
+  const [selectedLeave, setSelectedLeave] = useState("All");
+  const [selectedMarital, setSelectedMarital] = useState("All");
+  const [selectedMinistry, setSelectedMinistry] = useState("All");
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
   const [deleteId, setDeleteId] = useState(null);
@@ -308,7 +312,12 @@ export default function Members() {
       (m.email && m.email.toLowerCase().includes(term)) ||
       (m.phone && m.phone.includes(term));
     const groupMatch = selectedGroup === "All" || m.group_id === selectedGroup;
-    return searchMatch && groupMatch;
+    const ageMatch = selectedAge === "All" || m.age_group === selectedAge;
+    const leaveMatch = selectedLeave === "All" || m.leave_status === selectedLeave;
+    const maritalMatch = selectedMarital === "All" || m.marital_status === selectedMarital;
+    const ministryMatch = selectedMinistry === "All" || (m.ministries && m.ministries.includes(selectedMinistry));
+    
+    return searchMatch && groupMatch && ageMatch && leaveMatch && maritalMatch && ministryMatch;
   });
 
   const stats = {
@@ -405,31 +414,101 @@ export default function Members() {
       </div>
 
       {/* Control Bar */}
-      <div className="flex flex-col md:flex-row gap-4 mb-8">
-        <div className="flex-1 relative">
-          <Search size={20} className="absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant" />
-          <input
-            type="text"
-            placeholder="Filter by name, identifier or contact info..."
-            className="w-full pl-12 pr-4 h-14 rounded-2xl border border-[#181717] bg-surface text-on-surface focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-        </div>
-        <div className="relative md:w-64">
-          <select
-            className="w-full h-14 pl-4 pr-10 rounded-2xl border border-[#0e0d0d] bg-surface text-on-surface focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all appearance-none cursor-pointer"
-            value={selectedGroup}
-            onChange={(e) => setSelectedGroup(e.target.value)}
+      <div className="flex flex-col gap-4 mb-8">
+        <div className="flex flex-col md:flex-row gap-4">
+          <div className="flex-1 relative">
+            <Search size={20} className="absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant" />
+            <input
+              type="text"
+              placeholder="Search by name, email or phone..."
+              className="w-full pl-12 pr-4 h-14 rounded-2xl border border-outline-variant/20 bg-surface text-on-surface focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all shadow-sm"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
+          <Button 
+            variant="secondary" 
+            onClick={() => { 
+              setSearchTerm(""); 
+              setSelectedGroup("All"); 
+              setSelectedAge("All");
+              setSelectedLeave("All");
+              setSelectedMarital("All");
+              setSelectedMinistry("All");
+            }} 
+            icon={FilterX} 
+            className="h-14 rounded-2xl px-6"
           >
-            <option value="All">All Congregational Groups</option>
-            {groups.map(g => <option key={g.id} value={g.id}>{g.group_name}</option>)}
-          </select>
-          <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none" size={18} />
+            Reset Filters
+          </Button>
         </div>
-        <Button variant="secondary" onClick={() => { setSearchTerm(""); setSelectedGroup("All"); }} icon={FilterX} className="h-14 rounded-2xl px-6">
-          Reset Filters
-        </Button>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-3">
+          {/* Group Filter */}
+          <div className="relative">
+            <select
+              className="w-full h-12 pl-4 pr-10 rounded-xl border border-outline-variant/20 bg-surface text-on-surface focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all appearance-none cursor-pointer text-sm font-medium"
+              value={selectedGroup}
+              onChange={(e) => setSelectedGroup(e.target.value)}
+            >
+              <option value="All">All Groups</option>
+              {groups.map(g => <option key={g.id} value={g.id}>{g.group_name}</option>)}
+            </select>
+            <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none" size={16} />
+          </div>
+
+          {/* Age Filter */}
+          <div className="relative">
+            <select
+              className="w-full h-12 pl-4 pr-10 rounded-xl border border-outline-variant/20 bg-surface text-on-surface focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all appearance-none cursor-pointer text-sm font-medium"
+              value={selectedAge}
+              onChange={(e) => setSelectedAge(e.target.value)}
+            >
+              <option value="All">All Ages</option>
+              {['Kids', 'Teenage', 'Youth', 'Adult', 'Senior'].map(a => <option key={a} value={a}>{a}</option>)}
+            </select>
+            <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none" size={16} />
+          </div>
+
+          {/* Leave Filter */}
+          <div className="relative">
+            <select
+              className="w-full h-12 pl-4 pr-10 rounded-xl border border-outline-variant/20 bg-surface text-on-surface focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all appearance-none cursor-pointer text-sm font-medium"
+              value={selectedLeave}
+              onChange={(e) => setSelectedLeave(e.target.value)}
+            >
+              <option value="All">All Status</option>
+              {['Active', 'Inactive', 'Moved'].map(l => <option key={l} value={l}>{l}</option>)}
+            </select>
+            <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none" size={16} />
+          </div>
+
+          {/* Marital Filter */}
+          <div className="relative">
+            <select
+              className="w-full h-12 pl-4 pr-10 rounded-xl border border-outline-variant/20 bg-surface text-on-surface focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all appearance-none cursor-pointer text-sm font-medium"
+              value={selectedMarital}
+              onChange={(e) => setSelectedMarital(e.target.value)}
+            >
+              <option value="All">All Marital</option>
+              {['Unmarried', 'Married', 'Widow', 'Divorced'].map(m => <option key={m} value={m}>{m}</option>)}
+            </select>
+            <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none" size={16} />
+          </div>
+
+          {/* Ministry Filter */}
+          <div className="relative">
+            <select
+              className="w-full h-12 pl-4 pr-10 rounded-xl border border-outline-variant/20 bg-surface text-on-surface focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all appearance-none cursor-pointer text-sm font-medium"
+              value={selectedMinistry}
+              onChange={(e) => setSelectedMinistry(e.target.value)}
+            >
+              <option value="All">All Ministries</option>
+              {availableMinistries.map(m => <option key={m.id} value={m.name}>{m.name}</option>)}
+            </select>
+            <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none" size={16} />
+          </div>
+        </div>
       </div>
 
       {/* Main Table Card */}

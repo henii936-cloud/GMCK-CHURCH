@@ -38,6 +38,12 @@ export default function Messages() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [modalSearch, setModalSearch] = useState("");
   const messagesEndRef = useRef(null);
+  const activeTabRef = useRef(activeTab);
+
+  // Keep ref in sync for subscription
+  useEffect(() => {
+    activeTabRef.current = activeTab;
+  }, [activeTab]);
 
   // Initialize from location state (Direct Message from Leaders page)
   useEffect(() => {
@@ -63,11 +69,14 @@ export default function Messages() {
 
   useEffect(() => {
     if (!user) return;
+    setMessages([]); // Clear messages immediately when switching tabs
     fetchMessages();
     
     // Subscribe to messages
-    const targetId = activeTab.startsWith('dm:') ? activeTab.split(':')[1] : null;
-    const channelName = activeTab.startsWith('dm:') ? `dm:${[user.id, targetId].sort().join('-')}` : `chat:${activeTab}`;
+    const channelName = activeTab.startsWith('dm:') 
+      ? `dm:${[user.id, activeTab.split(':')[1]].sort().join('-')}` 
+      : `chat:${activeTab}`;
+      
     const channel = supabase
       .channel(channelName)
       .on('postgres_changes', { 
@@ -76,28 +85,35 @@ export default function Messages() {
         table: 'messages',
       }, payload => {
         const msg = payload.new;
-        const targetUserId = activeTab.split(':')[1];
+        const currentTab = activeTabRef.current;
+        const targetUserId = currentTab.startsWith('dm:') ? currentTab.split(':')[1] : null;
         
-        // Filter logic for current view
-        const isCurrentChannel = msg.channel === activeTab;
-        const isCurrentDM = !msg.channel && (
+        // STRICTOR Filtering logic for current view
+        const isCurrentChannel = msg.channel && msg.channel === currentTab;
+        const isCurrentDM = !msg.channel && currentTab.startsWith('dm:') && (
           (msg.sender_id === user.id && msg.recipient_id === targetUserId) ||
           (msg.sender_id === targetUserId && msg.recipient_id === user.id)
         );
 
         if (isCurrentChannel || isCurrentDM) {
-          setMessages(current => [...current, msg]);
+          setMessages(current => {
+            // Prevent duplicates
+            if (current.find(m => m.id === msg.id)) return current;
+            return [...current, msg];
+          });
         }
         
-        // Update recent DMs if it's a DM
-        if (!msg.channel) fetchRecentDMs();
+        // Update sidebar if it's a DM for us
+        if (!msg.channel && (msg.sender_id === user.id || msg.recipient_id === user.id)) {
+          fetchRecentDMs();
+        }
       })
       .subscribe();
 
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [activeTab]);
+  }, [activeTab, user?.id]);
 
   useEffect(scrollToBottom, [messages]);
 
@@ -203,10 +219,30 @@ export default function Messages() {
     return null;
   };
 
-  const channels = [
+  const baseChannels = [
     { id: "global", name: "Global Church", icon: MessageCircle, color: "text-blue-500", bg: "bg-blue-500/10" },
-    { id: `role:${user?.role}`, name: "Ministry Channel", icon: Shield, color: "text-purple-500", bg: "bg-purple-500/10" },
   ];
+
+  // If Admin, show all role channels. If others, only show their role channel.
+  const roleChannels = user?.role === 'admin' 
+    ? Object.keys(ROLE_CONFIG).map(roleKey => ({
+        id: `role:${roleKey}`,
+        name: `${ROLE_CONFIG[roleKey].label} Channel`,
+        icon: Shield,
+        color: ROLE_CONFIG[roleKey].color,
+        bg: ROLE_CONFIG[roleKey].bg
+      }))
+    : [
+        { 
+          id: `role:${user?.role}`, 
+          name: "Ministry Channel", 
+          icon: Shield, 
+          color: "text-purple-500", 
+          bg: "bg-purple-500/10" 
+        }
+      ];
+
+  const channels = [...baseChannels, ...roleChannels];
 
   const filteredChannels = channels.filter(ch => 
     ch.name.toLowerCase().includes(searchQuery.toLowerCase())

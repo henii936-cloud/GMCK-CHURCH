@@ -219,14 +219,9 @@ export default function Messages() {
       messageData.channel = activeTab;
     }
 
-    const { data: sentMsg, error } = await supabase.from('messages').insert([messageData]).select().single();
-    if (!error && sentMsg) {
+    const { error } = await supabase.from('messages').insert([messageData]);
+    if (!error) {
       setNewMessage("");
-      // Optimistically update local state if not already added by realtime
-      setMessages(current => {
-        if (current.find(m => m.id === sentMsg.id)) return current;
-        return [...current, sentMsg];
-      });
       if (activeTab.startsWith('dm:')) fetchRecentDMs();
     }
   };
@@ -278,15 +273,7 @@ export default function Messages() {
         }
       ];
 
-  const groupChannels = bibleStudyGroups.map(group => ({
-    id: `group:${group.id}`,
-    name: group.group_name,
-    icon: Users,
-    color: "text-blue-500",
-    bg: "bg-blue-500/10"
-  }));
-
-  const channels = [...baseChannels, ...roleChannels, ...groupChannels];
+  const channels = [...baseChannels, ...roleChannels];
 
   const filteredChannels = channels.filter(ch => 
     ch.name.toLowerCase().includes(searchQuery.toLowerCase())
@@ -370,7 +357,7 @@ export default function Messages() {
                   </button>
                 ))}
 
-                {(user?.role === 'admin' || user?.role === 'shepherd' || user?.role === 'bible_leader') && (
+                {(user?.role === 'admin' || user?.role === 'shepherd') && (
                   <>
                     <p className="text-[10px] font-black uppercase tracking-[0.2em] text-primary/20 mt-6 mb-2 px-4">Bible Study Groups</p>
                     {bibleStudyGroups.filter(g => g.group_name?.toLowerCase().includes(searchQuery.toLowerCase())).map(group => (

@@ -62,8 +62,8 @@ export default function App() {
 
   return (
     <Router>
-      <NotificationProvider>
-        <AuthProvider>
+      <AuthProvider>
+        <NotificationProvider>
           <Routes>
             {/* Auth Routes */}
             <Route path="/login" element={<Login />} />
@@ -142,8 +142,8 @@ export default function App() {
 
             <Route path="/" element={<Landing />} />
           </Routes>
-        </AuthProvider>
-      </NotificationProvider>
+        </NotificationProvider>
+      </AuthProvider>
     </Router>
   );
 }

@@ -12,23 +12,53 @@ import { format } from "date-fns";
 export default function ChatSystem() {
   const { user } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
-  const [activeChannel, setActiveChannel] = useState("global");
+  const [activeChannel, setActiveChannel] = useState(user?.role ? `role:${user.role}` : "global");
   const [messages, setMessages] = useState([]);
+  const [bibleStudyGroups, setBibleStudyGroups] = useState([]);
   const [newMessage, setNewMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const [profiles, setProfiles] = useState({});
   const messagesEndRef = useRef(null);
 
   // Channels configuration
-  const channels = [
-    { id: "global", name: "Global Church", icon: MessageCircle, color: "bg-primary" },
-    { id: `role:${user?.role}`, name: `${user?.role?.replace('_', ' ')} Channel`, icon: Shield, color: "bg-tertiary-fixed-dim" },
-  ];
+  const baseChannels = [];
 
-  // Add specific collaborative channels
-  if (user?.role === 'admin' || user?.role === 'shepherd') {
-    channels.push({ id: "role:admin_shepherd", name: "Admin & Shepherd", icon: Hash, color: "bg-secondary" });
-  }
+  const [channels, setChannels] = useState(baseChannels);
+
+  useEffect(() => {
+    let currentChannels = [];
+    
+    // Add User Role Channel
+    if (user?.role) {
+      currentChannels.push({ 
+        id: `role:${user.role}`, 
+        name: `${user.role.replace('_', ' ')} Channel`, 
+        icon: Shield, 
+        color: "bg-tertiary-fixed-dim" 
+      });
+    }
+    if (user?.role === 'admin' || user?.role === 'shepherd') {
+      currentChannels.push({ id: "role:admin_shepherd", name: "Admin & Shepherd", icon: Hash, color: "bg-secondary" });
+    }
+
+    // Add Bible Study Groups
+    bibleStudyGroups.forEach(group => {
+      currentChannels.push({ 
+        id: `group:${group.id}`, 
+        name: group.group_name, 
+        icon: Users, 
+        color: "bg-blue-500" 
+      });
+    });
+
+    setChannels(currentChannels);
+  }, [user, bibleStudyGroups]);
+
+  useEffect(() => {
+    if (user?.role && activeChannel === 'global') {
+      setActiveChannel(`role:${user.role}`);
+    }
+  }, [user, activeChannel]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -58,6 +88,32 @@ export default function ChatSystem() {
       };
     }
   }, [isOpen, activeChannel]);
+
+  useEffect(() => {
+    if (user) {
+      fetchBibleStudyGroups();
+      
+      const groupsChannel = supabase
+        .channel('chat_groups_sync')
+        .on('postgres_changes', { 
+          event: '*', 
+          schema: 'public', 
+          table: 'bible_study_groups' 
+        }, () => {
+          fetchBibleStudyGroups();
+        })
+        .subscribe();
+
+      return () => {
+        supabase.removeChannel(groupsChannel);
+      };
+    }
+  }, [user]);
+
+  const fetchBibleStudyGroups = async () => {
+    const { data } = await supabase.from('bible_study_groups').select('*');
+    if (data) setBibleStudyGroups(data);
+  };
 
   useEffect(scrollToBottom, [messages]);
 

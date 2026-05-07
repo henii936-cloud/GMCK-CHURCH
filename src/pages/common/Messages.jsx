@@ -26,7 +26,7 @@ const ROLE_CONFIG = {
 export default function Messages() {
   const { user } = useAuth();
   const location = useLocation();
-  const [activeTab, setActiveTab] = useState("global"); // 'global', 'role', or 'dm:userId'
+  const [activeTab, setActiveTab] = useState(user?.role ? `role:${user.role}` : "global"); // Default to role if available
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
   const [loading, setLoading] = useState(false);
@@ -35,6 +35,7 @@ export default function Messages() {
   const [searchQuery, setSearchQuery] = useState("");
   const [showUserSearch, setShowUserSearch] = useState(false);
   const [allUsers, setAllUsers] = useState([]);
+  const [bibleStudyGroups, setBibleStudyGroups] = useState([]);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [modalSearch, setModalSearch] = useState("");
   const messagesEndRef = useRef(null);
@@ -64,8 +65,37 @@ export default function Messages() {
       fetchProfiles();
       fetchRecentDMs();
       fetchAllUsers();
+      fetchBibleStudyGroups();
+
+      // Subscribe to Bible Study Group changes
+      const groupsChannel = supabase
+        .channel('public:bible_study_groups')
+        .on('postgres_changes', { 
+          event: '*', 
+          schema: 'public', 
+          table: 'bible_study_groups' 
+        }, () => {
+          fetchBibleStudyGroups();
+        })
+        .subscribe();
+
+      return () => {
+        supabase.removeChannel(groupsChannel);
+      };
     }
   }, [user]);
+
+  const fetchBibleStudyGroups = async () => {
+    const { data } = await supabase.from('bible_study_groups').select('*');
+    if (data) setBibleStudyGroups(data);
+  };
+
+  // Ensure activeTab is set to role if it was initialized as global before user load
+  useEffect(() => {
+    if (user?.role && activeTab === 'global') {
+      setActiveTab(`role:${user.role}`);
+    }
+  }, [user, activeTab]);
 
   useEffect(() => {
     if (!user) return;
@@ -205,8 +235,11 @@ export default function Messages() {
   };
 
   const getActiveTitle = () => {
-    if (activeTab === 'global') return "Global Church";
     if (activeTab.startsWith('role:')) return `${activeTab.split(':')[1].replace('_', ' ')} Channel`;
+    if (activeTab.startsWith('group:')) {
+      const id = activeTab.split(':')[1];
+      return bibleStudyGroups.find(g => g.id === id)?.group_name || "Bible Study Group";
+    }
     if (activeTab.startsWith('dm:')) {
       const id = activeTab.split(':')[1];
       return profiles[id]?.full_name || "Private Chat";
@@ -219,9 +252,7 @@ export default function Messages() {
     return null;
   };
 
-  const baseChannels = [
-    { id: "global", name: "Global Church", icon: MessageCircle, color: "text-blue-500", bg: "bg-blue-500/10" },
-  ];
+  const baseChannels = [];
 
   // If Admin, show all role channels. If others, only show their role channel.
   const roleChannels = user?.role === 'admin' 
@@ -322,6 +353,25 @@ export default function Messages() {
                     <div className="text-left min-w-0">
                       <p className="font-bold text-sm truncate">{ch.name}</p>
                       <p className={`text-[10px] opacity-60 truncate ${activeTab === ch.id ? 'text-white/70' : 'text-primary/40'}`}>Official Updates</p>
+                    </div>
+                  </button>
+                ))}
+
+                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-primary/20 mt-6 mb-2 px-4">Bible Study Groups</p>
+                {bibleStudyGroups.filter(g => g.group_name?.toLowerCase().includes(searchQuery.toLowerCase())).map(group => (
+                  <button
+                    key={group.id}
+                    onClick={() => handleTabChange(`group:${group.id}`)}
+                    className={`flex items-center gap-4 p-3 rounded-[20px] transition-all duration-300 group ${
+                      activeTab === `group:${group.id}` ? 'bg-primary text-white shadow-lg' : 'hover:bg-primary/5 text-on-surface'
+                    }`}
+                  >
+                    <div className={`w-12 h-12 rounded-[18px] grid place-items-center shrink-0 ${activeTab === `group:${group.id}` ? 'bg-white/20' : 'bg-blue-500/10'}`}>
+                      <Users size={22} className={activeTab === `group:${group.id}` ? 'text-white' : 'text-blue-500'} />
+                    </div>
+                    <div className="text-left min-w-0">
+                      <p className="font-bold text-sm truncate">{group.group_name}</p>
+                      <p className={`text-[10px] opacity-60 truncate ${activeTab === `group:${group.id}` ? 'text-white/70' : 'text-primary/40'}`}>Fellowship Chat</p>
                     </div>
                   </button>
                 ))}

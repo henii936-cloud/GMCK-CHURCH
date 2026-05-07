@@ -35,6 +35,8 @@ export default function Messages() {
   const [searchQuery, setSearchQuery] = useState("");
   const [showUserSearch, setShowUserSearch] = useState(false);
   const [allUsers, setAllUsers] = useState([]);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [modalSearch, setModalSearch] = useState("");
   const messagesEndRef = useRef(null);
 
   // Initialize from location state (Direct Message from Leaders page)
@@ -52,16 +54,20 @@ export default function Messages() {
   };
 
   useEffect(() => {
-    fetchProfiles();
-    fetchRecentDMs();
-    fetchAllUsers();
-  }, []);
+    if (user) {
+      fetchProfiles();
+      fetchRecentDMs();
+      fetchAllUsers();
+    }
+  }, [user]);
 
   useEffect(() => {
+    if (!user) return;
     fetchMessages();
     
     // Subscribe to messages
-    const channelName = activeTab.startsWith('dm:') ? `dm:${[user.id, activeTab.split(':')[1]].sort().join('-')}` : `chat:${activeTab}`;
+    const targetId = activeTab.startsWith('dm:') ? activeTab.split(':')[1] : null;
+    const channelName = activeTab.startsWith('dm:') ? `dm:${[user.id, targetId].sort().join('-')}` : `chat:${activeTab}`;
     const channel = supabase
       .channel(channelName)
       .on('postgres_changes', { 
@@ -128,21 +134,28 @@ export default function Messages() {
   };
 
   const fetchMessages = async () => {
+    if (!user) return;
     setLoading(true);
-    let query = supabase.from('messages').select('*').order('created_at', { ascending: true });
+    try {
+      let query = supabase.from('messages').select('*').order('created_at', { ascending: true });
 
-    if (activeTab.startsWith('dm:')) {
-      const targetId = activeTab.split(':')[1];
-      query = query
-        .is('channel', null)
-        .or(`and(sender_id.eq.${user.id},recipient_id.eq.${targetId}),and(sender_id.eq.${targetId},recipient_id.eq.${user.id})`);
-    } else {
-      query = query.eq('channel', activeTab);
+      if (activeTab.startsWith('dm:')) {
+        const targetId = activeTab.split(':')[1];
+        query = query
+          .is('channel', null)
+          .or(`and(sender_id.eq.${user.id},recipient_id.eq.${targetId}),and(sender_id.eq.${targetId},recipient_id.eq.${user.id})`);
+      } else {
+        query = query.eq('channel', activeTab);
+      }
+
+      const { data, error } = await query.limit(100);
+      if (error) throw error;
+      if (data) setMessages(data);
+    } catch (err) {
+      console.error("Error fetching messages:", err);
+    } finally {
+      setLoading(false);
     }
-
-    const { data } = await query.limit(100);
-    if (data) setMessages(data);
-    setLoading(false);
   };
 
   const sendMessage = async (e) => {
@@ -195,100 +208,137 @@ export default function Messages() {
     { id: `role:${user?.role}`, name: "Ministry Channel", icon: Shield, color: "text-purple-500", bg: "bg-purple-500/10" },
   ];
 
+  const filteredChannels = channels.filter(ch => 
+    ch.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const filteredDMs = recentDMs.filter(dmId => {
+    const p = profiles[dmId];
+    return p?.full_name?.toLowerCase().includes(searchQuery.toLowerCase());
+  });
+
+  const filteredUsers = allUsers.filter(u => 
+    u.full_name?.toLowerCase().includes(modalSearch.toLowerCase())
+  );
+
+  const handleTabChange = (id) => {
+    setActiveTab(id);
+    if (window.innerWidth < 1024) setIsSidebarOpen(false);
+  };
+
   return (
-    <div className="p-4 sm:p-8 h-[calc(100vh-64px)] flex items-center justify-center">
+    <div className="p-4 sm:p-8 h-[calc(100vh-64px)] flex items-center justify-center overflow-hidden">
       <div className="w-full max-w-7xl h-full flex gap-4 sm:gap-8 relative">
         
-        {/* Telegram Sidebar */}
-        <motion.div 
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          className="w-80 lg:flex flex-col gap-6 hidden"
-        >
-          <div className="flex items-center justify-between px-2">
-            <h1 className="text-2xl font-black text-primary">Chat</h1>
-            <button 
-              onClick={() => setShowUserSearch(true)}
-              className="w-10 h-10 rounded-2xl bg-primary/5 text-primary grid place-items-center hover:bg-primary hover:text-white transition-all duration-300"
+        {/* Sidebar */}
+        <AnimatePresence>
+          {(isSidebarOpen || window.innerWidth >= 1024) && (
+            <motion.div 
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              className={`w-full lg:w-80 flex-col gap-6 lg:flex ${isSidebarOpen ? 'flex absolute inset-0 z-50 bg-background lg:relative lg:bg-transparent' : 'hidden'}`}
             >
-              <Plus size={20} />
-            </button>
-          </div>
-
-          <div className="relative group px-2">
-            <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-primary/20 group-focus-within:text-primary transition-colors" size={18} />
-            <input 
-              type="text" 
-              placeholder="Search messages..."
-              className="w-full bg-surface-container-low border-none rounded-2xl py-3 pl-12 pr-4 text-sm focus:ring-2 ring-primary/20 transition-all"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-          </div>
-
-          <Card className="flex-1 p-2 overflow-y-auto custom-scrollbar flex flex-col gap-1 border-none shadow-premium bg-white/40 backdrop-blur-xl">
-            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-primary/20 mt-4 mb-2 px-4">Channels</p>
-            {channels.map(ch => (
-              <button
-                key={ch.id}
-                onClick={() => setActiveTab(ch.id)}
-                className={`flex items-center gap-4 p-3 rounded-[20px] transition-all duration-300 group ${
-                  activeTab === ch.id ? 'bg-primary text-white shadow-lg' : 'hover:bg-primary/5 text-on-surface'
-                }`}
-              >
-                <div className={`w-12 h-12 rounded-[18px] grid place-items-center shrink-0 ${activeTab === ch.id ? 'bg-white/20' : ch.bg}`}>
-                  <ch.icon size={22} className={activeTab === ch.id ? 'text-white' : ch.color} />
+              <div className="flex items-center justify-between px-2">
+                <h1 className="text-2xl font-black text-primary">Chat</h1>
+                <div className="flex gap-2">
+                  <button 
+                    onClick={() => setShowUserSearch(true)}
+                    className="w-10 h-10 rounded-2xl bg-primary/5 text-primary grid place-items-center hover:bg-primary hover:text-white transition-all duration-300"
+                  >
+                    <Plus size={20} />
+                  </button>
+                  {isSidebarOpen && window.innerWidth < 1024 && (
+                    <button 
+                      onClick={() => setIsSidebarOpen(false)}
+                      className="w-10 h-10 rounded-2xl bg-primary/5 text-primary grid place-items-center"
+                    >
+                      <X size={20} />
+                    </button>
+                  )}
                 </div>
-                <div className="text-left min-w-0">
-                  <p className="font-bold text-sm truncate">{ch.name}</p>
-                  <p className={`text-[10px] opacity-60 truncate ${activeTab === ch.id ? 'text-white/70' : 'text-primary/40'}`}>Official Updates</p>
-                </div>
-              </button>
-            ))}
-
-            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-primary/20 mt-6 mb-2 px-4">Direct Messages</p>
-            {recentDMs.map(dmId => {
-              const p = profiles[dmId];
-              const isActive = activeTab === `dm:${dmId}`;
-              if (!p) return null;
-              return (
-                <button
-                  key={dmId}
-                  onClick={() => setActiveTab(`dm:${dmId}`)}
-                  className={`flex items-center gap-4 p-3 rounded-[20px] transition-all duration-300 group ${
-                    isActive ? 'bg-primary text-white shadow-lg' : 'hover:bg-primary/5 text-on-surface'
-                  }`}
-                >
-                  <div className={`w-12 h-12 rounded-[18px] grid place-items-center shrink-0 font-black text-sm ${isActive ? 'bg-white/20 text-white' : 'bg-surface-container-highest text-primary'}`}>
-                    {p.full_name?.charAt(0)}
-                  </div>
-                  <div className="text-left min-w-0">
-                    <div className="flex items-center gap-2">
-                      <p className="font-bold text-sm truncate">{p.full_name}</p>
-                      {p.role && ROLE_CONFIG[p.role] && (
-                        <span className={`text-[8px] font-black uppercase tracking-tighter px-1.5 py-0.5 rounded ${ROLE_CONFIG[p.role].bg} ${ROLE_CONFIG[p.role].color}`}>
-                          {ROLE_CONFIG[p.role].label}
-                        </span>
-                      )}
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <div className={`w-1.5 h-1.5 rounded-full bg-emerald-500`} />
-                      <p className={`text-[10px] opacity-60 truncate ${isActive ? 'text-white/70' : 'text-primary/40'}`}>Online</p>
-                    </div>
-                  </div>
-                </button>
-              );
-            })}
-
-            {recentDMs.length === 0 && (
-              <div className="py-8 text-center opacity-20 flex flex-col items-center gap-2">
-                <Users size={32} />
-                <p className="text-[10px] font-black uppercase tracking-widest">No private chats</p>
-                <Button variant="ghost" size="sm" className="mt-2" onClick={() => setShowUserSearch(true)}>Find Someone</Button>
               </div>
-            )}
-          </Card>
-        </motion.div>
+
+              <div className="relative group px-2">
+                <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-primary/20 group-focus-within:text-primary transition-colors" size={18} />
+                <input 
+                  type="text" 
+                  placeholder="Search messages..."
+                  className="w-full bg-surface-container-low border-none rounded-2xl py-3 pl-12 pr-4 text-sm focus:ring-2 ring-primary/20 transition-all"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
+              </div>
+
+              <Card className="flex-1 p-2 overflow-y-auto custom-scrollbar flex flex-col gap-1 border-none shadow-premium bg-white/40 backdrop-blur-xl">
+                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-primary/20 mt-4 mb-2 px-4">Channels</p>
+                {filteredChannels.map(ch => (
+                  <button
+                    key={ch.id}
+                    onClick={() => handleTabChange(ch.id)}
+                    className={`flex items-center gap-4 p-3 rounded-[20px] transition-all duration-300 group ${
+                      activeTab === ch.id ? 'bg-primary text-white shadow-lg' : 'hover:bg-primary/5 text-on-surface'
+                    }`}
+                  >
+                    <div className={`w-12 h-12 rounded-[18px] grid place-items-center shrink-0 ${activeTab === ch.id ? 'bg-white/20' : ch.bg}`}>
+                      <ch.icon size={22} className={activeTab === ch.id ? 'text-white' : ch.color} />
+                    </div>
+                    <div className="text-left min-w-0">
+                      <p className="font-bold text-sm truncate">{ch.name}</p>
+                      <p className={`text-[10px] opacity-60 truncate ${activeTab === ch.id ? 'text-white/70' : 'text-primary/40'}`}>Official Updates</p>
+                    </div>
+                  </button>
+                ))}
+
+                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-primary/20 mt-6 mb-2 px-4">Direct Messages</p>
+                {filteredDMs.map(dmId => {
+                  const p = profiles[dmId];
+                  const isActive = activeTab === `dm:${dmId}`;
+                  if (!p) return null;
+                  return (
+                    <button
+                      key={dmId}
+                      onClick={() => handleTabChange(`dm:${dmId}`)}
+                      className={`flex items-center gap-4 p-3 rounded-[20px] transition-all duration-300 group ${
+                        isActive ? 'bg-primary text-white shadow-lg' : 'hover:bg-primary/5 text-on-surface'
+                      }`}
+                    >
+                      <div className={`w-12 h-12 rounded-[18px] grid place-items-center shrink-0 font-black text-sm ${isActive ? 'bg-white/20 text-white' : 'bg-surface-container-highest text-primary'}`}>
+                        {p.full_name?.charAt(0)}
+                      </div>
+                      <div className="text-left min-w-0">
+                        <div className="flex items-center gap-2">
+                          <p className="font-bold text-sm truncate">{p.full_name}</p>
+                          {p.role && ROLE_CONFIG[p.role] && (
+                            <span className={`text-[8px] font-black uppercase tracking-tighter px-1.5 py-0.5 rounded ${ROLE_CONFIG[p.role].bg} ${ROLE_CONFIG[p.role].color}`}>
+                              {ROLE_CONFIG[p.role].label}
+                            </span>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <div className={`w-1.5 h-1.5 rounded-full bg-emerald-500`} />
+                          <p className={`text-[10px] opacity-60 truncate ${isActive ? 'text-white/70' : 'text-primary/40'}`}>Online</p>
+                        </div>
+                      </div>
+                    </button>
+                  );
+                })}
+
+                {filteredDMs.length === 0 && searchQuery && (
+                  <p className="text-center text-[10px] font-bold text-primary/20 py-4">No results found</p>
+                )}
+
+                {recentDMs.length === 0 && !searchQuery && (
+                  <div className="py-8 text-center opacity-20 flex flex-col items-center gap-2">
+                    <Users size={32} />
+                    <p className="text-[10px] font-black uppercase tracking-widest">No private chats</p>
+                    <Button variant="ghost" size="sm" className="mt-2" onClick={() => setShowUserSearch(true)}>Find Someone</Button>
+                  </div>
+                )}
+              </Card>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* Telegram Chat Window */}
         <Card className="flex-1 flex flex-col p-0 overflow-hidden relative border-none shadow-premium bg-white/60 backdrop-blur-2xl rounded-[32px]">
@@ -298,7 +348,10 @@ export default function Messages() {
           {/* Chat Header */}
           <div className="p-4 sm:p-6 border-b border-primary/5 flex items-center justify-between bg-white/50 relative z-10">
             <div className="flex items-center gap-3 sm:gap-4">
-              <button className="lg:hidden w-10 h-10 rounded-full bg-primary/5 grid place-items-center text-primary">
+              <button 
+                onClick={() => setIsSidebarOpen(true)}
+                className="lg:hidden w-10 h-10 rounded-full bg-primary/5 grid place-items-center text-primary"
+              >
                 <ArrowLeft size={20} />
               </button>
               <div className={`w-10 h-10 sm:w-14 sm:h-14 rounded-[20px] sm:rounded-[24px] grid place-items-center shadow-lg shrink-0 ${activeTab.startsWith('dm:') ? 'bg-surface-container-highest' : channels.find(c => c.id === activeTab)?.bg}`}>
@@ -470,11 +523,13 @@ export default function Messages() {
                       type="text"
                       placeholder="Search people..."
                       className="w-full bg-surface-container-low border-none rounded-2xl py-3 pl-12 pr-4 text-sm outline-none ring-2 ring-transparent focus:ring-primary/10 transition-all"
+                      value={modalSearch}
+                      onChange={(e) => setModalSearch(e.target.value)}
                       autoFocus
                     />
                   </div>
                   <div className="max-h-96 overflow-y-auto custom-scrollbar flex flex-col gap-1">
-                    {allUsers.map(u => (
+                    {filteredUsers.map(u => (
                       <button
                         key={u.id}
                         onClick={() => startDM(u.id)}

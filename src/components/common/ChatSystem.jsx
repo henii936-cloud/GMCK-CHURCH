@@ -41,15 +41,17 @@ export default function ChatSystem() {
       currentChannels.push({ id: "role:admin_shepherd", name: "Admin & Shepherd", icon: Hash, color: "bg-secondary" });
     }
 
-    // Add Bible Study Groups
-    bibleStudyGroups.forEach(group => {
-      currentChannels.push({ 
-        id: `group:${group.id}`, 
-        name: group.group_name, 
-        icon: Users, 
-        color: "bg-blue-500" 
+    // Add Bible Study Groups for Admins and Shepherds
+    if (user?.role === 'admin' || user?.role === 'shepherd') {
+      bibleStudyGroups.forEach(group => {
+        currentChannels.push({ 
+          id: `group:${group.id}`, 
+          name: group.group_name, 
+          icon: Users, 
+          color: "bg-blue-500" 
+        });
       });
-    });
+    }
 
     setChannels(currentChannels);
   }, [user, bibleStudyGroups]);

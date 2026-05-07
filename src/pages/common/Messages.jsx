@@ -357,24 +357,28 @@ export default function Messages() {
                   </button>
                 ))}
 
-                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-primary/20 mt-6 mb-2 px-4">Bible Study Groups</p>
-                {bibleStudyGroups.filter(g => g.group_name?.toLowerCase().includes(searchQuery.toLowerCase())).map(group => (
-                  <button
-                    key={group.id}
-                    onClick={() => handleTabChange(`group:${group.id}`)}
-                    className={`flex items-center gap-4 p-3 rounded-[20px] transition-all duration-300 group ${
-                      activeTab === `group:${group.id}` ? 'bg-primary text-white shadow-lg' : 'hover:bg-primary/5 text-on-surface'
-                    }`}
-                  >
-                    <div className={`w-12 h-12 rounded-[18px] grid place-items-center shrink-0 ${activeTab === `group:${group.id}` ? 'bg-white/20' : 'bg-blue-500/10'}`}>
-                      <Users size={22} className={activeTab === `group:${group.id}` ? 'text-white' : 'text-blue-500'} />
-                    </div>
-                    <div className="text-left min-w-0">
-                      <p className="font-bold text-sm truncate">{group.group_name}</p>
-                      <p className={`text-[10px] opacity-60 truncate ${activeTab === `group:${group.id}` ? 'text-white/70' : 'text-primary/40'}`}>Fellowship Chat</p>
-                    </div>
-                  </button>
-                ))}
+                {(user?.role === 'admin' || user?.role === 'shepherd') && (
+                  <>
+                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-primary/20 mt-6 mb-2 px-4">Bible Study Groups</p>
+                    {bibleStudyGroups.filter(g => g.group_name?.toLowerCase().includes(searchQuery.toLowerCase())).map(group => (
+                      <button
+                        key={group.id}
+                        onClick={() => handleTabChange(`group:${group.id}`)}
+                        className={`flex items-center gap-4 p-3 rounded-[20px] transition-all duration-300 group ${
+                          activeTab === `group:${group.id}` ? 'bg-primary text-white shadow-lg' : 'hover:bg-primary/5 text-on-surface'
+                        }`}
+                      >
+                        <div className={`w-12 h-12 rounded-[18px] grid place-items-center shrink-0 ${activeTab === `group:${group.id}` ? 'bg-white/20' : 'bg-blue-500/10'}`}>
+                          <Users size={22} className={activeTab === `group:${group.id}` ? 'text-white' : 'text-blue-500'} />
+                        </div>
+                        <div className="text-left min-w-0">
+                          <p className="font-bold text-sm truncate">{group.group_name}</p>
+                          <p className={`text-[10px] opacity-60 truncate ${activeTab === `group:${group.id}` ? 'text-white/70' : 'text-primary/40'}`}>Fellowship Chat</p>
+                        </div>
+                      </button>
+                    ))}
+                  </>
+                )}
 
                 <p className="text-[10px] font-black uppercase tracking-[0.2em] text-primary/20 mt-6 mb-2 px-4">Direct Messages</p>
                 {filteredDMs.map(dmId => {

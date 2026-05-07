@@ -1,4 +1,4 @@
-import { formatToEthiopian } from \"../../utils/ethiopianDate\";
+import { formatToEthiopian } from "../../utils/ethiopianDate";
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -71,7 +71,7 @@ export default function AdminDashboard() {
         finance: totalFinance
       });
     } catch (err) {
-      console.error(\"Error fetching stats:\", err);
+      console.error("Error fetching stats:", err);
     }
   };
 
@@ -88,7 +88,7 @@ export default function AdminDashboard() {
       setOnlineElders(onlineData.data || []);
       setActivityLogs(activityData.data || []);
     } catch (err) {
-      console.error(\"Error fetching recent data:\", err);
+      console.error("Error fetching recent data:", err);
     }
   };
 
@@ -111,25 +111,25 @@ export default function AdminDashboard() {
   ];
 
   return (
-    <div className=\"animate-fade-in max-w-7xl mx-auto h-[calc(100vh-11rem)] flex flex-col\">
-      <div className=\"flex flex-col md:flex-row justify-between items-start md:items-end mb-6 gap-4 shrink-0\">
-        <div className=\"max-w-2xl\">
-          <p className=\"label-sm text-tertiary-fixed-dim mb-2 tracking-[0.3em]\">Administrative Oversight</p>
-          <h1 className=\"display-lg text-primary mb-2\">Admin <span className=\"text-tertiary-fixed-dim italic\">Dashboard</span></h1>
-          <p className=\"text-on-surface-variant font-medium tracking-wide leading-relaxed text-sm\">Global overview of church operations and Bible study progress. A digital sanctuary for ministry management.</p>
+    <div className="animate-fade-in max-w-7xl mx-auto h-[calc(100vh-11rem)] flex flex-col">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-6 gap-4 shrink-0">
+        <div className="max-w-2xl">
+          <p className="label-sm text-tertiary-fixed-dim mb-2 tracking-[0.3em]">Administrative Oversight</p>
+          <h1 className="display-lg text-primary mb-2">Admin <span className="text-tertiary-fixed-dim italic">Dashboard</span></h1>
+          <p className="text-on-surface-variant font-medium tracking-wide leading-relaxed text-sm">Global overview of church operations and Bible study progress. A digital sanctuary for ministry management.</p>
         </div>
-        <div className=\"flex items-center gap-6 bg-surface-container-low p-4 rounded-2xl border border-outline-variant/10\">
-          <div className=\"w-12 h-12 rounded-2xl bg-primary flex items-center justify-center shadow-lg signature-gradient\">
-            <Calendar size={20} className=\"text-on-primary\" />
+        <div className="flex items-center gap-6 bg-surface-container-low p-4 rounded-2xl border border-outline-variant/10">
+          <div className="w-12 h-12 rounded-2xl bg-primary flex items-center justify-center shadow-lg signature-gradient">
+            <Calendar size={20} className="text-on-primary" />
           </div>
-          <div className=\"text-right\">
-            <p className=\"label-sm opacity-60 mb-1\">Current Period</p>
-            <p className=\"text-lg font-heading font-bold text-primary\">{formatToEthiopian(new Date())}</p>
+          <div className="text-right">
+            <p className="label-sm opacity-60 mb-1">Current Period</p>
+            <p className="text-lg font-heading font-bold text-primary">{formatToEthiopian(new Date())}</p>
           </div>
         </div>
       </div>
 
-      <div className=\"grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-6 shrink-0\">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-6 shrink-0">
         {statCards.map((stat, index) => (
           <motion.div
             key={stat.label}
@@ -144,18 +144,18 @@ export default function AdminDashboard() {
             }}
           >
             <div 
-              className=\"absolute inset-0 opacity-0 group-hover:opacity-10 transition-opacity duration-500 pointer-events-none\"
+              className="absolute inset-0 opacity-0 group-hover:opacity-10 transition-opacity duration-500 pointer-events-none"
               style={{ background: `linear-gradient(135deg, ${stat.color}, transparent)` }}
             />
-            <div className=\"flex justify-between items-start mb-6 relative z-10\">
+            <div className="flex justify-between items-start mb-6 relative z-10">
               <div 
-                className=\"w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-500 group-hover:scale-110 group-hover:-rotate-6 shadow-sm\"
+                className="w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-500 group-hover:scale-110 group-hover:-rotate-6 shadow-sm"
                 style={{ backgroundColor: `color-mix(in srgb, ${stat.color} 15%, transparent)`, color: stat.color }}
               >
                 <stat.icon size={24} strokeWidth={2} />
               </div>
               <div 
-                className=\"flex items-center gap-1 text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full\"
+                className="flex items-center gap-1 text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full"
                 style={{ backgroundColor: `color-mix(in srgb, ${stat.color} 10%, transparent)`, color: stat.color }}
               >
                 <TrendingUp size={12} strokeWidth={2.5} />
@@ -163,9 +163,9 @@ export default function AdminDashboard() {
               </div>
             </div>
 
-            <div className=\"relative z-10\">
-              <p className=\"label-sm opacity-70 mb-1.5 text-[11px] tracking-[0.15em]\">{stat.label}</p>
-              <h3 className=\"text-3xl font-heading font-bold\" style={{ color: stat.color }}>
+            <div className="relative z-10">
+              <p className="label-sm opacity-70 mb-1.5 text-[11px] tracking-[0.15em]">{stat.label}</p>
+              <h3 className="text-3xl font-heading font-bold" style={{ color: stat.color }}>
                 {loading ? '...' : stat.value}
               </h3>
             </div>
@@ -173,83 +173,83 @@ export default function AdminDashboard() {
         ))}
       </div>
 
-      <div className=\"grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6\">
-        <div className=\"lg:col-span-2 editorial-card flex flex-col p-6 min-h-[400px]\">
-          <div className=\"flex justify-between items-center mb-4 shrink-0\">
-            <h3 className=\"headline-sm text-primary text-xl\">Recent Study <span className=\"text-tertiary-fixed-dim italic\">Progress</span></h3>
-            <button className=\"label-sm text-primary hover:text-tertiary-fixed-dim transition-colors\">View All</button>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+        <div className="lg:col-span-2 editorial-card flex flex-col p-6 min-h-[400px]">
+          <div className="flex justify-between items-center mb-4 shrink-0">
+            <h3 className="headline-sm text-primary text-xl">Recent Study <span className="text-tertiary-fixed-dim italic">Progress</span></h3>
+            <button className="label-sm text-primary hover:text-tertiary-fixed-dim transition-colors">View All</button>
           </div>
-          <div className=\"space-y-2 overflow-y-auto custom-scrollbar flex-1 pr-2\">
+          <div className="space-y-2 overflow-y-auto custom-scrollbar flex-1 pr-2">
             {recentStudy.length > 0 ? recentStudy.map(study => (
-              <div key={study.id} className=\"ministry-feed-item group hover:bg-surface-container-low rounded-lg transition-all px-4 py-2\">
-                <div className=\"flex items-center gap-4\">
-                  <div className=\"w-8 h-8 rounded-xl bg-surface-container-low flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-on-primary transition-all shrink-0\">
+              <div key={study.id} className="ministry-feed-item group hover:bg-surface-container-low rounded-lg transition-all px-4 py-2">
+                <div className="flex items-center gap-4">
+                  <div className="w-8 h-8 rounded-xl bg-surface-container-low flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-on-primary transition-all shrink-0">
                     <BookOpen size={16} />
                   </div>
-                  <div className=\"flex-1 min-w-0\">
-                    <p className=\"font-bold text-sm text-on-surface group-hover:text-primary transition-colors truncate\">{study.bible_study_groups?.group_name}</p>
-                    <p className=\"text-xs text-on-surface-variant truncate\">{study.topic}</p>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-bold text-sm text-on-surface group-hover:text-primary transition-colors truncate">{study.bible_study_groups?.group_name}</p>
+                    <p className="text-xs text-on-surface-variant truncate">{study.topic}</p>
                   </div>
-                  <div className=\"text-right shrink-0\">
-                    <p className=\"label-sm opacity-60 text-xs\">{formatToEthiopian(study.date)}</p>
-                    <p className=\"text-[9px] font-black uppercase tracking-widest text-primary\">Completed</p>
+                  <div className="text-right shrink-0">
+                    <p className="label-sm opacity-60 text-xs">{formatToEthiopian(study.date)}</p>
+                    <p className="text-[9px] font-black uppercase tracking-widest text-primary">Completed</p>
                   </div>
                 </div>
               </div>
             )) : (
-              <p className=\"text-center py-8 text-on-surface-variant/40 font-medium text-sm\">No recent study progress recorded.</p>
+              <p className="text-center py-8 text-on-surface-variant/40 font-medium text-sm">No recent study progress recorded.</p>
             )}
           </div>
         </div>
 
-        <div className=\"editorial-card flex flex-col p-6 min-h-[400px]\">
-          <h3 className=\"headline-sm text-primary text-xl mb-4 shrink-0\">Upcoming <span className=\"text-tertiary-fixed-dim italic\">Events</span></h3>
-          <div className=\"space-y-4 overflow-y-auto custom-scrollbar flex-1 pr-2\">
+        <div className="editorial-card flex flex-col p-6 min-h-[400px]">
+          <h3 className="headline-sm text-primary text-xl mb-4 shrink-0">Upcoming <span className="text-tertiary-fixed-dim italic">Events</span></h3>
+          <div className="space-y-4 overflow-y-auto custom-scrollbar flex-1 pr-2">
             {upcomingEvents.length > 0 ? upcomingEvents.map(event => {
               const date = new Date(event.date);
               return (
-                <div key={event.id} className=\"flex gap-4 group items-center\">
-                  <div className=\"text-center min-w-[40px] shrink-0\">
-                    <p className=\"label-sm text-tertiary-fixed-dim text-xs\">
+                <div key={event.id} className="flex gap-4 group items-center">
+                  <div className="text-center min-w-[40px] shrink-0">
+                    <p className="label-sm text-tertiary-fixed-dim text-xs">
                       {formatToEthiopian(date)}
                     </p>
-                    <p className=\"text-xl font-heading font-bold text-primary leading-none\">{date.getDate()}</p>
+                    <p className="text-xl font-heading font-bold text-primary leading-none">{date.getDate()}</p>
                   </div>
-                  <div className=\"min-w-0\">
-                    <p className=\"font-bold text-sm text-on-surface group-hover:text-primary transition-colors truncate\">{event.title}</p>
-                    <p className=\"label-sm opacity-60 mt-0.5 text-xs truncate\">{event.location} • {event.event_time}</p>
+                  <div className="min-w-0">
+                    <p className="font-bold text-sm text-on-surface group-hover:text-primary transition-colors truncate">{event.title}</p>
+                    <p className="label-sm opacity-60 mt-0.5 text-xs truncate">{event.location} • {event.event_time}</p>
                   </div>
                 </div>
               );
             }) : (
-              <p className=\"text-center py-8 text-on-surface-variant/40 font-medium text-sm\">No upcoming events.</p>
+              <p className="text-center py-8 text-on-surface-variant/40 font-medium text-sm">No upcoming events.</p>
             )}
           </div>
         </div>
       </div>
 
-      <div className=\"grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6 pb-6\">
-        <div className=\"space-y-8\">
-          <div className=\"bg-surface border border-outline-variant/10 rounded-[32px] p-8\">
-            <div className=\"flex items-center justify-between mb-6\">
-              <h2 className=\"text-xl font-black text-on-surface flex items-center gap-3\">
-                <ShieldCheck className=\"text-primary\" size={24} />
-                Pending <span className=\"text-primary\">Approvals</span>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6 pb-6">
+        <div className="space-y-8">
+          <div className="bg-surface border border-outline-variant/10 rounded-[32px] p-8">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-xl font-black text-on-surface flex items-center gap-3">
+                <ShieldCheck className="text-primary" size={24} />
+                Pending <span className="text-primary">Approvals</span>
               </h2>
-              <span className=\"px-3 py-1 bg-primary/10 text-primary text-[10px] font-black rounded-full\">
+              <span className="px-3 py-1 bg-primary/10 text-primary text-[10px] font-black rounded-full">
                 {pendingApprovals.length} ACTION ITEMS
               </span>
             </div>
-            <div className=\"space-y-4\">
+            <div className="space-y-4">
               {pendingApprovals.length === 0 ? (
-                <div className=\"py-8 text-center bg-surface-container-lowest rounded-2xl border border-dashed border-outline-variant/20\">
-                  <Activity size={32} className=\"mx-auto text-on-surface-variant/20 mb-2\" />
-                  <p className=\"text-xs font-bold text-on-surface-variant/40 italic\">All caught up!</p>
+                <div className="py-8 text-center bg-surface-container-lowest rounded-2xl border border-dashed border-outline-variant/20">
+                  <Activity size={32} className="mx-auto text-on-surface-variant/20 mb-2" />
+                  <p className="text-xs font-bold text-on-surface-variant/40 italic">All caught up!</p>
                 </div>
               ) : pendingApprovals.map(budget => (
-                <div key={budget.id} className=\"p-4 bg-surface-container-lowest rounded-2xl border border-outline-variant/5 hover:border-primary/20 transition-all group\">
-                  <div className=\"flex justify-between items-start mb-2\">
-                    <h3 className=\"text-sm font-black text-on-surface truncate pr-4\">
+                <div key={budget.id} className="p-4 bg-surface-container-lowest rounded-2xl border border-outline-variant/5 hover:border-primary/20 transition-all group">
+                  <div className="flex justify-between items-start mb-2">
+                    <h3 className="text-sm font-black text-on-surface truncate pr-4">
                       {budget.name.split('::')[1] || budget.name}
                     </h3>
                     <span className={`text-[9px] font-black px-2 py-0.5 rounded uppercase tracking-tighter ${
@@ -258,10 +258,10 @@ export default function AdminDashboard() {
                       {budget.status === 'Pending' ? 'Needs Justifier' : 'Needs Signer'}
                     </span>
                   </div>
-                  <div className=\"flex items-center justify-between\">
-                    <p className=\"text-lg font-black text-primary\">${budget.amount?.toLocaleString()}</p>
+                  <div className="flex items-center justify-between">
+                    <p className="text-lg font-black text-primary">${budget.amount?.toLocaleString()}</p>
                     {budget.approvals && budget.approvals.length > 0 && (
-                      <div className=\"flex items-center gap-1\">
+                      <div className="flex items-center gap-1">
                         {budget.approvals.map(app => (
                           <div key={app.id} title={`${app.approver_name} (${app.role})`} className={`w-5 h-5 rounded-full border-2 border-surface flex items-center justify-center text-[7px] font-black ${
                             app.role === 'justifier' ? 'bg-emerald-500 text-white' : 'bg-primary text-white'
@@ -277,32 +277,32 @@ export default function AdminDashboard() {
             </div>
           </div>
 
-          <div className=\"bg-surface border border-outline-variant/10 rounded-[32px] p-8\">
-            <h2 className=\"text-xl font-black text-on-surface mb-6 flex items-center gap-3\">
-              <Eye className=\"text-tertiary\" size={24} />
-              Elders <span className=\"text-tertiary\">Activity</span>
+          <div className="bg-surface border border-outline-variant/10 rounded-[32px] p-8">
+            <h2 className="text-xl font-black text-on-surface mb-6 flex items-center gap-3">
+              <Eye className="text-tertiary" size={24} />
+              Elders <span className="text-tertiary">Activity</span>
             </h2>
-            <div className=\"space-y-4\">
+            <div className="space-y-4">
               {onlineElders.map(elder => {
                 const lastActive = new Date(elder.last_active);
                 const isOnline = (new Date() - lastActive) < 5 * 60 * 1000;
                 return (
-                  <div key={elder.id} className=\"flex items-center justify-between p-3 bg-surface-container-lowest rounded-2xl border border-outline-variant/5\">
-                    <div className=\"flex items-center gap-3\">
+                  <div key={elder.id} className="flex items-center justify-between p-3 bg-surface-container-lowest rounded-2xl border border-outline-variant/5">
+                    <div className="flex items-center gap-3">
                       <div className={`w-10 h-10 rounded-full flex items-center justify-center text-lg font-black ${
                         isOnline ? 'bg-emerald-500/10 text-emerald-500 border-2 border-emerald-500/20' : 'bg-on-surface-variant/5 text-on-surface-variant'
                       }`}>
                         {elder.full_name?.[0] || 'U'}
                       </div>
                       <div>
-                        <p className=\"text-sm font-black text-on-surface\">{elder.full_name}</p>
-                        <p className=\"text-[10px] font-bold text-on-surface-variant/60 uppercase tracking-widest\">{elder.role}</p>
+                        <p className="text-sm font-black text-on-surface">{elder.full_name}</p>
+                        <p className="text-[10px] font-bold text-on-surface-variant/60 uppercase tracking-widest">{elder.role}</p>
                       </div>
                     </div>
                     {isOnline && (
-                      <div className=\"flex items-center gap-1.5 px-3 py-1 bg-emerald-500/10 rounded-full\">
-                        <div className=\"w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse\" />
-                        <span className=\"text-[10px] font-black text-emerald-600 uppercase\">Live</span>
+                      <div className="flex items-center gap-1.5 px-3 py-1 bg-emerald-500/10 rounded-full">
+                        <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                        <span className="text-[10px] font-black text-emerald-600 uppercase">Live</span>
                       </div>
                     )}
                   </div>
@@ -312,16 +312,16 @@ export default function AdminDashboard() {
           </div>
         </div>
 
-        <div className=\"bg-surface border border-outline-variant/10 rounded-[32px] p-8\">
-          <h2 className=\"text-xl font-black text-on-surface mb-6 flex items-center gap-3\">
-            <Activity className=\"text-primary\" size={24} />
-            Multi-User <span className=\"text-primary\">Audit Trail</span>
+        <div className="bg-surface border border-outline-variant/10 rounded-[32px] p-8">
+          <h2 className="text-xl font-black text-on-surface mb-6 flex items-center gap-3">
+            <Activity className="text-primary" size={24} />
+            Multi-User <span className="text-primary">Audit Trail</span>
           </h2>
-          <div className=\"space-y-4 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar\">
+          <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
             {activityLogs.length === 0 ? (
-              <p className=\"text-xs text-on-surface-variant/40 italic text-center py-4\">No recent system activity logs available.</p>
+              <p className="text-xs text-on-surface-variant/40 italic text-center py-4">No recent system activity logs available.</p>
             ) : activityLogs.map(log => (
-              <div key={log.id} className=\"flex gap-4 p-4 bg-surface-container-lowest rounded-2xl border border-outline-variant/5 relative overflow-hidden group\">
+              <div key={log.id} className="flex gap-4 p-4 bg-surface-container-lowest rounded-2xl border border-outline-variant/5 relative overflow-hidden group">
                 <div className={`shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${
                   log.action === 'approve' ? 'bg-emerald-500/10 text-emerald-600' :
                   log.action === 'reject' ? 'bg-red-500/10 text-red-500' :
@@ -329,9 +329,9 @@ export default function AdminDashboard() {
                 }`}>
                   {log.action === 'approve' ? <ShieldCheck size={14} /> : log.action === 'reject' ? <AlertCircle size={14} /> : <Clock size={14} />}
                 </div>
-                <div className=\"flex-1 min-w-0\">
-                  <p className=\"text-xs font-bold text-on-surface mb-1 leading-snug\">{log.description}</p>
-                  <p className=\"text-[10px] text-on-surface-variant/60 font-medium\">
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs font-bold text-on-surface mb-1 leading-snug">{log.description}</p>
+                  <p className="text-[10px] text-on-surface-variant/60 font-medium">
                     {new Date(log.created_at).toLocaleTimeString()} • {formatToEthiopian(log.created_at)}
                   </p>
                 </div>

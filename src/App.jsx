@@ -20,6 +20,7 @@ import AdminActivities from "./pages/admin/Programs";
 import LeaderAttendance from "./pages/leader/Attendance";
 import LeaderStudy from "./pages/leader/Study";
 import LeaderMembers from "./pages/leader/Members";
+import Leaders from "./pages/admin/Leaders";
 import RecordGiving from "./pages/finance/RecordGiving";
 import ApprovedBudgets from "./pages/finance/ApprovedBudgets";
 import LeaderRoute from "./routes/LeaderRoute";
@@ -79,6 +80,7 @@ export default function App() {
             <Route path="budgets" element={<AdminBudgets />} />
             <Route path="programs" element={<AdminActivities />} />
             <Route path="ministries" element={<ShepherdMinistries viewOnly={true} />} />
+            <Route path="leaders" element={<Leaders />} />
             <Route path="messages" element={<Messages />} />
           </Route>
 

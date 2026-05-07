@@ -3,8 +3,10 @@ import { supabase } from "../../services/supabaseClient";
 import { Card, Button } from "../../components/common/UI";
 import { ShieldCheck, Mail, MapPin, UserPlus } from "lucide-react";
 import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 
 export default function Leaders() {
+  const navigate = useNavigate();
   const [leaders, setLeaders] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -31,6 +33,10 @@ export default function Leaders() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleMessage = (leaderId) => {
+    navigate('/admin/messages', { state: { directChatId: leaderId } });
   };
 
   return (
@@ -86,7 +92,13 @@ export default function Leaders() {
                 </div>
 
                 <div style={{ marginTop: '24px', paddingTop: '20px', borderTop: '1px solid var(--border)', display: 'flex', gap: '12px' }}>
-                  <Button variant="outline" style={{ flex: 1 }}>Message</Button>
+                  <Button 
+                    variant="outline" 
+                    style={{ flex: 1 }}
+                    onClick={() => handleMessage(leader.id)}
+                  >
+                    Message
+                  </Button>
                   <Button variant="secondary" style={{ flex: 1 }}>Edit Profile</Button>
                 </div>
               </Card>

@@ -259,16 +259,46 @@ export default function Messages() {
   };
 
   const getActiveTitle = () => {
-    if (activeTab.startsWith('role:')) return `${activeTab.split(':')[1].replace('_', ' ')} Channel`;
+    if (activeTab === 'role:admin_shepherd') return 'Leadership Channel';
+    if (activeTab.startsWith('role:')) {
+      const roleKey = activeTab.split(':')[1];
+      return ROLE_CONFIG[roleKey] ? `${ROLE_CONFIG[roleKey].label} Channel` : `${roleKey.replace('_', ' ')} Channel`;
+    }
     if (activeTab.startsWith('group:')) {
       const id = activeTab.split(':')[1];
-      return bibleStudyGroups.find(g => g.id === id)?.group_name || "Bible Study Group";
+      return bibleStudyGroups.find(g => g.id === id)?.group_name || 'Bible Study Group';
     }
     if (activeTab.startsWith('dm:')) {
       const id = activeTab.split(':')[1];
-      return profiles[id]?.full_name || "Private Chat";
+      return profiles[id]?.full_name || 'Private Chat';
     }
-    return "Messages";
+    return 'Messages';
+  };
+
+  const getActiveIcon = () => {
+    if (activeTab.startsWith('group:')) return Users;
+    if (activeTab.startsWith('dm:')) return null;
+    return Shield;
+  };
+
+  const getActiveBg = () => {
+    if (activeTab.startsWith('group:')) return 'bg-blue-500/10';
+    if (activeTab === 'role:admin_shepherd') return 'bg-secondary/10';
+    if (activeTab.startsWith('role:')) {
+      const roleKey = activeTab.split(':')[1];
+      return ROLE_CONFIG[roleKey]?.bg || 'bg-primary/10';
+    }
+    return 'bg-surface-container-highest';
+  };
+
+  const getActiveColor = () => {
+    if (activeTab.startsWith('group:')) return 'text-blue-500';
+    if (activeTab === 'role:admin_shepherd') return 'text-secondary';
+    if (activeTab.startsWith('role:')) {
+      const roleKey = activeTab.split(':')[1];
+      return ROLE_CONFIG[roleKey]?.color || 'text-primary';
+    }
+    return 'text-primary';
   };
 
   const getActiveProfile = () => {
@@ -276,12 +306,11 @@ export default function Messages() {
     return null;
   };
 
-  const baseChannels = [];
+  const isLeadership = user?.role === 'admin' || user?.role === 'shepherd';
+  const isLeaderOrAbove = isLeadership || user?.role === 'bible_leader';
 
-  // If Admin/Shepherd/Leader, show role channels.
-  const isLeadership = user?.role === 'admin' || user?.role === 'shepherd' || user?.role === 'bible_leader';
-  
-  const roleChannels = user?.role === 'admin' 
+  // Build role channels: admin/shepherd see ALL roles, others see only their own
+  const roleChannels = (isLeadership)
     ? Object.keys(ROLE_CONFIG).map(roleKey => ({
         id: `role:${roleKey}`,
         name: `${ROLE_CONFIG[roleKey].label} Channel`,
@@ -289,21 +318,32 @@ export default function Messages() {
         color: ROLE_CONFIG[roleKey].color,
         bg: ROLE_CONFIG[roleKey].bg
       }))
-    : [
-        { 
-          id: `role:${user?.role}`, 
-          name: "Ministry Channel", 
-          icon: Shield, 
-          color: "text-purple-500", 
-          bg: "bg-purple-500/10" 
-        }
-      ];
+    : [{ 
+        id: `role:${user?.role}`, 
+        name: 'Ministry Channel', 
+        icon: Shield, 
+        color: ROLE_CONFIG[user?.role]?.color || 'text-purple-500', 
+        bg: ROLE_CONFIG[user?.role]?.bg || 'bg-purple-500/10'
+      }];
 
-  if (isLeadership && user?.role !== 'admin') {
-    roleChannels.push({ id: "role:admin_shepherd", name: "Leadership Channel", icon: Hash, color: "text-secondary", bg: "bg-secondary/10" });
+  // Leadership channel for shepherd & bible_leader
+  if ((user?.role === 'shepherd' || user?.role === 'bible_leader')) {
+    roleChannels.push({ id: 'role:admin_shepherd', name: 'Leadership Channel', icon: Hash, color: 'text-emerald-500', bg: 'bg-emerald-500/10' });
   }
 
-  const channels = [...baseChannels, ...roleChannels];
+  // Group channels for leadership roles
+  const groupChannels = isLeaderOrAbove
+    ? bibleStudyGroups.map(group => ({
+        id: `group:${group.id}`,
+        name: group.group_name,
+        icon: Users,
+        color: 'text-blue-500',
+        bg: 'bg-blue-500/10'
+      }))
+    : [];
+
+  // Unified channel list for lookups (header icon, bg, etc.)
+  const channels = [...roleChannels, ...groupChannels];
 
   const filteredChannels = channels.filter(ch => 
     ch.name.toLowerCase().includes(searchQuery.toLowerCase())
@@ -369,7 +409,7 @@ export default function Messages() {
 
               <Card className="flex-1 p-2 overflow-y-auto custom-scrollbar flex flex-col gap-1 border-none shadow-premium bg-white/40 backdrop-blur-xl">
                 <p className="text-[10px] font-black uppercase tracking-[0.2em] text-primary/20 mt-4 mb-2 px-4">Channels</p>
-                {filteredChannels.map(ch => (
+                {roleChannels.filter(ch => ch.name.toLowerCase().includes(searchQuery.toLowerCase())).map(ch => (
                   <button
                     key={ch.id}
                     onClick={() => handleTabChange(ch.id)}
@@ -382,28 +422,28 @@ export default function Messages() {
                     </div>
                     <div className="text-left min-w-0">
                       <p className="font-bold text-sm truncate">{ch.name}</p>
-                      <p className={`text-[10px] opacity-60 truncate ${activeTab === ch.id ? 'text-white/70' : 'text-primary/40'}`}>Official Updates</p>
+                      <p className={`text-[10px] opacity-60 truncate ${activeTab === ch.id ? 'text-white/70' : 'text-primary/40'}`}>Official Channel</p>
                     </div>
                   </button>
                 ))}
 
-                {(user?.role === 'admin' || user?.role === 'shepherd' || user?.role === 'bible_leader') && (
+                {isLeaderOrAbove && groupChannels.length > 0 && (
                   <>
                     <p className="text-[10px] font-black uppercase tracking-[0.2em] text-primary/20 mt-6 mb-2 px-4">Bible Study Groups</p>
-                    {bibleStudyGroups.filter(g => g.group_name?.toLowerCase().includes(searchQuery.toLowerCase())).map(group => (
+                    {groupChannels.filter(ch => ch.name.toLowerCase().includes(searchQuery.toLowerCase())).map(ch => (
                       <button
-                        key={group.id}
-                        onClick={() => handleTabChange(`group:${group.id}`)}
-                        className={`flex items-center gap-4 p-3 rounded-[20px] transition-all duration-300 group ${
-                          activeTab === `group:${group.id}` ? 'bg-primary text-white shadow-lg' : 'hover:bg-primary/5 text-on-surface'
+                        key={ch.id}
+                        onClick={() => handleTabChange(ch.id)}
+                        className={`flex items-center gap-4 p-3 rounded-[20px] transition-all duration-300 ${
+                          activeTab === ch.id ? 'bg-primary text-white shadow-lg' : 'hover:bg-primary/5 text-on-surface'
                         }`}
                       >
-                        <div className={`w-12 h-12 rounded-[18px] grid place-items-center shrink-0 ${activeTab === `group:${group.id}` ? 'bg-white/20' : 'bg-blue-500/10'}`}>
-                          <Users size={22} className={activeTab === `group:${group.id}` ? 'text-white' : 'text-blue-500'} />
+                        <div className={`w-12 h-12 rounded-[18px] grid place-items-center shrink-0 ${activeTab === ch.id ? 'bg-white/20' : ch.bg}`}>
+                          <Users size={22} className={activeTab === ch.id ? 'text-white' : ch.color} />
                         </div>
                         <div className="text-left min-w-0">
-                          <p className="font-bold text-sm truncate">{group.group_name}</p>
-                          <p className={`text-[10px] opacity-60 truncate ${activeTab === `group:${group.id}` ? 'text-white/70' : 'text-primary/40'}`}>Fellowship Chat</p>
+                          <p className="font-bold text-sm truncate">{ch.name}</p>
+                          <p className={`text-[10px] opacity-60 truncate ${activeTab === ch.id ? 'text-white/70' : 'text-primary/40'}`}>Fellowship Chat</p>
                         </div>
                       </button>
                     ))}
@@ -474,13 +514,13 @@ export default function Messages() {
               >
                 <ArrowLeft size={20} />
               </button>
-              <div className={`w-10 h-10 sm:w-14 sm:h-14 rounded-[20px] sm:rounded-[24px] grid place-items-center shadow-lg shrink-0 ${activeTab.startsWith('dm:') ? 'bg-surface-container-highest' : channels.find(c => c.id === activeTab)?.bg}`}>
+              <div className={`w-10 h-10 sm:w-14 sm:h-14 rounded-[20px] sm:rounded-[24px] grid place-items-center shadow-lg shrink-0 ${activeTab.startsWith('dm:') ? 'bg-surface-container-highest' : getActiveBg()}`}>
                 {activeTab.startsWith('dm:') ? (
                   <span className="font-black text-lg text-primary">{getActiveTitle()?.charAt(0)}</span>
                 ) : (
-                  React.createElement(channels.find(c => c.id === activeTab)?.icon || MessageSquare, { 
+                  React.createElement(getActiveIcon() || MessageSquare, { 
                     size: 24,
-                    className: channels.find(c => c.id === activeTab)?.color
+                    className: getActiveColor()
                   })
                 )}
               </div>

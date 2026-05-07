@@ -219,10 +219,34 @@ export default function Messages() {
       messageData.channel = activeTab;
     }
 
-    const { error } = await supabase.from('messages').insert([messageData]);
-    if (!error) {
-      setNewMessage("");
+    // Optimistic Update
+    const tempId = `temp-${Date.now()}`;
+    const optimisticMessage = {
+      ...messageData,
+      id: tempId,
+      created_at: new Date().toISOString(),
+      is_optimistic: true
+    };
+    setMessages(prev => [...prev, optimisticMessage]);
+    setNewMessage("");
+
+    try {
+      const { data, error } = await supabase
+        .from('messages')
+        .insert([messageData])
+        .select()
+        .single();
+
+      if (error) throw error;
+      
+      // Replace optimistic message with real one
+      setMessages(prev => prev.map(m => m.id === tempId ? data : m));
       if (activeTab.startsWith('dm:')) fetchRecentDMs();
+    } catch (error) {
+      console.error("Error sending message:", error);
+      // Remove optimistic message on error
+      setMessages(prev => prev.filter(m => m.id !== tempId));
+      alert("Failed to send message. Please try again.");
     }
   };
 
@@ -254,7 +278,9 @@ export default function Messages() {
 
   const baseChannels = [];
 
-  // If Admin, show all role channels. If others, only show their role channel.
+  // If Admin/Shepherd/Leader, show role channels.
+  const isLeadership = user?.role === 'admin' || user?.role === 'shepherd' || user?.role === 'bible_leader';
+  
   const roleChannels = user?.role === 'admin' 
     ? Object.keys(ROLE_CONFIG).map(roleKey => ({
         id: `role:${roleKey}`,
@@ -272,6 +298,10 @@ export default function Messages() {
           bg: "bg-purple-500/10" 
         }
       ];
+
+  if (isLeadership && user?.role !== 'admin') {
+    roleChannels.push({ id: "role:admin_shepherd", name: "Leadership Channel", icon: Hash, color: "text-secondary", bg: "bg-secondary/10" });
+  }
 
   const channels = [...baseChannels, ...roleChannels];
 
@@ -357,7 +387,7 @@ export default function Messages() {
                   </button>
                 ))}
 
-                {(user?.role === 'admin' || user?.role === 'shepherd') && (
+                {(user?.role === 'admin' || user?.role === 'shepherd' || user?.role === 'bible_leader') && (
                   <>
                     <p className="text-[10px] font-black uppercase tracking-[0.2em] text-primary/20 mt-6 mb-2 px-4">Bible Study Groups</p>
                     {bibleStudyGroups.filter(g => g.group_name?.toLowerCase().includes(searchQuery.toLowerCase())).map(group => (

@@ -11,6 +11,7 @@ export default function Study() {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [groupId, setGroupId] = useState(null);
+  const [isSkipping, setIsSkipping] = useState(false);
   const [formData, setFormData] = useState({
     study_topic: "",
     completion_date: new Date().toISOString().split('T')[0],
@@ -44,17 +45,29 @@ export default function Study() {
       setMessage("Error: No group assigned to this leader.");
       return;
     }
+    
+    if (isSkipping && !formData.notes.trim()) {
+      setMessage("Error: Please provide a reason for skipping.");
+      return;
+    }
+
     setLoading(true);
     setMessage("");
+    
+    const submissionData = {
+      ...formData,
+      study_topic: isSkipping ? "⚠️ Skipped Session" : formData.study_topic,
+      group_id: groupId,
+      leader_id: user.id,
+      notes: isSkipping ? `REASON FOR SKIPPING: ${formData.notes}` : formData.notes
+    };
+
     try {
-      await studyService.saveStudy({
-        ...formData,
-        group_id: groupId,
-        leader_id: user.id
-      });
+      await studyService.saveStudy(submissionData);
       
-      setMessage("Study progress logged for Admin review!");
+      setMessage(isSkipping ? "Session skip logged successfully." : "Study progress logged for Admin review!");
       setFormData({ study_topic: "", completion_date: new Date().toISOString().split('T')[0], notes: "" });
+      setIsSkipping(false);
       setTimeout(() => setMessage(""), 3000);
     } catch (err) {
       console.error("Save study error:", err);
@@ -76,30 +89,55 @@ export default function Study() {
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_280px] gap-4 sm:gap-8">
         {/* Form */}
         <Card className="p-5 sm:p-10">
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-lg font-bold text-primary">
+              {isSkipping ? "Skip Session Log" : "New Study Log"}
+            </h2>
+            <button 
+              type="button"
+              onClick={() => {
+                setIsSkipping(!isSkipping);
+                setMessage("");
+              }}
+              className={`text-[10px] font-black uppercase tracking-[0.2em] px-4 py-2 rounded-lg transition-all ${
+                isSkipping 
+                ? "bg-primary text-on-primary" 
+                : "bg-surface-container-highest text-primary/60 hover:text-primary"
+              }`}
+            >
+              {isSkipping ? "Cancel Skip" : "Skip This Session"}
+            </button>
+          </div>
+
           <form onSubmit={handleSubmit} className="flex flex-col gap-4 sm:gap-5">
-            <Input 
-              label="Study Topic / Key Theme" 
-              placeholder="e.g. Ephesians 1:1-10 • Unity in Christ" 
-              value={formData.study_topic}
-              onChange={(e) => setFormData({...formData, study_topic: e.target.value})}
-              required
-            />
+            {!isSkipping && (
+              <Input 
+                label="Study Topic / Key Theme" 
+                placeholder="e.g. Ephesians 1:1-10 • Unity in Christ" 
+                value={formData.study_topic}
+                onChange={(e) => setFormData({...formData, study_topic: e.target.value})}
+                required={!isSkipping}
+              />
+            )}
             
             <EtDatePicker 
-              label="Completion Date" 
+              label={isSkipping ? "Date of Skipped Session" : "Completion Date"} 
               value={formData.completion_date}
               onChange={(e) => setFormData({...formData, completion_date: e.target.value})}
               required
             />
 
             <div className="space-y-2 sm:space-y-3">
-              <label className="label-sm font-black uppercase tracking-widest text-primary/60 text-[9px] sm:text-[11px]">Notes / Reflections</label>
+              <label className="label-sm font-black uppercase tracking-widest text-primary/60 text-[9px] sm:text-[11px]">
+                {isSkipping ? "Reason for Skipping" : "Notes / Reflections"}
+              </label>
               <textarea 
                 className="w-full bg-surface-container-low rounded-lg sm:rounded-xl px-4 sm:px-6 py-3 sm:py-4 text-sm text-on-surface placeholder:text-on-surface-variant/40 outline-none border-2 border-transparent focus:border-primary/20 focus:bg-surface transition-all resize-none"
                 style={{ minHeight: '100px' }}
-                placeholder="Key takeaways or group reflections..."
+                placeholder={isSkipping ? "Why was this session skipped? (Required)" : "Key takeaways or group reflections..."}
                 value={formData.notes}
                 onChange={(e) => setFormData({...formData, notes: e.target.value})}
+                required={isSkipping}
               />
             </div>
 
@@ -113,8 +151,14 @@ export default function Study() {
               </p>
             )}
 
-            <Button type="submit" className="w-full py-3 sm:py-4 justify-center rounded-xl text-sm sm:text-base" disabled={loading}>
-              {loading ? <Loader2 className="animate-spin" size={18} /> : <>Log Study Progress <Send size={16} className="ml-2" /></>}
+            <Button type="submit" className={`w-full py-3 sm:py-4 justify-center rounded-xl text-sm sm:text-base ${isSkipping ? 'bg-amber-600 text-white hover:bg-amber-700 shadow-amber-900/20' : ''}`} disabled={loading}>
+              {loading ? (
+                <Loader2 className="animate-spin" size={18} />
+              ) : isSkipping ? (
+                <>Log Skipped Session <Send size={16} className="ml-2" /></>
+              ) : (
+                <>Log Study Progress <Send size={16} className="ml-2" /></>
+              )}
             </Button>
           </form>
         </Card>

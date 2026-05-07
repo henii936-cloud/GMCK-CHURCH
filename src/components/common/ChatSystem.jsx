@@ -37,12 +37,12 @@ export default function ChatSystem() {
         color: "bg-tertiary-fixed-dim" 
       });
     }
-    if (user?.role === 'admin' || user?.role === 'shepherd') {
-      currentChannels.push({ id: "role:admin_shepherd", name: "Admin & Shepherd", icon: Hash, color: "bg-secondary" });
+    if (user?.role === 'admin' || user?.role === 'shepherd' || user?.role === 'bible_leader') {
+      currentChannels.push({ id: "role:admin_shepherd", name: "Leadership Channel", icon: Hash, color: "bg-secondary" });
     }
 
-    // Add Bible Study Groups for Admins and Shepherds
-    if (user?.role === 'admin' || user?.role === 'shepherd') {
+    // Add Bible Study Groups for Admins, Shepherds and Bible Leaders
+    if (user?.role === 'admin' || user?.role === 'shepherd' || user?.role === 'bible_leader') {
       bibleStudyGroups.forEach(group => {
         currentChannels.push({ 
           id: `group:${group.id}`, 
@@ -151,9 +151,33 @@ export default function ChatSystem() {
       channel: activeChannel,
     };
 
-    const { error } = await supabase.from('messages').insert([messageData]);
-    if (!error) {
-      setNewMessage("");
+    // Optimistic Update
+    const tempId = `temp-${Date.now()}`;
+    const optimisticMessage = {
+      ...messageData,
+      id: tempId,
+      created_at: new Date().toISOString(),
+      is_optimistic: true
+    };
+    
+    setMessages(current => [...current, optimisticMessage]);
+    setNewMessage("");
+
+    try {
+      const { data, error } = await supabase
+        .from('messages')
+        .insert([messageData])
+        .select()
+        .single();
+
+      if (error) throw error;
+      
+      // Replace optimistic message with real one
+      setMessages(current => current.map(m => m.id === tempId ? data : m));
+    } catch (err) {
+      console.error("Error sending message:", err);
+      // Remove optimistic message on error
+      setMessages(current => current.filter(m => m.id !== tempId));
     }
   };
 

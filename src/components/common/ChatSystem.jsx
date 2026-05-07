@@ -18,6 +18,7 @@ export default function ChatSystem() {
   const [newMessage, setNewMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const [profiles, setProfiles] = useState({});
+  const [leaderGroupId, setLeaderGroupId] = useState(null);
   const messagesEndRef = useRef(null);
 
   // Channels configuration
@@ -41,20 +42,21 @@ export default function ChatSystem() {
       currentChannels.push({ id: "role:admin_shepherd", name: "Leadership Channel", icon: Hash, color: "bg-secondary" });
     }
 
-    // Add Bible Study Groups for Admins, Shepherds and Bible Leaders
-    if (user?.role === 'admin' || user?.role === 'shepherd' || user?.role === 'bible_leader') {
+    // Admin/Shepherd see ALL groups; Bible Leaders see ONLY their assigned group
+    const isLeadership = user?.role === 'admin' || user?.role === 'shepherd';
+    if (isLeadership) {
       bibleStudyGroups.forEach(group => {
-        currentChannels.push({ 
-          id: `group:${group.id}`, 
-          name: group.group_name, 
-          icon: Users, 
-          color: "bg-blue-500" 
-        });
+        currentChannels.push({ id: `group:${group.id}`, name: group.group_name, icon: Users, color: "bg-blue-500" });
       });
+    } else if (user?.role === 'bible_leader' && leaderGroupId) {
+      const myGroup = bibleStudyGroups.find(g => g.id === leaderGroupId);
+      if (myGroup) {
+        currentChannels.push({ id: `group:${myGroup.id}`, name: myGroup.group_name, icon: Users, color: "bg-blue-500" });
+      }
     }
 
     setChannels(currentChannels);
-  }, [user, bibleStudyGroups]);
+  }, [user, bibleStudyGroups, leaderGroupId]);
 
   useEffect(() => {
     if (user?.role && activeChannel === 'global') {
@@ -94,6 +96,18 @@ export default function ChatSystem() {
   useEffect(() => {
     if (user) {
       fetchBibleStudyGroups();
+
+      // Fetch assigned group for Bible Leaders
+      if (user.role === 'bible_leader') {
+        supabase
+          .from('group_leaders')
+          .select('group_id')
+          .eq('user_id', user.id)
+          .maybeSingle()
+          .then(({ data }) => {
+            if (data?.group_id) setLeaderGroupId(data.group_id);
+          });
+      }
       
       const groupsChannel = supabase
         .channel('chat_groups_sync')

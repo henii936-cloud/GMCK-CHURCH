@@ -38,6 +38,7 @@ export default function Messages() {
   const [bibleStudyGroups, setBibleStudyGroups] = useState([]);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [modalSearch, setModalSearch] = useState("");
+  const [leaderGroupId, setLeaderGroupId] = useState(null);
   const messagesEndRef = useRef(null);
   const activeTabRef = useRef(activeTab);
 
@@ -66,6 +67,22 @@ export default function Messages() {
       fetchRecentDMs();
       fetchAllUsers();
       fetchBibleStudyGroups();
+
+      // For Bible Leaders, fetch their assigned group
+      if (user.role === 'bible_leader') {
+        supabase
+          .from('group_leaders')
+          .select('group_id')
+          .eq('user_id', user.id)
+          .maybeSingle()
+          .then(({ data }) => {
+            if (data?.group_id) {
+              setLeaderGroupId(data.group_id);
+              // Auto-select their group channel
+              setActiveTab(`group:${data.group_id}`);
+            }
+          });
+      }
 
       // Subscribe to Bible Study Group changes
       const groupsChannel = supabase
@@ -331,8 +348,11 @@ export default function Messages() {
     roleChannels.push({ id: 'role:admin_shepherd', name: 'Leadership Channel', icon: Hash, color: 'text-emerald-500', bg: 'bg-emerald-500/10' });
   }
 
-  // Group channels for leadership roles
-  const groupChannels = isLeaderOrAbove
+  // Group channels:
+  // - Admin/Shepherd: ALL groups
+  // - Bible Leader: ONLY their assigned group
+  // - Others: none
+  const groupChannels = isLeadership
     ? bibleStudyGroups.map(group => ({
         id: `group:${group.id}`,
         name: group.group_name,
@@ -340,7 +360,17 @@ export default function Messages() {
         color: 'text-blue-500',
         bg: 'bg-blue-500/10'
       }))
-    : [];
+    : user?.role === 'bible_leader' && leaderGroupId
+      ? bibleStudyGroups
+          .filter(g => g.id === leaderGroupId)
+          .map(group => ({
+            id: `group:${group.id}`,
+            name: group.group_name,
+            icon: Users,
+            color: 'text-blue-500',
+            bg: 'bg-blue-500/10'
+          }))
+      : [];
 
   // Unified channel list for lookups (header icon, bg, etc.)
   const channels = [...roleChannels, ...groupChannels];

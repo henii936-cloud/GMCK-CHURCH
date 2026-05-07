@@ -4,7 +4,8 @@ import {
   MessageSquare, Send, Users, Shield, 
   MessageCircle, Hash, Search, MoreVertical,
   Smile, ImageIcon, Paperclip, Phone, Video,
-  Check, CheckCheck, Plus, ArrowLeft, User
+  Check, CheckCheck, Plus, ArrowLeft, User,
+  X
 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import { supabase } from "../../services/supabaseClient";
@@ -17,8 +18,9 @@ const ROLE_CONFIG = {
   shepherd: { label: "Shepherd", color: "text-emerald-500", bg: "bg-emerald-500/10", border: "border-emerald-500/20" },
   bible_leader: { label: "Leader", color: "text-blue-500", bg: "bg-blue-500/10", border: "border-blue-500/20" },
   finance: { label: "Finance", color: "text-amber-500", bg: "bg-amber-500/10", border: "border-amber-500/20" },
-  youth: { label: "Youth", color: "text-purple-500", bg: "bg-purple-500/10", border: "border-purple-500/20" },
+  youth_ministry: { label: "Youth", color: "text-purple-500", bg: "bg-purple-500/10", border: "border-purple-500/20" },
   management: { label: "Mgmt", color: "text-indigo-500", bg: "bg-indigo-500/10", border: "border-indigo-500/20" },
+  kids_ministry: { label: "Kids", color: "text-pink-500", bg: "bg-pink-500/10", border: "border-pink-500/20" },
 };
 
 export default function Messages() {
@@ -31,12 +33,17 @@ export default function Messages() {
   const [profiles, setProfiles] = useState({});
   const [recentDMs, setRecentDMs] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
+  const [showUserSearch, setShowUserSearch] = useState(false);
+  const [allUsers, setAllUsers] = useState([]);
   const messagesEndRef = useRef(null);
 
   // Initialize from location state (Direct Message from Leaders page)
   useEffect(() => {
     if (location.state?.directChatId) {
-      setActiveTab(`dm:${location.state.directChatId}`);
+      const targetId = location.state.directChatId;
+      setActiveTab(`dm:${targetId}`);
+      // Ensure the profile is loaded
+      if (!profiles[targetId]) fetchProfiles();
     }
   }, [location.state]);
 
@@ -47,6 +54,7 @@ export default function Messages() {
   useEffect(() => {
     fetchProfiles();
     fetchRecentDMs();
+    fetchAllUsers();
   }, []);
 
   useEffect(() => {
@@ -96,11 +104,15 @@ export default function Messages() {
     }
   };
 
+  const fetchAllUsers = async () => {
+    const { data } = await supabase.from('profiles').select('*').neq('id', user.id);
+    if (data) setAllUsers(data);
+  };
+
   const fetchRecentDMs = async () => {
-    // This is a simplified way to get people you've messaged
     const { data } = await supabase
       .from('messages')
-      .select('sender_id, recipient_id')
+      .select('sender_id, recipient_id, created_at')
       .or(`sender_id.eq.${user.id},recipient_id.eq.${user.id}`)
       .is('channel', null)
       .order('created_at', { ascending: false });
@@ -155,9 +167,17 @@ export default function Messages() {
     }
   };
 
+  const startDM = (userId) => {
+    setActiveTab(`dm:${userId}`);
+    setShowUserSearch(false);
+    if (!recentDMs.includes(userId)) {
+      setRecentDMs(prev => [userId, ...prev]);
+    }
+  };
+
   const getActiveTitle = () => {
     if (activeTab === 'global') return "Global Church";
-    if (activeTab.startsWith('role:')) return `${activeTab.split(':')[1].replace('_', ' ')}s Only`;
+    if (activeTab.startsWith('role:')) return `${activeTab.split(':')[1].replace('_', ' ')} Channel`;
     if (activeTab.startsWith('dm:')) {
       const id = activeTab.split(':')[1];
       return profiles[id]?.full_name || "Private Chat";
@@ -172,7 +192,7 @@ export default function Messages() {
 
   const channels = [
     { id: "global", name: "Global Church", icon: MessageCircle, color: "text-blue-500", bg: "bg-blue-500/10" },
-    { id: `role:${user?.role}`, name: "Leadership", icon: Shield, color: "text-purple-500", bg: "bg-purple-500/10" },
+    { id: `role:${user?.role}`, name: "Ministry Channel", icon: Shield, color: "text-purple-500", bg: "bg-purple-500/10" },
   ];
 
   return (
@@ -187,7 +207,10 @@ export default function Messages() {
         >
           <div className="flex items-center justify-between px-2">
             <h1 className="text-2xl font-black text-primary">Chat</h1>
-            <button className="w-10 h-10 rounded-2xl bg-primary/5 text-primary grid place-items-center hover:bg-primary hover:text-white transition-all duration-300">
+            <button 
+              onClick={() => setShowUserSearch(true)}
+              className="w-10 h-10 rounded-2xl bg-primary/5 text-primary grid place-items-center hover:bg-primary hover:text-white transition-all duration-300"
+            >
               <Plus size={20} />
             </button>
           </div>
@@ -196,7 +219,7 @@ export default function Messages() {
             <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-primary/20 group-focus-within:text-primary transition-colors" size={18} />
             <input 
               type="text" 
-              placeholder="Search chats..."
+              placeholder="Search messages..."
               className="w-full bg-surface-container-low border-none rounded-2xl py-3 pl-12 pr-4 text-sm focus:ring-2 ring-primary/20 transition-all"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
@@ -218,7 +241,7 @@ export default function Messages() {
                 </div>
                 <div className="text-left min-w-0">
                   <p className="font-bold text-sm truncate">{ch.name}</p>
-                  <p className={`text-[10px] opacity-60 truncate ${activeTab === ch.id ? 'text-white/70' : 'text-primary/40'}`}>Official Church Channel</p>
+                  <p className={`text-[10px] opacity-60 truncate ${activeTab === ch.id ? 'text-white/70' : 'text-primary/40'}`}>Official Updates</p>
                 </div>
               </button>
             ))}
@@ -260,7 +283,8 @@ export default function Messages() {
             {recentDMs.length === 0 && (
               <div className="py-8 text-center opacity-20 flex flex-col items-center gap-2">
                 <Users size={32} />
-                <p className="text-[10px] font-black uppercase tracking-widest">No private chats yet</p>
+                <p className="text-[10px] font-black uppercase tracking-widest">No private chats</p>
+                <Button variant="ghost" size="sm" className="mt-2" onClick={() => setShowUserSearch(true)}>Find Someone</Button>
               </div>
             )}
           </Card>
@@ -320,7 +344,7 @@ export default function Messages() {
                   <MessageSquare size={64} />
                 </div>
                 <h3 className="text-2xl font-black text-primary uppercase tracking-[0.2em]">Start Chatting</h3>
-                <p className="text-sm font-bold text-primary mt-2">Messages are end-to-end encrypted</p>
+                <p className="text-sm font-bold text-primary mt-2">End-to-end encrypted messaging</p>
               </div>
             ) : (
               messages.map((msg, idx) => {
@@ -331,7 +355,6 @@ export default function Messages() {
 
                 return (
                   <div key={msg.id} className={`flex gap-3 ${isMe ? 'flex-row-reverse' : 'flex-row'}`}>
-                    {/* Avatar Column */}
                     {!activeTab.startsWith('dm:') && (
                       <div className="w-10 shrink-0">
                         {showAvatar && !isMe && (
@@ -358,7 +381,6 @@ export default function Messages() {
                           : 'bg-white text-primary rounded-[22px] rounded-tl-[4px] border border-primary/5 mr-12'
                         } ${!nextIsMe ? 'mb-2' : 'mb-1'}`}
                       >
-                        {/* Role Badge inside bubble if not me */}
                         {!isMe && !activeTab.startsWith('dm:') && sender?.role && (
                           <div className={`text-[8px] font-black uppercase tracking-tighter mb-1 inline-block px-1.5 py-0.5 rounded ${ROLE_CONFIG[sender.role]?.bg} ${ROLE_CONFIG[sender.role]?.color}`}>
                             {ROLE_CONFIG[sender.role]?.label}
@@ -367,13 +389,11 @@ export default function Messages() {
 
                         <p className="text-sm leading-relaxed whitespace-pre-wrap">{msg.content}</p>
                         
-                        {/* Message Info (Time + Status) */}
                         <div className={`flex items-center gap-1 mt-1 justify-end opacity-40 group-hover:opacity-100 transition-opacity ${isMe ? 'text-white' : 'text-primary'}`}>
                           <span className="text-[9px] font-bold">{format(new Date(msg.created_at), 'HH:mm')}</span>
                           {isMe && <CheckCheck size={12} />}
                         </div>
 
-                        {/* Telegram Tail Effect */}
                         {showAvatar && (
                           <div className={`absolute top-0 w-4 h-4 overflow-hidden ${isMe ? '-right-2' : '-left-2'}`}>
                             <div className={`w-4 h-4 rotate-45 transform ${isMe ? 'bg-primary -translate-x-1/2' : 'bg-white border-t border-l border-primary/5 translate-x-1/2'}`} />
@@ -423,6 +443,65 @@ export default function Messages() {
             </form>
           </div>
         </Card>
+
+        {/* User Search Modal */}
+        <AnimatePresence>
+          {showUserSearch && (
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-primary/20 backdrop-blur-sm z-[100] flex items-center justify-center p-4"
+            >
+              <motion.div 
+                initial={{ scale: 0.9, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.9, opacity: 0 }}
+                className="w-full max-w-md bg-white rounded-[32px] shadow-2xl overflow-hidden"
+              >
+                <div className="p-6 border-b border-primary/5 flex items-center justify-between bg-primary/5">
+                  <h3 className="text-lg font-black text-primary">New Message</h3>
+                  <button onClick={() => setShowUserSearch(false)} className="p-2 hover:bg-primary/10 rounded-xl transition-all"><X size={20} /></button>
+                </div>
+                <div className="p-4">
+                  <div className="relative mb-4">
+                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-primary/30" size={18} />
+                    <input 
+                      type="text"
+                      placeholder="Search people..."
+                      className="w-full bg-surface-container-low border-none rounded-2xl py-3 pl-12 pr-4 text-sm outline-none ring-2 ring-transparent focus:ring-primary/10 transition-all"
+                      autoFocus
+                    />
+                  </div>
+                  <div className="max-h-96 overflow-y-auto custom-scrollbar flex flex-col gap-1">
+                    {allUsers.map(u => (
+                      <button
+                        key={u.id}
+                        onClick={() => startDM(u.id)}
+                        className="flex items-center gap-4 p-3 rounded-2xl hover:bg-primary/5 transition-all group"
+                      >
+                        <div className="w-12 h-12 rounded-[18px] bg-surface-container-highest grid place-items-center font-black text-primary group-hover:bg-primary group-hover:text-white transition-all">
+                          {u.full_name?.charAt(0)}
+                        </div>
+                        <div className="text-left">
+                          <p className="font-bold text-sm text-primary">{u.full_name}</p>
+                          <div className="flex items-center gap-2">
+                            {u.role && ROLE_CONFIG[u.role] && (
+                              <span className={`text-[8px] font-black uppercase tracking-tighter px-1.5 py-0.5 rounded ${ROLE_CONFIG[u.role].bg} ${ROLE_CONFIG[u.role].color}`}>
+                                {ROLE_CONFIG[u.role].label}
+                              </span>
+                            )}
+                            <p className="text-[10px] text-primary/40 uppercase font-black">Available</p>
+                          </div>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </div>
   );

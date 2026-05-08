@@ -8,7 +8,6 @@ import Signup from "./pages/auth/signup";
 import Landing from "./pages/Landing";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import LeaderDashboard from "./pages/leader/LeaderDashboard";
-
 import AdminProgress from "./pages/admin/Progress";
 import AdminEvents from "./pages/admin/Events";
 import AdminEvangelism from "./pages/admin/Evangelism";
@@ -32,21 +31,18 @@ import YouthRoute from "./routes/YouthRoute";
 import ShepherdRoute from "./routes/ShepherdRoute";
 import FinanceDashboard from "./pages/finance/FinanceDashboard";
 import Expenses from "./pages/finance/Expenses";
-// Management pages
 import ManagementDashboard from "./pages/management/ManagementDashboard";
 import Workers from "./pages/management/Workers";
 import Salaries from "./pages/management/Salaries";
 import ManagementFinance from "./pages/management/ManagementFinance";
-// Youth Ministry pages
 import YouthDashboard from "./pages/youth/YouthDashboard";
 import YouthEvents from "./pages/youth/YouthEvents";
 import YouthMembers from "./pages/youth/YouthMembers";
-// Shepherd pages
 import ShepherdDashboard from "./pages/shepherd/ShepherdDashboard";
 import ShepherdGroups from "./pages/shepherd/ShepherdGroups";
 import ShepherdMinistries from "./pages/shepherd/Ministries";
 import Messages from "./pages/common/Messages";
-// Kids Ministry pages
+import Settings from "./pages/common/Settings";
 import KidsRoute from "./routes/KidsRoute";
 import KidsDashboard from "./pages/kids/KidsDashboard";
 import KidsMembers from "./pages/kids/KidsMembers";
@@ -55,7 +51,6 @@ import KidsAttendance from "./pages/kids/KidsAttendance";
 import KidsEvents from "./pages/kids/KidsEvents";
 
 export default function App() {
-  console.log("App component mounted");
   useEffect(() => {
     document.title = "ChurchERP - Dashboard";
   }, []);
@@ -84,15 +79,17 @@ export default function App() {
               <Route path="ministries" element={<ShepherdMinistries viewOnly={true} />} />
               <Route path="leaders" element={<Leaders />} />
               <Route path="messages" element={<Messages />} />
+              <Route path="settings" element={<Settings />} />
             </Route>
 
-            {/* Leader Routes */}
+            {/* Bible Leader Routes */}
             <Route path="/leader" element={<LeaderRoute><Layout allowedRoles={['bible_leader']} /></LeaderRoute>}>
               <Route index element={<LeaderDashboard />} />
               <Route path="members" element={<LeaderMembers />} />
               <Route path="attendance" element={<LeaderAttendance />} />
               <Route path="study" element={<LeaderStudy />} />
               <Route path="messages" element={<Messages />} />
+              <Route path="settings" element={<Settings />} />
             </Route>
 
             {/* Finance Routes */}
@@ -102,6 +99,7 @@ export default function App() {
               <Route path="budgets" element={<ApprovedBudgets />} />
               <Route path="expenses" element={<Expenses />} />
               <Route path="messages" element={<Messages />} />
+              <Route path="settings" element={<Settings />} />
             </Route>
 
             {/* Management Routes */}
@@ -111,6 +109,7 @@ export default function App() {
               <Route path="salaries" element={<Salaries />} />
               <Route path="finance" element={<ManagementFinance />} />
               <Route path="messages" element={<Messages />} />
+              <Route path="settings" element={<Settings />} />
             </Route>
 
             {/* Youth Ministry Routes */}
@@ -119,6 +118,7 @@ export default function App() {
               <Route path="events" element={<YouthEvents />} />
               <Route path="members" element={<YouthMembers />} />
               <Route path="messages" element={<Messages />} />
+              <Route path="settings" element={<Settings />} />
             </Route>
 
             {/* Shepherd Routes */}
@@ -128,6 +128,7 @@ export default function App() {
               <Route path="evangelism" element={<AdminEvangelism viewOnly={false} />} />
               <Route path="ministries" element={<ShepherdMinistries viewOnly={false} />} />
               <Route path="messages" element={<Messages />} />
+              <Route path="settings" element={<Settings />} />
             </Route>
 
             {/* Kids Ministry Routes */}
@@ -138,6 +139,7 @@ export default function App() {
               <Route path="attendance" element={<KidsAttendance />} />
               <Route path="events" element={<KidsEvents />} />
               <Route path="messages" element={<Messages />} />
+              <Route path="settings" element={<Settings />} />
             </Route>
 
             <Route path="/" element={<Landing />} />
@@ -147,4 +149,3 @@ export default function App() {
     </Router>
   );
 }
-

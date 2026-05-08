@@ -66,12 +66,14 @@ export default function Sidebar() {
       { name: "Budgets", icon: Wallet, path: "/admin/budgets" },
       { name: "Reports", icon: ClipboardList, path: "/admin/reports" },
       { name: "Messages", icon: MessageSquare, path: "/admin/messages" },
+      { name: "Settings", icon: Settings, path: "/admin/settings" },
     ],
     bible_leader: [
       { name: "My Group Members", icon: Users, path: "/leader" },
       { name: "Take Attendance", icon: ClipboardList, path: "/leader/attendance" },
       { name: "Record Study Progress", icon: BookOpen, path: "/leader/study" },
       { name: "Messages", icon: MessageSquare, path: "/leader/messages" },
+      { name: "Settings", icon: Settings, path: "/leader/settings" },
     ],
     finance: [
       { name: "Dashboard", icon: Layers, path: "/finance" },
@@ -79,6 +81,7 @@ export default function Sidebar() {
       { name: "Record Giving", icon: DollarSign, path: "/finance/record" },
       { name: "Expenses", icon: ArrowDownRight, path: "/finance/expenses" },
       { name: "Messages", icon: MessageSquare, path: "/finance/messages" },
+      { name: "Settings", icon: Settings, path: "/finance/settings" },
     ],
     management: [
       { name: "Dashboard", icon: Layers, path: "/management" },
@@ -86,12 +89,14 @@ export default function Sidebar() {
       { name: "Salary Management", icon: Wallet, path: "/management/salaries" },
       { name: "Finance Overview", icon: DollarSign, path: "/management/finance" },
       { name: "Messages", icon: MessageSquare, path: "/management/messages" },
+      { name: "Settings", icon: Settings, path: "/management/settings" },
     ],
     youth_ministry: [
       { name: "Dashboard", icon: Layers, path: "/youth" },
       { name: "Youth Members", icon: Users, path: "/youth/members" },
       { name: "Youth Events", icon: Calendar, path: "/youth/events" },
       { name: "Messages", icon: MessageSquare, path: "/youth/messages" },
+      { name: "Settings", icon: Settings, path: "/youth/settings" },
     ],
     shepherd: [
       { name: "Overview", icon: Layers, path: "/shepherd" },
@@ -99,6 +104,7 @@ export default function Sidebar() {
       { name: "Evangelism", icon: Heart, path: "/shepherd/evangelism" },
       { name: "Ministries", icon: Heart, path: "/shepherd/ministries" },
       { name: "Messages", icon: MessageSquare, path: "/shepherd/messages" },
+      { name: "Settings", icon: Settings, path: "/shepherd/settings" },
     ],
     kids_ministry: [
       { name: "Dashboard", icon: Layers, path: "/kids" },
@@ -107,6 +113,7 @@ export default function Sidebar() {
       { name: "Attendance", icon: ClipboardList, path: "/kids/attendance" },
       { name: "Kids Events", icon: Calendar, path: "/kids/events" },
       { name: "Messages", icon: MessageSquare, path: "/kids/messages" },
+      { name: "Settings", icon: Settings, path: "/kids/settings" },
     ],
   };
 
@@ -172,8 +179,12 @@ export default function Sidebar() {
         </button>
 
         <div className="flex items-center gap-4 mb-8">
-          <div className="w-12 h-12 rounded-2xl bg-tertiary-fixed-dim grid place-items-center font-heading font-bold text-on-tertiary-fixed shadow-whisper">
-            {user?.full_name?.charAt(0) || 'U'}
+          <div className="w-12 h-12 rounded-2xl bg-tertiary-fixed-dim overflow-hidden font-heading font-bold text-on-tertiary-fixed shadow-whisper flex items-center justify-center">
+            {user?.avatar_url ? (
+              <img src={user.avatar_url} alt={user.full_name} className="w-full h-full object-cover" />
+            ) : (
+              user?.full_name?.charAt(0) || 'U'
+            )}
           </div>
           <div className="overflow-hidden">
             <p className="font-bold text-sm text-primary truncate">{user?.full_name}</p>

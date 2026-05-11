@@ -46,9 +46,8 @@ export default function AttendanceHistory({ history }) {
           const absentCount = records.filter(r => r.status === 'Absent').length;
           const excusedCount = records.filter(r => r.status === 'Excused').length;
           
-          const [year, month, day] = groupData.date.split('-');
-          const displayDate = formatToEthiopian(year, month - 1, day);
-          const displayDateLong = formatToEthiopian(year, month - 1, day);
+          const displayDate = formatToEthiopian(groupData.date);
+          const displayDateLong = formatToEthiopian(groupData.date);
 
           const isExpanded = expandedDates[key];
 

@@ -57,7 +57,6 @@ export default function Sidebar() {
       { name: "Dashboard", icon: Layers, path: "/admin" },
       { name: "Members", icon: Users, path: "/admin/members" },
       { name: "Bible Study Groups", icon: MapPin, path: "/admin/groups" },
-      { name: "Group Leaders", icon: ShieldCheck, path: "/admin/leaders" },
       { name: "Study Progress", icon: BookOpen, path: "/admin/progress" },
       { name: "Events", icon: Activity, path: "/admin/events" },
       { name: "Evangelism", icon: Heart, path: "/admin/evangelism" },

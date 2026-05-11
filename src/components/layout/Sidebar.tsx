@@ -3,9 +3,30 @@ import { useTranslation } from "react-i18next";
 import { Button } from "../common/UI";
 import { motion } from "motion/react";
 import {
-  Users, Layers, DollarSign, Activity, Settings,
-  MapPin, BookOpen, ClipboardList, LogOut, ChevronRight, ShieldCheck, Wallet, Heart, ArrowDownRight,
-  Menu, X, Briefcase, Zap, Eye, UserCheck, Calendar, Shield, FileText, MessageSquare
+  Users,
+  Layers,
+  DollarSign,
+  Activity,
+  Settings,
+  MapPin,
+  BookOpen,
+  ClipboardList,
+  LogOut,
+  ChevronRight,
+  ShieldCheck,
+  Wallet,
+  Heart,
+  ArrowDownRight,
+  Menu,
+  X,
+  Briefcase,
+  Zap,
+  Eye,
+  UserCheck,
+  Calendar,
+  Shield,
+  FileText,
+  MessageSquare,
 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import { useState, useEffect } from "react";
@@ -18,9 +39,9 @@ export default function Sidebar() {
   const { t, i18n } = useTranslation();
 
   const toggleLanguage = () => {
-    const newLang = i18n.language === 'en' ? 'am' : 'en';
+    const newLang = i18n.language === "en" ? "am" : "en";
     i18n.changeLanguage(newLang);
-    localStorage.setItem('app_language', newLang);
+    localStorage.setItem("app_language", newLang);
   };
 
   // Close sidebar on route change (mobile)
@@ -33,18 +54,20 @@ export default function Sidebar() {
     const handleResize = () => {
       if (window.innerWidth >= 1024) setMobileOpen(false);
     };
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   // Prevent body scroll when mobile sidebar is open
   useEffect(() => {
     if (mobileOpen) {
-      document.body.style.overflow = 'hidden';
+      document.body.style.overflow = "hidden";
     } else {
-      document.body.style.overflow = '';
+      document.body.style.overflow = "";
     }
-    return () => { document.body.style.overflow = ''; };
+    return () => {
+      document.body.style.overflow = "";
+    };
   }, [mobileOpen]);
 
   const handleLogout = async () => {
@@ -69,7 +92,11 @@ export default function Sidebar() {
     ],
     bible_leader: [
       { name: "My Group Members", icon: Users, path: "/leader" },
-      { name: "Take Attendance", icon: ClipboardList, path: "/leader/attendance" },
+      {
+        name: "Take Attendance",
+        icon: ClipboardList,
+        path: "/leader/attendance",
+      },
       { name: "Record Study Progress", icon: BookOpen, path: "/leader/study" },
       { name: "Messages", icon: MessageSquare, path: "/leader/messages" },
       { name: "Settings", icon: Settings, path: "/leader/settings" },
@@ -86,7 +113,11 @@ export default function Sidebar() {
       { name: "Dashboard", icon: Layers, path: "/management" },
       { name: "Church Workers", icon: UserCheck, path: "/management/workers" },
       { name: "Salary Management", icon: Wallet, path: "/management/salaries" },
-      { name: "Finance Overview", icon: DollarSign, path: "/management/finance" },
+      {
+        name: "Finance Overview",
+        icon: DollarSign,
+        path: "/management/finance",
+      },
       { name: "Messages", icon: MessageSquare, path: "/management/messages" },
       { name: "Settings", icon: Settings, path: "/management/settings" },
     ],
@@ -124,19 +155,24 @@ export default function Sidebar() {
       <div className="flex flex-col gap-2 mb-16">
         <div className="flex items-center gap-3">
           <div className="w-12 h-12 rounded-2xl bg-surface-container-high overflow-hidden shadow-whisper border border-outline-variant/10">
-            <img 
-              src="/src/assets/admin-icon.png" 
-              alt="Admin Icon" 
+            <img
+              src="/src/assets/admin-icon.png"
+              alt="Admin Icon"
               className="w-full h-full object-cover"
               onError={(e) => {
-                e.target.style.display = 'none';
-                e.target.parentElement.innerHTML = '<div class="w-full h-full bg-primary grid place-items-center"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-on-primary"><path d="m8 3 4 8 5-5 5 15H2L8 3z"/></svg></div>';
+                e.target.style.display = "none";
+                e.target.parentElement.innerHTML =
+                  '<div class="w-full h-full bg-primary grid place-items-center"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-on-primary"><path d="m8 3 4 8 5-5 5 15H2L8 3z"/></svg></div>';
               }}
             />
           </div>
           <div>
-            <h2 className="headline-sm text-primary tracking-tight">Church<span className="text-tertiary-fixed-dim italic">ERP</span></h2>
-            <p className="label-sm opacity-40 tracking-[0.2em]">{user?.role?.replace('_', ' ')}</p>
+            <h2 className="headline-sm text-primary tracking-tight">
+              Church<span className="text-tertiary-fixed-dim italic">ERP</span>
+            </h2>
+            <p className="label-sm opacity-40 tracking-[0.2em]">
+              {user?.role?.replace("_", " ")}
+            </p>
           </div>
         </div>
       </div>
@@ -149,17 +185,33 @@ export default function Sidebar() {
               <li key={item.path}>
                 <Link
                   to={item.path}
-                  className={`flex items-center gap-4 px-4 py-4 rounded-xl no-underline transition-all duration-500 group relative ${isActive ? 'text-primary bg-surface-container-highest' : 'text-on-surface-variant hover:bg-surface-container'}`}
+                  className={`flex items-center gap-4 px-4 py-4 rounded-xl no-underline transition-all duration-500 group relative ${isActive ? "text-primary bg-surface-container-highest" : "text-on-surface-variant hover:bg-surface-container"}`}
                 >
                   {isActive && (
-                    <motion.div 
+                    <motion.div
                       layoutId="sidebar-active"
-                      className="absolute left-0 top-1/2 -translate-y-1/2 w-1.5 h-1/2 bg-primary rounded-r-full" 
+                      className="absolute left-0 top-1/2 -translate-y-1/2 w-1.5 h-1/2 bg-primary rounded-r-full"
                     />
                   )}
-                  <item.icon size={20} className={isActive ? 'text-primary' : 'text-on-surface-variant group-hover:text-primary transition-colors duration-500'} />
-                  <span className={`text-sm tracking-tight ${isActive ? 'font-black' : 'font-medium'}`}>{t(item.name)}</span>
-                  {isActive && <ChevronRight size={14} className="ml-auto text-primary/40" />}
+                  <item.icon
+                    size={20}
+                    className={
+                      isActive
+                        ? "text-primary"
+                        : "text-on-surface-variant group-hover:text-primary transition-colors duration-500"
+                    }
+                  />
+                  <span
+                    className={`text-sm tracking-tight ${isActive ? "font-black" : "font-medium"}`}
+                  >
+                    {t(item.name)}
+                  </span>
+                  {isActive && (
+                    <ChevronRight
+                      size={14}
+                      className="ml-auto text-primary/40"
+                    />
+                  )}
                 </Link>
               </li>
             );
@@ -168,27 +220,38 @@ export default function Sidebar() {
       </nav>
 
       <div className="mt-auto pt-6 border-t border-outline-variant/10">
-        
         {/* Language Switcher */}
         <button
           onClick={toggleLanguage}
           className="w-full flex items-center justify-between px-4 py-3 mb-4 rounded-xl text-sm text-on-surface-variant hover:text-primary hover:bg-surface-container transition-all duration-300"
         >
-          <span className="font-medium tracking-tight text-xs uppercase">{t("Language")}: {i18n.language === 'en' ? 'English' : 'አማርኛ'}</span>
-          <span className="text-xs font-black bg-surface-container-high px-2 py-1 rounded-md">{i18n.language === 'en' ? 'AM' : 'EN'}</span>
+          <span className="font-medium tracking-tight text-xs uppercase">
+            {t("Language")}: {i18n.language === "en" ? "English" : "አማርኛ"}
+          </span>
+          <span className="text-xs font-black bg-surface-container-high px-2 py-1 rounded-md">
+            {i18n.language === "en" ? "AM" : "EN"}
+          </span>
         </button>
 
         <div className="flex items-center gap-4 mb-8">
           <div className="w-12 h-12 rounded-2xl bg-tertiary-fixed-dim overflow-hidden font-heading font-bold text-on-tertiary-fixed shadow-whisper flex items-center justify-center">
             {user?.avatar_url ? (
-              <img src={user.avatar_url} alt={user.full_name} className="w-full h-full object-cover" />
+              <img
+                src={user.avatar_url}
+                alt={user.full_name}
+                className="w-full h-full object-cover"
+              />
             ) : (
-              user?.full_name?.charAt(0) || 'U'
+              user?.full_name?.charAt(0) || "U"
             )}
           </div>
           <div className="overflow-hidden">
-            <p className="font-bold text-sm text-primary truncate">{user?.full_name}</p>
-            <p className="label-sm opacity-40 lowercase tracking-widest">{user?.role?.replace('_', ' ')}</p>
+            <p className="font-bold text-sm text-primary truncate">
+              {user?.full_name}
+            </p>
+            <p className="label-sm opacity-40 lowercase tracking-widest">
+              {user?.role?.replace("_", " ")}
+            </p>
           </div>
         </div>
         <button
@@ -220,15 +283,15 @@ export default function Sidebar() {
 
       {/* Mobile overlay */}
       {mobileOpen && (
-        <div 
+        <div
           className="lg:hidden fixed inset-0 bg-primary/20 backdrop-blur-sm z-[70]"
           onClick={() => setMobileOpen(false)}
         />
       )}
 
       {/* Mobile sidebar drawer */}
-      <aside 
-        className={`lg:hidden fixed inset-y-0 left-0 z-[80] w-[280px] bg-surface-container-low p-6 flex flex-col gap-10 text-on-surface border-none shadow-2xl transition-transform duration-300 ease-out ${mobileOpen ? 'translate-x-0' : '-translate-x-full'}`}
+      <aside
+        className={`lg:hidden fixed inset-y-0 left-0 z-[80] w-[280px] bg-surface-container-low p-6 flex flex-col gap-10 text-on-surface border-none shadow-2xl transition-transform duration-300 ease-out ${mobileOpen ? "translate-x-0" : "-translate-x-full"}`}
       >
         <button
           onClick={() => setMobileOpen(false)}

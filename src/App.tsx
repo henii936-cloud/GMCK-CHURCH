@@ -41,6 +41,7 @@ import YouthMembers from "./pages/youth/YouthMembers";
 import ShepherdDashboard from "./pages/shepherd/ShepherdDashboard";
 import ShepherdGroups from "./pages/shepherd/ShepherdGroups";
 import ShepherdMinistries from "./pages/shepherd/Ministries";
+import ShepherdEvents from "./pages/shepherd/ShepherdEvents";
 import Messages from "./pages/common/Messages";
 import Settings from "./pages/common/Settings";
 import KidsRoute from "./routes/KidsRoute";
@@ -125,6 +126,7 @@ export default function App() {
             <Route path="/shepherd" element={<ShepherdRoute><Layout allowedRoles={['shepherd']} /></ShepherdRoute>}>
               <Route index element={<ShepherdDashboard />} />
               <Route path="groups" element={<AdminGroups viewOnly={false} />} />
+              <Route path="events" element={<ShepherdEvents />} />
               <Route path="evangelism" element={<AdminEvangelism viewOnly={false} />} />
               <Route path="ministries" element={<ShepherdMinistries viewOnly={false} />} />
               <Route path="messages" element={<Messages />} />

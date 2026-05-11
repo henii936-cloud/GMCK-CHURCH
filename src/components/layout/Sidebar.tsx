@@ -100,6 +100,7 @@ export default function Sidebar() {
     shepherd: [
       { name: "Overview", icon: Layers, path: "/shepherd" },
       { name: "Bible Study Groups", icon: MapPin, path: "/shepherd/groups" },
+      { name: "Shepherd Events", icon: Calendar, path: "/shepherd/events" },
       { name: "Evangelism", icon: Heart, path: "/shepherd/evangelism" },
       { name: "Ministries", icon: Heart, path: "/shepherd/ministries" },
       { name: "Messages", icon: MessageSquare, path: "/shepherd/messages" },

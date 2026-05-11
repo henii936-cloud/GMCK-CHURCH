@@ -1,6 +1,7 @@
 # Church ERP - Role System Analysis
 
 ## Overview
+
 The Church ERP system implements a **role-based access control (RBAC)** architecture with 7 distinct roles, each managing different church operations. The system uses Supabase for authentication and a centralized AuthContext for role verification.
 
 ---
@@ -8,9 +9,11 @@ The Church ERP system implements a **role-based access control (RBAC)** architec
 ## Role Hierarchy & Definitions
 
 ### 1. **ADMIN** (Super Administrator)
+
 **Role Key:** `admin`
 
 **Responsibilities:**
+
 - Complete system oversight and configuration
 - User and member management across all departments
 - Access to all features and dashboards
@@ -19,6 +22,7 @@ The Church ERP system implements a **role-based access control (RBAC)** architec
 - Report generation and analytics
 
 **Accessible Pages:**
+
 ```
 /admin
 ├── members (manage all church members)
@@ -37,6 +41,7 @@ The Church ERP system implements a **role-based access control (RBAC)** architec
 ```
 
 **Key Features:**
+
 - View-only access to subordinate roles' data
 - Can view groups, evangelism, and ministries in read-only mode
 - Comprehensive dashboard for decision-making
@@ -44,9 +49,11 @@ The Church ERP system implements a **role-based access control (RBAC)** architec
 ---
 
 ### 2. **ADMIN - BIBLE LEADER** (Bible Study Group Leader)
+
 **Role Key:** `bible_leader`
 
 **Responsibilities:**
+
 - Manage their assigned Bible study group
 - Track attendance and member participation
 - Record and monitor study progress
@@ -54,6 +61,7 @@ The Church ERP system implements a **role-based access control (RBAC)** architec
 - Report group activities
 
 **Accessible Pages:**
+
 ```
 /leader
 ├── members (view group members)
@@ -64,6 +72,7 @@ The Church ERP system implements a **role-based access control (RBAC)** architec
 ```
 
 **Integration Points:**
+
 - Part of the overall member hierarchy
 - Reports attendance to Admin through system database
 - Members belong to their group only
@@ -72,9 +81,11 @@ The Church ERP system implements a **role-based access control (RBAC)** architec
 ---
 
 ### 3. **FINANCE**
+
 **Role Key:** `finance`
 
 **Responsibilities:**
+
 - Record and track financial contributions
 - Manage approved budgets and spending
 - Track expenses and financial reports
@@ -82,6 +93,7 @@ The Church ERP system implements a **role-based access control (RBAC)** architec
 - Manage giving records
 
 **Accessible Pages:**
+
 ```
 /finance
 ├── dashboard (financial overview)
@@ -93,6 +105,7 @@ The Church ERP system implements a **role-based access control (RBAC)** architec
 ```
 
 **Integration Points:**
+
 - Records data that Admin reviews in Admin Finance
 - Expenses feed into budget management
 - Financial reports accessible to Management role
@@ -101,9 +114,11 @@ The Church ERP system implements a **role-based access control (RBAC)** architec
 ---
 
 ### 4. **MANAGEMENT**
+
 **Role Key:** `management`
 
 **Responsibilities:**
+
 - Manage church workers and staff
 - Salary management and payroll
 - Financial overview for management purposes
@@ -111,6 +126,7 @@ The Church ERP system implements a **role-based access control (RBAC)** architec
 - Workers and staff administration
 
 **Accessible Pages:**
+
 ```
 /management
 ├── dashboard (management overview)
@@ -122,6 +138,7 @@ The Church ERP system implements a **role-based access control (RBAC)** architec
 ```
 
 **Integration Points:**
+
 - Manages workers who may have other roles
 - Accesses financial data reported by Finance role
 - Worker information may affect attendance and reporting
@@ -130,9 +147,11 @@ The Church ERP system implements a **role-based access control (RBAC)** architec
 ---
 
 ### 5. **SHEPHERD** (Pastoral/Ministry Oversight)
+
 **Role Key:** `shepherd`
 
 **Responsibilities:**
+
 - Oversee Bible study groups and group leaders
 - Manage evangelism initiatives
 - Coordinate all church ministries
@@ -140,6 +159,7 @@ The Church ERP system implements a **role-based access control (RBAC)** architec
 - Ministry planning and coordination
 
 **Accessible Pages:**
+
 ```
 /shepherd
 ├── overview (ministry dashboard)
@@ -151,6 +171,7 @@ The Church ERP system implements a **role-based access control (RBAC)** architec
 ```
 
 **Integration Points:**
+
 - Works with Bible Leaders under their supervision
 - Reviews evangelism data and reports
 - Coordinates with other ministries (youth, kids)
@@ -160,9 +181,11 @@ The Church ERP system implements a **role-based access control (RBAC)** architec
 ---
 
 ### 6. **YOUTH MINISTRY**
+
 **Role Key:** `youth_ministry`
 
 **Responsibilities:**
+
 - Manage youth group members
 - Plan and coordinate youth events
 - Track youth attendance and engagement
@@ -170,6 +193,7 @@ The Church ERP system implements a **role-based access control (RBAC)** architec
 - Youth member development
 
 **Accessible Pages:**
+
 ```
 /youth
 ├── dashboard (youth ministry overview)
@@ -180,6 +204,7 @@ The Church ERP system implements a **role-based access control (RBAC)** architec
 ```
 
 **Integration Points:**
+
 - Youth members tracked separately from general membership
 - Events coordinated with overall church calendar
 - May interface with Shepherd for ministry coordination
@@ -188,9 +213,11 @@ The Church ERP system implements a **role-based access control (RBAC)** architec
 ---
 
 ### 7. **KIDS MINISTRY**
+
 **Role Key:** `kids_ministry`
 
 **Responsibilities:**
+
 - Manage kids/children classes and attendance
 - Coordinate children's events and activities
 - Track children member engagement
@@ -198,6 +225,7 @@ The Church ERP system implements a **role-based access control (RBAC)** architec
 - Age-appropriate ministry delivery
 
 **Accessible Pages:**
+
 ```
 /kids
 ├── dashboard (kids ministry overview)
@@ -210,6 +238,7 @@ The Church ERP system implements a **role-based access control (RBAC)** architec
 ```
 
 **Integration Points:**
+
 - Children members tracked in separate database
 - Attendance data reported to Admin
 - May interface with Shepherd for ministry integration
@@ -221,6 +250,7 @@ The Church ERP system implements a **role-based access control (RBAC)** architec
 ## Role Integration Architecture
 
 ### Authentication Flow
+
 ```
 User Logs In
     ↓
@@ -238,7 +268,9 @@ Role used for routing and access control
 ### Access Control Mechanisms
 
 #### 1. **Route Guards (Role-Based Routing)**
+
 Each role has a dedicated Route component:
+
 - `AdminRoute` → checks `role === "admin"`
 - `LeaderRoute` → checks `role === "bible_leader"`
 - `FinanceRoute` → checks `role === "finance"`
@@ -248,23 +280,30 @@ Each role has a dedicated Route component:
 - `KidsRoute` → checks `role === "kids_ministry"` OR `role === "admin"`
 
 #### 2. **Redirect Logic**
+
 If unauthorized:
+
 - User redirected to their role's home dashboard
 - Non-logged-in users sent to `/login`
 - Invalid role access returns to home (`/`)
 
 #### 3. **Sidebar Navigation**
+
 The Sidebar component shows menu items based on user's role:
+
 ```javascript
 const navItems = menuItems[user?.role?.toLowerCase()] || [];
 ```
+
 Each role sees only their permitted menu options.
 
 #### 4. **ProtectedRoute Component**
+
 Used for granular control within routes:
+
 ```javascript
 if (!allowedRoles.includes(user.role)) {
-  return <Navigate to={rolePath[user.role]} />
+  return <Navigate to={rolePath[user.role]} />;
 }
 ```
 
@@ -273,6 +312,7 @@ if (!allowedRoles.includes(user.role)) {
 ## Data Flow & Integration Points
 
 ### Member Management Integration
+
 ```
 Admin (creates/manages members)
     ↓
@@ -284,6 +324,7 @@ Progress data → Admin Analytics
 ```
 
 ### Financial Integration
+
 ```
 Finance (records giving & expenses)
     ↓
@@ -295,6 +336,7 @@ Budgets → Admin/Finance for approval
 ```
 
 ### Ministry Coordination
+
 ```
 Shepherd (oversees all ministries)
     ↓
@@ -310,6 +352,7 @@ All data → Admin for system-wide reporting
 ```
 
 ### Event Management
+
 ```
 Admin/Shepherd (plan events)
     ↓
@@ -347,18 +390,21 @@ Reports to Admin
 ## Key Integration Features
 
 ### 1. **Shared Navigation Infrastructure**
+
 - All roles use the same Layout component
 - Sidebar adapts based on role
 - Messages and Settings available to all roles
 - Language toggle (English/Amharic) for all users
 
 ### 2. **Unified Authentication Context**
+
 - Single source of truth for user state
 - Role information cached in localStorage for performance
 - Automatic session refresh with auth state changes
 - Fallback to user_metadata if profile fetch fails
 
 ### 3. **Data Access Patterns**
+
 - **Admin**: Full read-write access to all data
 - **Shepherd**: Oversight of ministry structure
 - **Ministry Roles** (Youth, Kids, Leaders): Own department data
@@ -366,11 +412,13 @@ Reports to Admin
 - **Management**: Worker and salary data
 
 ### 4. **Common Communication Hub**
+
 - All roles have access to Messages
 - Messages component routes communication between roles
 - Enables cross-role coordination
 
 ### 5. **Reporting & Analytics**
+
 - Admin has comprehensive reporting across all areas
 - Each role has role-specific analytics on their dashboard
 - Data flows from operational roles to Admin for system-wide insights
@@ -380,18 +428,22 @@ Reports to Admin
 ## Potential Integration Challenges & Solutions
 
 ### Challenge 1: Role Inconsistency
+
 **Problem:** Some routes check `role !== "finance"` while others use `role?.toLowerCase()`
 **Solution:** Standardize role comparison (suggest using `.toLowerCase()` consistently)
 
 ### Challenge 2: Permission Expansion
+
 **Problem:** If Admin needs to perform Kids Ministry tasks, route needs explicit handling
 **Solution:** Already implemented for Kids Route - allows both `kids_ministry` and `admin`
 
 ### Challenge 3: Cross-Role Data Access
+
 **Problem:** Finance viewing member data or Shepherd viewing financial reports
 **Solution:** Use API permissions and Supabase RLS (Row-Level Security) to control data visibility
 
 ### Challenge 4: Concurrent Role Assignment
+
 **Problem:** Users assigned multiple roles (e.g., Leader + Finance)
 **Solution:** Currently not supported - would require role array or permission flags instead of single role
 

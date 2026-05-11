@@ -45,6 +45,7 @@ The Church ERP role system is built on a **Role-Based Access Control (RBAC)** ar
 ### 1. AuthContext (`src/context/AuthContext.jsx`)
 
 **Key Responsibilities:**
+
 - Load and cache user profile from Supabase
 - Manage authentication session state
 - Provide user data and role to entire app
@@ -54,7 +55,7 @@ The Church ERP role system is built on a **Role-Based Access Control (RBAC)** ar
 
 ```javascript
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);      // { id, email, role, full_name, ... }
+  const [user, setUser] = useState(null); // { id, email, role, full_name, ... }
   const [session, setSession] = useState(null); // Supabase session
   const [loading, setLoading] = useState(true);
 
@@ -75,6 +76,7 @@ export const useAuth = () => useContext(AuthContext);
 ```
 
 **Caching Strategy:**
+
 ```javascript
 const cachedProfile = localStorage.getItem(`profile_${authUser.id}`);
 if (cachedProfile) {
@@ -82,12 +84,13 @@ if (cachedProfile) {
   setUser(JSON.parse(cachedProfile));
 }
 // Fetch fresh data in background
-supabase.from('profiles').select('*').eq('id', authUser.id);
+supabase.from("profiles").select("*").eq("id", authUser.id);
 ```
 
 ### 2. Route Protection Components
 
 #### AdminRoute
+
 ```javascript
 // Route Guard Pattern - Specific Role
 export default function AdminRoute({ children }) {
@@ -107,6 +110,7 @@ export default function AdminRoute({ children }) {
 ```
 
 #### KidsRoute (Special Case - Multiple Roles)
+
 ```javascript
 // Note: Kids route allows BOTH kids_ministry AND admin roles
 if (role !== "kids_ministry" && role !== "admin") {
@@ -115,6 +119,7 @@ if (role !== "kids_ministry" && role !== "admin") {
 ```
 
 **Route Guards Implemented:**
+
 - `AdminRoute` - admin only
 - `LeaderRoute` - bible_leader only
 - `FinanceRoute` - finance only
@@ -150,6 +155,7 @@ export default function ProtectedRoute({ children, allowedRoles }) {
 ```
 
 **Used in App.jsx:**
+
 ```jsx
 <Route path="/admin" element={
   <AdminRoute>
@@ -161,6 +167,7 @@ export default function ProtectedRoute({ children, allowedRoles }) {
 ### 4. Sidebar Navigation (`src/components/layout/Sidebar.jsx`)
 
 **Dynamic Menu System:**
+
 ```javascript
 const menuItems = {
   admin: [
@@ -170,7 +177,11 @@ const menuItems = {
   ],
   bible_leader: [
     { name: "My Group Members", icon: Users, path: "/leader" },
-    { name: "Take Attendance", icon: ClipboardList, path: "/leader/attendance" },
+    {
+      name: "Take Attendance",
+      icon: ClipboardList,
+      path: "/leader/attendance",
+    },
     // ... more items
   ],
   finance: [
@@ -188,6 +199,7 @@ const navItems = menuItems[user?.role?.toLowerCase()] || [];
 ## Database Schema Integration
 
 ### Profiles Table (Supabase)
+
 ```sql
 CREATE TABLE profiles (
   id UUID PRIMARY KEY REFERENCES auth.users(id),
@@ -242,16 +254,17 @@ CREATE POLICY "finance_view_all" ON members
 ## Role Checking Patterns
 
 ### Pattern 1: In Components
+
 ```javascript
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from "../context/AuthContext";
 
 export default function Component() {
   const { user } = useAuth();
 
-  if (user?.role === 'admin') {
+  if (user?.role === "admin") {
     return <AdminView />;
   }
-  if (user?.role === 'finance') {
+  if (user?.role === "finance") {
     return <FinanceView />;
   }
   return <DefaultView />;
@@ -259,31 +272,42 @@ export default function Component() {
 ```
 
 ### Pattern 2: In Routes
+
 ```javascript
-<Route path="/admin" element={<AdminRoute><AdminPage /></AdminRoute>} />
+<Route
+  path="/admin"
+  element={
+    <AdminRoute>
+      <AdminPage />
+    </AdminRoute>
+  }
+/>
 ```
 
 ### Pattern 3: With Conditional Features
+
 ```javascript
-{user?.role === 'admin' && (
-  <AdminOnlySection>
-    Delete User Button
-  </AdminOnlySection>
-)}
+{
+  user?.role === "admin" && (
+    <AdminOnlySection>Delete User Button</AdminOnlySection>
+  );
+}
 ```
 
 ### Pattern 4: Role-Based Data Access
+
 ```javascript
 // In API calls
 const fetchMembers = async () => {
-  if (user?.role === 'admin') {
+  if (user?.role === "admin") {
     // Fetch all members
-    return supabase.from('members').select('*');
-  } else if (user?.role === 'bible_leader') {
+    return supabase.from("members").select("*");
+  } else if (user?.role === "bible_leader") {
     // Fetch only their group's members
-    return supabase.from('members')
-      .select('*')
-      .eq('group_id', user.assigned_group_id);
+    return supabase
+      .from("members")
+      .select("*")
+      .eq("group_id", user.assigned_group_id);
   }
 };
 ```
@@ -293,6 +317,7 @@ const fetchMembers = async () => {
 ## Authentication Flow
 
 ### Login Process
+
 ```
 1. User enters email/password on Login page
 2. Call supabase.auth.signInWithPassword()
@@ -308,6 +333,7 @@ const fetchMembers = async () => {
 ```
 
 ### Session Refresh
+
 ```
 1. Supabase detects token expiration
 2. Fires 'TOKEN_REFRESHED' event
@@ -316,6 +342,7 @@ const fetchMembers = async () => {
 ```
 
 ### Logout Process
+
 ```
 1. User clicks logout
 2. Call supabase.auth.signOut()
@@ -330,27 +357,29 @@ const fetchMembers = async () => {
 
 ### Data Owned by Each Role
 
-| Role | Owns | Can View | Cannot View |
-|------|------|----------|-------------|
-| **admin** | System config, all data | Everything | Nothing |
-| **bible_leader** | Their group's attendance, progress | Own group members | Other groups |
-| **finance** | Donations, expenses, budgets | All financial data | Member details |
-| **management** | Worker records, salaries | Finance overview | Member details |
-| **shepherd** | Ministry structure, evangelism | Groups, leaders, ministries | Finance, staff |
-| **youth_ministry** | Youth members, events | Only youth data | Other ministries |
-| **kids_ministry** | Children, classes, kids events | Only kids data | Other ministries |
+| Role               | Owns                               | Can View                    | Cannot View      |
+| ------------------ | ---------------------------------- | --------------------------- | ---------------- |
+| **admin**          | System config, all data            | Everything                  | Nothing          |
+| **bible_leader**   | Their group's attendance, progress | Own group members           | Other groups     |
+| **finance**        | Donations, expenses, budgets       | All financial data          | Member details   |
+| **management**     | Worker records, salaries           | Finance overview            | Member details   |
+| **shepherd**       | Ministry structure, evangelism     | Groups, leaders, ministries | Finance, staff   |
+| **youth_ministry** | Youth members, events              | Only youth data             | Other ministries |
+| **kids_ministry**  | Children, classes, kids events     | Only kids data              | Other ministries |
 
 ---
 
 ## Security Considerations
 
 ### Current Implementation
+
 - ✅ Session-based authentication via Supabase
 - ✅ Role stored in user profile (single source of truth)
 - ✅ Route-level protection via Route Guards
 - ✅ UI elements hidden based on role
 
 ### Recommendations for Enhancement
+
 - ❌ Implement Supabase RLS policies (critical!)
 - ❌ Validate role on every API call (backend)
 - ❌ Use JWT claims for role verification
@@ -359,6 +388,7 @@ const fetchMembers = async () => {
 - ❌ Implement permission matrix (not just roles)
 
 ### RLS Policy Template
+
 ```sql
 -- Prevent unauthorized data access at database level
 CREATE POLICY "enforce_role_access" ON members
@@ -385,26 +415,26 @@ CREATE POLICY "enforce_role_access" ON members
 ### Test Cases
 
 ```javascript
-describe('Role-Based Access Control', () => {
-  it('should redirect non-admin users from /admin', () => {
+describe("Role-Based Access Control", () => {
+  it("should redirect non-admin users from /admin", () => {
     // Mock user with bible_leader role
     // Navigate to /admin
     // Expect redirect to /leader
   });
 
-  it('should allow admin to access all routes', () => {
+  it("should allow admin to access all routes", () => {
     // Mock user with admin role
     // Navigate to each role's route
     // Expect all to succeed
   });
 
-  it('should load correct menu items for each role', () => {
+  it("should load correct menu items for each role", () => {
     // For each role
     // Check that sidebar shows correct menu items
     // Check that other roles' items are hidden
   });
 
-  it('should cache user profile in localStorage', () => {
+  it("should cache user profile in localStorage", () => {
     // Login user
     // Check localStorage for profile_[userId]
     // Verify cache expires appropriately
@@ -417,23 +447,26 @@ describe('Role-Based Access Control', () => {
 ## Performance Optimizations
 
 ### 1. Profile Caching
+
 ```javascript
 // Fast initial render from localStorage
 const cachedProfile = localStorage.getItem(`profile_${authUser.id}`);
 if (cachedProfile) setUser(JSON.parse(cachedProfile));
 
 // Fresh data in background
-supabase.from('profiles').select('*').eq('id', authUser.id);
+supabase.from("profiles").select("*").eq("id", authUser.id);
 ```
 
 ### 2. Role-Based Code Splitting
+
 ```javascript
 // Consider lazy loading role-specific pages
-const AdminRoute = lazy(() => import('./pages/admin'));
-const LeaderRoute = lazy(() => import('./pages/leader'));
+const AdminRoute = lazy(() => import("./pages/admin"));
+const LeaderRoute = lazy(() => import("./pages/leader"));
 ```
 
 ### 3. Memoization
+
 ```javascript
 // Prevent unnecessary re-renders
 const MemoizedSidebar = memo(Sidebar);

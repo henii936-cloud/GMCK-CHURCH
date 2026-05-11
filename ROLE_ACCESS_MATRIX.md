@@ -2,29 +2,29 @@
 
 ## Quick Reference: Who Can Access What
 
-| Feature/Module | Admin | Bible Leader | Finance | Management | Shepherd | Youth | Kids |
-|---|---|---|---|---|---|---|---|
-| **Dashboard** | ✅ Full | ✅ Own | ✅ Own | ✅ Own | ✅ Own | ✅ Own | ✅ Own |
-| **Members** | ✅ Full | ✅ Own Group | ❌ | ❌ | ✅ View | ✅ Youth Only | ✅ Kids Only |
-| **Bible Study Groups** | ✅ Full | ✅ Own | ❌ | ❌ | ✅ Full | ❌ | ❌ |
-| **Attendance** | ✅ Full | ✅ Own Group | ❌ | ❌ | ✅ View | ❌ | ✅ Own |
-| **Study Progress** | ✅ Full | ✅ Own Group | ❌ | ❌ | ✅ View | ❌ | ❌ |
-| **Finance Dashboard** | ✅ Full | ❌ | ✅ Full | ✅ View Only | ❌ | ❌ | ❌ |
-| **Record Giving** | ✅ View | ❌ | ✅ Full | ❌ | ❌ | ❌ | ❌ |
-| **Budgets** | ✅ Full | ❌ | ✅ View | ❌ | ❌ | ❌ | ❌ |
-| **Expenses** | ✅ Full | ❌ | ✅ Full | ❌ | ❌ | ❌ | ❌ |
-| **Workers/Staff** | ✅ View | ❌ | ❌ | ✅ Full | ❌ | ❌ | ❌ |
-| **Salaries** | ✅ View | ❌ | ❌ | ✅ Full | ❌ | ❌ | ❌ |
-| **Evangelism** | ✅ View | ❌ | ❌ | ❌ | ✅ Full | ❌ | ❌ |
-| **Ministries** | ✅ View | ❌ | ❌ | ❌ | ✅ Full | ❌ | ❌ |
-| **Youth Events** | ✅ View | ❌ | ❌ | ❌ | ❌ | ✅ Full | ❌ |
-| **Youth Members** | ✅ View | ❌ | ❌ | ❌ | ❌ | ✅ Full | ❌ |
-| **Kids Classes** | ✅ View | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ Full |
-| **Kids Attendance** | ✅ View | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ Full |
-| **Kids Events** | ✅ View | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ Full |
-| **Reports** | ✅ Full | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| **Messages** | ✅ Full | ✅ Full | ✅ Full | ✅ Full | ✅ Full | ✅ Full | ✅ Full |
-| **Settings** | ✅ Full | ✅ Own | ✅ Own | ✅ Own | ✅ Own | ✅ Own | ✅ Own |
+| Feature/Module         | Admin   | Bible Leader | Finance | Management   | Shepherd | Youth         | Kids         |
+| ---------------------- | ------- | ------------ | ------- | ------------ | -------- | ------------- | ------------ |
+| **Dashboard**          | ✅ Full | ✅ Own       | ✅ Own  | ✅ Own       | ✅ Own   | ✅ Own        | ✅ Own       |
+| **Members**            | ✅ Full | ✅ Own Group | ❌      | ❌           | ✅ View  | ✅ Youth Only | ✅ Kids Only |
+| **Bible Study Groups** | ✅ Full | ✅ Own       | ❌      | ❌           | ✅ Full  | ❌            | ❌           |
+| **Attendance**         | ✅ Full | ✅ Own Group | ❌      | ❌           | ✅ View  | ❌            | ✅ Own       |
+| **Study Progress**     | ✅ Full | ✅ Own Group | ❌      | ❌           | ✅ View  | ❌            | ❌           |
+| **Finance Dashboard**  | ✅ Full | ❌           | ✅ Full | ✅ View Only | ❌       | ❌            | ❌           |
+| **Record Giving**      | ✅ View | ❌           | ✅ Full | ❌           | ❌       | ❌            | ❌           |
+| **Budgets**            | ✅ Full | ❌           | ✅ View | ❌           | ❌       | ❌            | ❌           |
+| **Expenses**           | ✅ Full | ❌           | ✅ Full | ❌           | ❌       | ❌            | ❌           |
+| **Workers/Staff**      | ✅ View | ❌           | ❌      | ✅ Full      | ❌       | ❌            | ❌           |
+| **Salaries**           | ✅ View | ❌           | ❌      | ✅ Full      | ❌       | ❌            | ❌           |
+| **Evangelism**         | ✅ View | ❌           | ❌      | ❌           | ✅ Full  | ❌            | ❌           |
+| **Ministries**         | ✅ View | ❌           | ❌      | ❌           | ✅ Full  | ❌            | ❌           |
+| **Youth Events**       | ✅ View | ❌           | ❌      | ❌           | ❌       | ✅ Full       | ❌           |
+| **Youth Members**      | ✅ View | ❌           | ❌      | ❌           | ❌       | ✅ Full       | ❌           |
+| **Kids Classes**       | ✅ View | ❌           | ❌      | ❌           | ❌       | ❌            | ✅ Full      |
+| **Kids Attendance**    | ✅ View | ❌           | ❌      | ❌           | ❌       | ❌            | ✅ Full      |
+| **Kids Events**        | ✅ View | ❌           | ❌      | ❌           | ❌       | ❌            | ✅ Full      |
+| **Reports**            | ✅ Full | ❌           | ❌      | ❌           | ❌       | ❌            | ❌           |
+| **Messages**           | ✅ Full | ✅ Full      | ✅ Full | ✅ Full      | ✅ Full  | ✅ Full       | ✅ Full      |
+| **Settings**           | ✅ Full | ✅ Own       | ✅ Own  | ✅ Own       | ✅ Own   | ✅ Own        | ✅ Own       |
 
 ---
 
@@ -86,6 +86,7 @@ Church Administration
 ## Data Flow Between Roles
 
 ### 1. Member Tracking Flow
+
 ```
 Bible Leader (records attendance/progress)
     ↓
@@ -95,6 +96,7 @@ Admin (generates overall reports)
 ```
 
 ### 2. Financial Flow
+
 ```
 Finance (records all transactions)
     ↓
@@ -104,6 +106,7 @@ Admin (makes decisions/approves budgets)
 ```
 
 ### 3. Ministry Coordination Flow
+
 ```
 Shepherd (oversees strategy)
     ↓
@@ -114,6 +117,7 @@ Shepherd (oversees strategy)
 ```
 
 ### 4. Event Management Flow
+
 ```
 Shepherd/Youth/Kids (plan event)
     ↓
@@ -129,16 +133,19 @@ Report to Admin
 ### By Department
 
 **Leadership Department:**
+
 - Admin and Shepherd form the strategic leadership
 - Shepherd supervises Bible Leaders
 - All report flow to Admin
 
 **Operations Department:**
+
 - Finance manages monetary flow
 - Management manages human resources
 - Both provide insights to Admin
 
 **Ministry Department:**
+
 - Youth and Kids ministries operate independently
 - Coordinate through Shepherd
 - Report attendance/metrics to Admin

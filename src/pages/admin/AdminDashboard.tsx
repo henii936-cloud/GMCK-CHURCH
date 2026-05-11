@@ -52,7 +52,7 @@ export default function AdminDashboard() {
         supabase.from('bible_study_groups').select('*', { count: 'exact', head: true }),
         supabase.from('profiles').select('*', { count: 'exact', head: true }).eq('role', 'bible_leader'),
         supabase.from('transactions').select('amount'),
-        supabase.from('attendance').select('status')
+        supabase.from('study_attendance').select('status')
       ]);
 
       const totalFinance = financeData?.reduce((sum, t) => sum + Number(t.amount), 0) || 0;
@@ -77,16 +77,15 @@ export default function AdminDashboard() {
 
   const fetchRecentData = async () => {
     try {
-      const [studyData, eventsData, onlineData, activityData] = await Promise.all([
+      const [studyData, eventsData, onlineData] = await Promise.all([
         supabase.from('study_progress').select('*, bible_study_groups(group_name)').order('created_at', { ascending: false }).limit(5),
         supabase.from('events').select('*').gte('date', new Date().toISOString().split('T')[0]).order('date', { ascending: true }).limit(3),
-        supabase.from('profiles').select('*').order('last_active', { ascending: false }).limit(5),
-        supabase.from('activity_logs').select('*, profiles(full_name, role)').order('created_at', { ascending: false }).limit(10)
+        supabase.from('profiles').select('*').order('created_at', { ascending: false }).limit(5)
       ]);
       setRecentStudy(studyData.data || []);
       setUpcomingEvents(eventsData.data || []);
       setOnlineElders(onlineData.data || []);
-      setActivityLogs(activityData.data || []);
+      setActivityLogs([]); // Empty array since table doesn't exist
     } catch (err) {
       console.error("Error fetching recent data:", err);
     }
@@ -112,7 +111,16 @@ export default function AdminDashboard() {
 
   return (
     <div className="animate-fade-in max-w-7xl mx-auto h-[calc(100vh-11rem)] flex flex-col">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-6 gap-4 shrink-0">
+      {loading ? (
+        <div className="flex-1 flex items-center justify-center">
+          <div className="text-center">
+            <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+            <p className="text-on-surface-variant">Loading dashboard data...</p>
+          </div>
+        </div>
+      ) : (
+      <>
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-6 gap-4 shrink-0">
         <div className="max-w-2xl">
           <p className="label-sm text-tertiary-fixed-dim mb-2 tracking-[0.3em]">Administrative Oversight</p>
           <h1 className="display-lg text-primary mb-2">Admin <span className="text-tertiary-fixed-dim italic">Dashboard</span></h1>
@@ -340,6 +348,8 @@ export default function AdminDashboard() {
           </div>
         </div>
       </div>
+      </>
+      )}
     </div>
   );
 }

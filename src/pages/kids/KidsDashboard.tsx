@@ -4,19 +4,24 @@ import { supabase } from "../../services/supabaseClient";
 import { useAuth } from "../../context/AuthContext";
 import { motion } from "motion/react";
 import { Baby, Users, Calendar, BarChart2, Bell, Search, Loader2, TrendingUp, Smile, Heart } from "lucide-react";
+import BirthdayCelebration from "../../components/common/BirthdayCelebration";
+import { memberService } from "../../services/api";
 
 export default function KidsDashboard() {
   const { user } = useAuth();
   const [data, setData] = useState({ kids: [], classes: [], attendance: [], loading: true });
+  const [celebrants, setCelebrants] = useState([]);
+  const [showCelebration, setShowCelebration] = useState(true);
 
   useEffect(() => { loadData(); }, []);
 
   const loadData = async () => {
     try {
-      const [kidsRes, classesRes, attendanceRes] = await Promise.all([
+      const [kidsRes, classesRes, attendanceRes, birthdays] = await Promise.all([
         supabase.from("kids").select("*, kids_classes(class_name)"),
         supabase.from("kids_classes").select("*"),
         supabase.from("kids_attendance").select("*").order("date", { ascending: false }),
+        memberService.getBirthdaysToday('kids_ministry'),
       ]);
       
       setData({
@@ -25,6 +30,7 @@ export default function KidsDashboard() {
         attendance: attendanceRes.data || [],
         loading: false,
       });
+      setCelebrants(birthdays || []);
     } catch (err) {
       console.error(err);
       setData(prev => ({ ...prev, loading: false }));
@@ -46,11 +52,17 @@ export default function KidsDashboard() {
     { label: "Total Kids", value: data.kids.length, icon: Baby, color: "text-primary", bg: "bg-primary/10" },
     { label: "Active Classes", value: data.classes.length, icon: Users, color: "text-tertiary-fixed-dim", bg: "bg-tertiary-fixed-dim/10" },
     { label: "Attendance Rate", value: `${attendanceRate}%`, icon: TrendingUp, color: "text-green-500", bg: "bg-green-500/10" },
-    { label: "Birthdays Soon", value: 0, icon: Heart, color: "text-pink-500", bg: "bg-pink-500/10" },
+    { label: "Birthdays Today", value: celebrants.length, icon: Heart, color: "text-pink-500", bg: "bg-pink-500/10" },
   ];
 
   return (
     <div className="animate-fade-in max-w-7xl mx-auto">
+      {showCelebration && celebrants.length > 0 && (
+        <BirthdayCelebration
+          celebrants={celebrants}
+          onDismiss={() => setShowCelebration(false)}
+        />
+      )}
       {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-16 gap-8">
         <div>

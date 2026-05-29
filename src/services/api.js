@@ -216,32 +216,47 @@ export const memberService = {
     if (error) throw error;
     return true;
   },
-  getBirthdaysToday: async () => {
+  getBirthdaysToday: async (role) => {
     try {
       const { data: members, error: mError } = await supabase
         .from("members")
-        .select("id, full_name, date_of_birth, image_url");
+        .select("id, full_name, date_of_birth, image_url, age_group, phone");
       if (mError) throw mError;
 
       let kidsList = [];
-      try {
-        const { data: kids, error: kError } = await supabase
-          .from("kids")
-          .select("id, full_name, birth_date");
-        if (!kError) kidsList = kids || [];
-      } catch (kErr) {
-        console.warn("Kids table may not exist or error fetching kids birthdays:", kErr);
+      if (!role || role === 'admin' || role === 'kids_ministry') {
+        try {
+          const { data: kids, error: kError } = await supabase
+            .from("kids")
+            .select("id, full_name, birth_date");
+          if (!kError) kidsList = kids || [];
+        } catch (kErr) {
+          console.warn("Kids table may not exist or error fetching kids birthdays:", kErr);
+        }
       }
 
       const today = new Date();
       const todayMonth = today.getMonth() + 1;
       const todayDay = today.getDate();
 
-      const memberCelebrants = (members || []).filter(m => {
+      let memberCelebrants = (members || []).filter(m => {
         if (!m.date_of_birth) return false;
         const d = new Date(m.date_of_birth);
         return d.getMonth() + 1 === todayMonth && d.getDate() === todayDay;
       }).map(m => ({ ...m, type: "member", name: m.full_name, dob: m.date_of_birth }));
+
+      if (role === 'youth_ministry') {
+        memberCelebrants = memberCelebrants.filter(m => 
+          m.age_group === 'Youth' || 
+          m.age_group === 'Teen' || 
+          m.age_group === 'Teenage' || 
+          m.age_group === 'Young Adult' || 
+          m.age_group === 'Adult'
+        );
+        kidsList = [];
+      } else if (role === 'kids_ministry') {
+        memberCelebrants = memberCelebrants.filter(m => m.age_group === 'Kids');
+      }
 
       const kidCelebrants = kidsList.filter(k => {
         if (!k.birth_date) return false;

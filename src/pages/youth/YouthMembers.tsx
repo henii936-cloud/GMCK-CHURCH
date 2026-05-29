@@ -1,15 +1,22 @@
 import { formatToEthiopian } from "../../utils/ethiopianDate";
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { supabase } from "../../services/supabaseClient";
 import { useAuth } from "../../context/AuthContext";
-import { motion } from "motion/react";
-import { Users, Search, Loader2, Filter } from "lucide-react";
+import { motion, AnimatePresence } from "motion/react";
+import { Users, Search, Loader2, Edit2, X } from "lucide-react";
+import EtDatePicker from "../../components/common/EtDatePicker";
 
 export default function YouthMembersPage() {
   const [members, setMembers] = useState([]);
   const [search, setSearch] = useState("");
   const [filterGroup, setFilterGroup] = useState("All");
   const [loading, setLoading] = useState(true);
+  
+  // Birthday editing states
+  const [editingMember, setEditingMember] = useState<any>(null);
+  const [showModal, setShowModal] = useState(false);
+  const [birthday, setBirthday] = useState("");
+  const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => { fetchMembers(); }, []);
 
@@ -18,6 +25,31 @@ export default function YouthMembersPage() {
     const { data } = await supabase.from("members").select("*, bible_study_groups(group_name)").in("age_group", ["Youth", "Teen", "Young Adult"]).order("full_name");
     setMembers(data || []);
     setLoading(false);
+  };
+
+  const handleOpenEditModal = (member: any) => {
+    setEditingMember(member);
+    setBirthday(member.date_of_birth || "");
+    setShowModal(true);
+  };
+
+  const handleSaveBirthday = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingMember) return;
+    setIsSaving(true);
+    try {
+      const { error } = await supabase
+        .from("members")
+        .update({ date_of_birth: birthday || null })
+        .eq("id", editingMember.id);
+      if (error) throw error;
+      setShowModal(false);
+      fetchMembers();
+    } catch (err) {
+      console.error("Error updating birthday:", err);
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const groups = ["All", "Teen", "Youth", "Young Adult"];
@@ -71,16 +103,26 @@ export default function YouthMembersPage() {
                     <p className="font-black text-primary text-sm truncate">{m.full_name}</p>
                     <p className="text-xs text-on-surface-variant">{m.gender || "—"}</p>
                   </div>
-                  <span className={`text-[9px] font-black px-2 py-1 rounded-full uppercase tracking-wider ${
-                    m.age_group === "Teen" ? "bg-blue-400/10 text-blue-400" :
-                    m.age_group === "Youth" ? "bg-primary/10 text-primary" :
-                    "bg-tertiary-fixed-dim/10 text-tertiary-fixed-dim"
-                  }`}>{m.age_group}</span>
+                  <div className="flex flex-col items-end gap-1.5">
+                    <span className={`text-[9px] font-black px-2 py-1 rounded-full uppercase tracking-wider ${
+                      m.age_group === "Teen" ? "bg-blue-400/10 text-blue-400" :
+                      m.age_group === "Youth" ? "bg-primary/10 text-primary" :
+                      "bg-tertiary-fixed-dim/10 text-tertiary-fixed-dim"
+                    }`}>{m.age_group}</span>
+                    <button 
+                      onClick={() => handleOpenEditModal(m)} 
+                      className="p-1.5 rounded-lg bg-surface-container-high hover:bg-surface-container text-on-surface-variant hover:text-primary transition-all cursor-pointer"
+                      title="Edit Birthday"
+                    >
+                      <Edit2 size={12} />
+                    </button>
+                  </div>
                 </div>
                 <div className="space-y-1.5">
                   {m.phone && <p className="text-xs text-on-surface-variant">📞 {m.phone}</p>}
                   {m.email && <p className="text-xs text-on-surface-variant truncate">✉️ {m.email}</p>}
                   {m.bible_study_groups?.group_name && <p className="text-xs text-on-surface-variant">🏠 {m.bible_study_groups.group_name}</p>}
+                  <p className="text-xs text-on-surface-variant">🎂 Birthday: {m.date_of_birth ? formatToEthiopian(m.date_of_birth) : "—"}</p>
                   <p className="text-xs text-on-surface-variant">Joined: {m.join_date ? formatToEthiopian(m.join_date) : "—"}</p>
                 </div>
               </motion.div>
@@ -95,6 +137,37 @@ export default function YouthMembersPage() {
           )}
         </>
       )}
+
+      {/* Birthday Edit Modal */}
+      <AnimatePresence>
+        {showModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-black/60 backdrop-blur-sm">
+            <motion.div initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.95, opacity: 0 }}
+              className="w-full max-w-md bg-surface border border-outline-variant/10 rounded-[2rem] shadow-2xl overflow-hidden"
+            >
+              <div className="p-8 border-b border-outline-variant/10 flex justify-between items-center">
+                <h2 className="headline-sm text-primary font-black">Edit Birthday</h2>
+                <button onClick={() => setShowModal(false)} className="p-2 rounded-full hover:bg-surface-container-high transition-colors cursor-pointer"><X size={24} /></button>
+              </div>
+              <form onSubmit={handleSaveBirthday} className="p-8 space-y-6">
+                <div className="space-y-2">
+                  <p className="text-sm text-on-surface font-semibold">Member Name:</p>
+                  <p className="text-base text-primary font-bold">{editingMember?.full_name}</p>
+                </div>
+                <EtDatePicker label="Birth Date" value={birthday} onChange={e => setBirthday(e.target.value)} required={false} name="date_of_birth" />
+                <div className="flex justify-end gap-3 pt-4">
+                  <button type="button" onClick={() => setShowModal(false)} className="px-6 py-2.5 rounded-xl text-sm font-bold bg-surface-container-low hover:bg-surface-container text-on-surface transition-all cursor-pointer">
+                    Cancel
+                  </button>
+                  <button type="submit" disabled={isSaving} className="px-8 py-2.5 rounded-xl text-sm font-bold bg-primary text-on-primary hover:opacity-90 shadow-lg shadow-primary/20 transition-all cursor-pointer disabled:opacity-50">
+                    {isSaving ? "Saving..." : "Save Changes"}
+                  </button>
+                </div>
+              </form>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

@@ -20,9 +20,11 @@ import { supabase } from "../../services/supabaseClient";
 import { Card } from "../../components/common/UI";
 import BirthdayCelebration from "../../components/common/BirthdayCelebration";
 import { memberService } from "../../services/api";
+import { useAuth } from "../../context/AuthContext";
 
 export default function AdminDashboard() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [stats, setStats] = useState({
     members: 0,
     groups: 0,
@@ -56,7 +58,7 @@ export default function AdminDashboard() {
 
   const fetchBirthdays = async () => {
     try {
-      const data = await memberService.getBirthdaysToday();
+      const data = await memberService.getBirthdaysToday('admin');
       setCelebrants(data || []);
     } catch (err) {
       console.error("Error loading birthdays:", err);

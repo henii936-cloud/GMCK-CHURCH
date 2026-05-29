@@ -2,22 +2,27 @@ import { formatToEthiopian } from "../../utils/ethiopianDate";
 import { useState, useEffect } from "react";
 import { supabase } from "../../services/supabaseClient";
 import { useAuth } from "../../context/AuthContext";
-import { motion } from "motion/react";
+import { motion, AnimatePresence } from "motion/react";
 import { Zap, Users, Calendar, BarChart2, Bell, Search, Loader2, TrendingUp } from "lucide-react";
+import BirthdayCelebration from "../../components/common/BirthdayCelebration";
+import { memberService } from "../../services/api";
 
 export default function YouthDashboard() {
   const { user } = useAuth();
   const [data, setData] = useState({ youthMembers: [], events: [], notifications: [], attendance: [], loading: true });
+  const [celebrants, setCelebrants] = useState([]);
+  const [showCelebration, setShowCelebration] = useState(true);
 
   useEffect(() => { loadData(); }, []);
 
   const loadData = async () => {
     try {
-      const [members, events, notifs, attendance] = await Promise.all([
+      const [members, events, notifs, attendance, birthdays] = await Promise.all([
         supabase.from("members").select("*").in("age_group", ["Youth", "Teen", "Young Adult"]),
         supabase.from("youth_events").select("*").order("event_date", { ascending: false }),
         supabase.from("youth_notifications").select("*").order("created_at", { ascending: false }).limit(5),
         supabase.from("youth_attendance").select("*"),
+        memberService.getBirthdaysToday('youth_ministry'),
       ]);
       setData({
         youthMembers: members.data || [],
@@ -26,6 +31,7 @@ export default function YouthDashboard() {
         attendance: attendance.data || [],
         loading: false,
       });
+      setCelebrants(birthdays || []);
     } catch (err) {
       console.error(err);
       setData(prev => ({ ...prev, loading: false }));
@@ -55,6 +61,12 @@ export default function YouthDashboard() {
 
   return (
     <div className="animate-fade-in max-w-7xl mx-auto">
+      {showCelebration && celebrants.length > 0 && (
+        <BirthdayCelebration
+          celebrants={celebrants}
+          onDismiss={() => setShowCelebration(false)}
+        />
+      )}
       {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-16 gap-8">
         <div>

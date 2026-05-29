@@ -18,6 +18,8 @@ import {
 import { motion } from "framer-motion";
 import { supabase } from "../../services/supabaseClient";
 import { Card } from "../../components/common/UI";
+import BirthdayCelebration from "../../components/common/BirthdayCelebration";
+import { memberService } from "../../services/api";
 
 export default function AdminDashboard() {
   const navigate = useNavigate();
@@ -33,6 +35,8 @@ export default function AdminDashboard() {
   const [onlineElders, setOnlineElders] = useState([]);
   const [activityLogs, setActivityLogs] = useState([]);
   const [pendingApprovals, setPendingApprovals] = useState([]);
+  const [celebrants, setCelebrants] = useState([]);
+  const [showCelebration, setShowCelebration] = useState(true);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -45,8 +49,18 @@ export default function AdminDashboard() {
       fetchStats(),
       fetchRecentData(),
       fetchPendingApprovals(),
+      fetchBirthdays(),
     ]);
     setLoading(false);
+  };
+
+  const fetchBirthdays = async () => {
+    try {
+      const data = await memberService.getBirthdaysToday();
+      setCelebrants(data || []);
+    } catch (err) {
+      console.error("Error loading birthdays:", err);
+    }
   };
 
   const fetchStats = async () => {
@@ -178,6 +192,12 @@ export default function AdminDashboard() {
         </div>
       ) : (
         <>
+          {showCelebration && celebrants.length > 0 && (
+            <BirthdayCelebration
+              celebrants={celebrants}
+              onDismiss={() => setShowCelebration(false)}
+            />
+          )}
           <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-6 gap-4 shrink-0">
             <div className="max-w-2xl">
               <p className="label-sm text-tertiary-fixed-dim mb-2 tracking-[0.3em]">

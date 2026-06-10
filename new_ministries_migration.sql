@@ -23,7 +23,7 @@ ALTER TABLE public.profiles
     -- NEW ROLES --
     'counseling_ministry',
     'church_development',
-    'diaconate_ministry',
+    'diaconate',
     'education_ministry',
     'evangelism_ministry',
     'pulpit_ministry'
@@ -167,12 +167,12 @@ ALTER TABLE public.welfare_activities ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY "deacon_assign_admin" ON public.deacon_assignments FOR ALL USING (public.is_admin());
 CREATE POLICY "deacon_assign_ministry" ON public.deacon_assignments FOR ALL USING (
-  EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'diaconate_ministry')
+  EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'diaconate')
 );
 
 CREATE POLICY "welfare_admin" ON public.welfare_activities FOR ALL USING (public.is_admin());
 CREATE POLICY "welfare_ministry" ON public.welfare_activities FOR ALL USING (
-  EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'diaconate_ministry')
+  EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'diaconate')
 );
 
 -- =====================================================

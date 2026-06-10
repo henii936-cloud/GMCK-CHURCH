@@ -15,8 +15,8 @@ export default function DiaconateRoute({ children }) {
 
   if (!user) return <Navigate to="/login" replace />;
 
-  const role = user?.role || user?.user_metadata?.role;
-  if (role !== "diaconate_ministry" && role !== "admin") return <Navigate to="/" />;
+  const role = (user?.role || user?.user_metadata?.role)?.toLowerCase();
+  if (role !== "diaconate" && role !== "admin") return <Navigate to="/" />;
 
   return children;
 }

@@ -27,6 +27,13 @@ export default function Layout({ allowedRoles }) {
       management: "/management",
       youth_ministry: "/youth",
       shepherd: "/shepherd",
+      kids_ministry: "/kids",
+      counseling_ministry: "/counseling",
+      church_development: "/church-development",
+      diaconate: "/diaconate",
+      education_ministry: "/education",
+      evangelism_ministry: "/evangelism",
+      pulpit_ministry: "/pulpit",
     };
     return <Navigate to={rolePath[userRole] || "/login"} replace />;
   }

@@ -30,11 +30,24 @@ export default function SignIn() {
             }
 
             // Redirect based on role if available
-            const role = data.user?.user_metadata?.role;
-            if (role === 'admin') navigate("/admin");
-            else if (role === 'leader' || role === 'bible_leader') navigate("/leader");
-            else if (role === 'finance') navigate("/finance");
-            else navigate("/");
+            const role = data.profile?.role || data.user?.user_metadata?.role;
+            const routes = {
+                admin: "/admin",
+                bible_leader: "/leader",
+                leader: "/leader",
+                finance: "/finance",
+                management: "/management",
+                youth_ministry: "/youth",
+                shepherd: "/shepherd",
+                kids_ministry: "/kids",
+                counseling_ministry: "/counseling",
+                church_development: "/church-development",
+                diaconate: "/diaconate",
+                education_ministry: "/education",
+                evangelism_ministry: "/evangelism",
+                pulpit_ministry: "/pulpit"
+            };
+            navigate(routes[role] || "/");
         } catch (error) {
             console.error("Login error:", error.message);
             setErrorMsg(error.message);

@@ -3,7 +3,8 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { 
   ShieldCheck, Mail, Lock, 
   ArrowRight, ChevronLeft, Users, 
-  Zap, CheckCircle2, User, MapPin, DollarSign, Briefcase, Eye, Baby
+  Zap, CheckCircle2, User, MapPin, DollarSign, Briefcase, Eye, Baby,
+  HeartHandshake, HardHat, Shield, BookOpen, Globe, Mic2
 } from 'lucide-react';
 import { motion } from 'motion/react';
 import { Button, Card, Input } from '../../components/common/UI';
@@ -111,6 +112,78 @@ export default function Signup() {
       shadow: 'shadow-tertiary-fixed-dim/20',
       gradient: 'from-tertiary-fixed-dim/20 to-transparent',
       desc: 'Nurture the next generation in our digital Sunday School sanctuary.' 
+    },
+    { 
+      id: 'counseling_ministry', 
+      name: 'Counseling Ministry', 
+      icon: HeartHandshake, 
+      color: 'text-primary',
+      bg: 'bg-primary',
+      border: 'border-primary',
+      bgLight: 'bg-primary/5',
+      shadow: 'shadow-primary/10',
+      gradient: 'from-primary/10 to-transparent',
+      desc: 'Provide guidance, support, and spiritual counseling to members.' 
+    },
+    { 
+      id: 'church_development', 
+      name: 'Church Development', 
+      icon: HardHat, 
+      color: 'text-tertiary-fixed-dim',
+      bg: 'bg-tertiary-fixed-dim',
+      border: 'border-tertiary-fixed-dim',
+      bgLight: 'bg-tertiary-fixed-dim/10',
+      shadow: 'shadow-tertiary-fixed-dim/20',
+      gradient: 'from-tertiary-fixed-dim/20 to-transparent',
+      desc: 'Oversee infrastructure projects, maintenance, and facility growth.' 
+    },
+    { 
+      id: 'diaconate', 
+      name: 'Diaconate', 
+      icon: Shield, 
+      color: 'text-primary',
+      bg: 'bg-primary',
+      border: 'border-primary',
+      bgLight: 'bg-primary/5',
+      shadow: 'shadow-primary/10',
+      gradient: 'from-primary/10 to-transparent',
+      desc: 'Coordinate deacon services, ushering, and welfare activities.' 
+    },
+    { 
+      id: 'education_ministry', 
+      name: 'Education Ministry', 
+      icon: BookOpen, 
+      color: 'text-tertiary-fixed-dim',
+      bg: 'bg-tertiary-fixed-dim',
+      border: 'border-tertiary-fixed-dim',
+      bgLight: 'bg-tertiary-fixed-dim/10',
+      shadow: 'shadow-tertiary-fixed-dim/20',
+      gradient: 'from-tertiary-fixed-dim/20 to-transparent',
+      desc: 'Manage Bible classes, training programs, and educational curriculum.' 
+    },
+    { 
+      id: 'evangelism_ministry', 
+      name: 'Evangelism Ministry', 
+      icon: Globe, 
+      color: 'text-primary',
+      bg: 'bg-primary',
+      border: 'border-primary',
+      bgLight: 'bg-primary/5',
+      shadow: 'shadow-primary/10',
+      gradient: 'from-primary/10 to-transparent',
+      desc: 'Coordinate outreach missions, campaigns, and new convert follow-ups.' 
+    },
+    { 
+      id: 'pulpit_ministry', 
+      name: 'Pulpit Ministry', 
+      icon: Mic2, 
+      color: 'text-tertiary-fixed-dim',
+      bg: 'bg-tertiary-fixed-dim',
+      border: 'border-tertiary-fixed-dim',
+      bgLight: 'bg-tertiary-fixed-dim/10',
+      shadow: 'shadow-tertiary-fixed-dim/20',
+      gradient: 'from-tertiary-fixed-dim/20 to-transparent',
+      desc: 'Manage preachers, sermon schedules, and worship assignments.' 
     },
   ];
 

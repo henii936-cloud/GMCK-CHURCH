@@ -12,7 +12,7 @@ CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 CREATE TABLE IF NOT EXISTS public.profiles (
   id UUID REFERENCES auth.users ON DELETE CASCADE PRIMARY KEY,
   full_name TEXT,
-  role TEXT CHECK (role IN ('admin', 'bible_leader', 'finance', 'management', 'youth_ministry', 'shepherd', 'kids_ministry')),
+  role TEXT CHECK (role IN ('admin', 'bible_leader', 'finance', 'management', 'youth_ministry', 'shepherd', 'kids_ministry', 'counseling_ministry', 'church_development', 'diaconate', 'education_ministry', 'evangelism_ministry', 'pulpit_ministry')),
   created_at TIMESTAMPTZ DEFAULT timezone('utc', now()) NOT NULL
 );
 

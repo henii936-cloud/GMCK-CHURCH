@@ -56,6 +56,33 @@ import KidsClasses from "./pages/kids/KidsClasses";
 import KidsAttendance from "./pages/kids/KidsAttendance";
 import KidsEvents from "./pages/kids/KidsEvents";
 
+import CounselingRoute from "./routes/CounselingRoute";
+import CounselingDashboard from "./pages/counseling/CounselingDashboard";
+import CounselingRequests from "./pages/counseling/CounselingRequests";
+import CounselingSessions from "./pages/counseling/CounselingSessions";
+
+import ChurchDevelopmentRoute from "./routes/ChurchDevelopmentRoute";
+import DevDashboard from "./pages/church_development/DevDashboard";
+import DevProjects from "./pages/church_development/DevProjects";
+
+import DiaconateRoute from "./routes/DiaconateRoute";
+import DiaconateDashboard from "./pages/diaconate/DiaconateDashboard";
+import DeaconAssignments from "./pages/diaconate/DeaconAssignments";
+
+import EducationRoute from "./routes/EducationRoute";
+import EducationDashboard from "./pages/education/EducationDashboard";
+import EduCourses from "./pages/education/EduCourses";
+
+import EvangelismMinistryRoute from "./routes/EvangelismMinistryRoute";
+import EvangelismDashboard from "./pages/evangelism/EvangelismDashboard";
+import EvangelismPrograms from "./pages/evangelism/EvangelismPrograms";
+import Converts from "./pages/evangelism/Converts";
+
+import PulpitRoute from "./routes/PulpitRoute";
+import PulpitDashboard from "./pages/pulpit/PulpitDashboard";
+import Preachers from "./pages/pulpit/Preachers";
+import PulpitAssignments from "./pages/pulpit/PulpitAssignments";
+import PreacherAssessments from "./pages/pulpit/PreacherAssessments";
 export default function App() {
   useEffect(() => {
     document.title = "ChurchERP - Dashboard";
@@ -206,6 +233,101 @@ export default function App() {
               <Route path="classes" element={<KidsClasses />} />
               <Route path="attendance" element={<KidsAttendance />} />
               <Route path="events" element={<KidsEvents />} />
+              <Route path="messages" element={<Messages />} />
+              <Route path="settings" element={<Settings />} />
+            </Route>
+
+            {/* Counseling Ministry Routes */}
+            <Route
+              path="/counseling"
+              element={
+                <CounselingRoute>
+                  <Layout allowedRoles={["counseling_ministry", "admin"]} />
+                </CounselingRoute>
+              }
+            >
+              <Route index element={<CounselingDashboard />} />
+              <Route path="requests" element={<CounselingRequests />} />
+              <Route path="sessions" element={<CounselingSessions />} />
+              <Route path="messages" element={<Messages />} />
+              <Route path="settings" element={<Settings />} />
+            </Route>
+
+            {/* Church Development Routes */}
+            <Route
+              path="/church-development"
+              element={
+                <ChurchDevelopmentRoute>
+                  <Layout allowedRoles={["church_development", "admin"]} />
+                </ChurchDevelopmentRoute>
+              }
+            >
+              <Route index element={<DevDashboard />} />
+              <Route path="projects" element={<DevProjects />} />
+              <Route path="messages" element={<Messages />} />
+              <Route path="settings" element={<Settings />} />
+            </Route>
+
+            {/* Diaconate Routes */}
+            <Route
+              path="/diaconate"
+              element={
+                <DiaconateRoute>
+                  <Layout allowedRoles={["diaconate", "admin"]} />
+                </DiaconateRoute>
+              }
+            >
+              <Route index element={<DiaconateDashboard />} />
+              <Route path="assignments" element={<DeaconAssignments />} />
+              <Route path="welfare" element={<DeaconAssignments />} /> {/* Temp mapping */}
+              <Route path="messages" element={<Messages />} />
+              <Route path="settings" element={<Settings />} />
+            </Route>
+
+            {/* Education Ministry Routes */}
+            <Route
+              path="/education"
+              element={
+                <EducationRoute>
+                  <Layout allowedRoles={["education_ministry", "admin"]} />
+                </EducationRoute>
+              }
+            >
+              <Route index element={<EducationDashboard />} />
+              <Route path="courses" element={<EduCourses />} />
+              <Route path="messages" element={<Messages />} />
+              <Route path="settings" element={<Settings />} />
+            </Route>
+
+            {/* Evangelism Ministry Routes */}
+            <Route
+              path="/evangelism"
+              element={
+                <EvangelismMinistryRoute>
+                  <Layout allowedRoles={["evangelism_ministry", "admin"]} />
+                </EvangelismMinistryRoute>
+              }
+            >
+              <Route index element={<EvangelismDashboard />} />
+              <Route path="programs" element={<EvangelismPrograms />} />
+              <Route path="converts" element={<Converts />} />
+              <Route path="messages" element={<Messages />} />
+              <Route path="settings" element={<Settings />} />
+            </Route>
+
+            {/* Pulpit Ministry Routes */}
+            <Route
+              path="/pulpit"
+              element={
+                <PulpitRoute>
+                  <Layout allowedRoles={["pulpit_ministry", "admin"]} />
+                </PulpitRoute>
+              }
+            >
+              <Route index element={<PulpitDashboard />} />
+              <Route path="preachers" element={<Preachers />} />
+              <Route path="assignments" element={<PulpitAssignments />} />
+              <Route path="assessments" element={<PreacherAssessments />} />
               <Route path="messages" element={<Messages />} />
               <Route path="settings" element={<Settings />} />
             </Route>

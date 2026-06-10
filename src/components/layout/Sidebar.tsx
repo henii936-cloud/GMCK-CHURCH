@@ -27,6 +27,10 @@ import {
   Shield,
   FileText,
   MessageSquare,
+  HeartHandshake,
+  HardHat,
+  Globe,
+  Mic2,
 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import { useState, useEffect } from "react";
@@ -145,6 +149,46 @@ export default function Sidebar() {
       { name: "Kids Events", icon: Calendar, path: "/kids/events" },
       { name: "Messages", icon: MessageSquare, path: "/kids/messages" },
       { name: "Settings", icon: Settings, path: "/kids/settings" },
+    ],
+    counseling_ministry: [
+      { name: "Dashboard", icon: Layers, path: "/counseling" },
+      { name: "Requests", icon: HeartHandshake, path: "/counseling/requests" },
+      { name: "Sessions", icon: Calendar, path: "/counseling/sessions" },
+      { name: "Messages", icon: MessageSquare, path: "/counseling/messages" },
+      { name: "Settings", icon: Settings, path: "/counseling/settings" },
+    ],
+    church_development: [
+      { name: "Dashboard", icon: Layers, path: "/church-development" },
+      { name: "Projects", icon: HardHat, path: "/church-development/projects" },
+      { name: "Messages", icon: MessageSquare, path: "/church-development/messages" },
+      { name: "Settings", icon: Settings, path: "/church-development/settings" },
+    ],
+    diaconate: [
+      { name: "Dashboard", icon: Layers, path: "/diaconate" },
+      { name: "Assignments", icon: Shield, path: "/diaconate/assignments" },
+      { name: "Messages", icon: MessageSquare, path: "/diaconate/messages" },
+      { name: "Settings", icon: Settings, path: "/diaconate/settings" },
+    ],
+    education_ministry: [
+      { name: "Dashboard", icon: Layers, path: "/education" },
+      { name: "Courses", icon: BookOpen, path: "/education/courses" },
+      { name: "Messages", icon: MessageSquare, path: "/education/messages" },
+      { name: "Settings", icon: Settings, path: "/education/settings" },
+    ],
+    evangelism_ministry: [
+      { name: "Dashboard", icon: Layers, path: "/evangelism" },
+      { name: "Programs", icon: Globe, path: "/evangelism/programs" },
+      { name: "Converts", icon: UserCheck, path: "/evangelism/converts" },
+      { name: "Messages", icon: MessageSquare, path: "/evangelism/messages" },
+      { name: "Settings", icon: Settings, path: "/evangelism/settings" },
+    ],
+    pulpit_ministry: [
+      { name: "Dashboard", icon: Layers, path: "/pulpit" },
+      { name: "Preachers", icon: Mic2, path: "/pulpit/preachers" },
+      { name: "Assignments", icon: Calendar, path: "/pulpit/assignments" },
+      { name: "Assessments", icon: ClipboardList, path: "/pulpit/assessments" },
+      { name: "Messages", icon: MessageSquare, path: "/pulpit/messages" },
+      { name: "Settings", icon: Settings, path: "/pulpit/settings" },
     ],
   };
 
